@@ -94,33 +94,6 @@ sol2bis <- lp(direction = "max", objective.in = f.obj, const.mat = f.A2, const.d
 
 sol2$con
 ```
-#VINCOLO 2 - PROVA
-```{r eval=FALSE, include=FALSE}
-proporzione <- df %>% group_by(Casino, Month, Section) %>%
-  summarise(Num_macchine = sum(numero_macchine)) %>%
-  mutate(prop_per_mese = round(Num_macchine / sum(Num_macchine), 3))
-
-bounds <- matrix(c(round(0.2 * nslots), round(0.3 * nslots)), ncol = 2)
-colnames(bounds) <- c("lower", "upper")
-f.b2 <- rep(c(bounds$lower, bounds$upper), 4), rep(c(round(0.15*230), round(0.35*230)), 4))
-
-
-# Duplicate every row, needed because for each section/month/casino we need a lower and upper bound. 
-# Retain order --> obs1-low, obs1-up, obs2-low, ...)
-df.bounds <- df %>% slice(rep(1:n(), each = 2))
-df.bounds$bound <- NA # create bound columns
-# Create index needed to insert lower and upper values, so it is an index that selects every other row
-idx.everyOther <- seq(1, nrow(df.bounds), 2)
-df.bounds$bound[idx.everyOther] <- "lower"
-df.bounds$bound[-idx.everyOther] <- "upper"
-
-#create dummy matrix for Casino and section and month, used to activate each constraint (retaining the same order as the df is important)
-f.A <- t(predict(dummyVars(~  bound : Casino : Section : factor(Month), data = df.bounds), newdata = df.bounds))
-# Duplicate every row, needed because for each section/month/casino we need a lower and upper bound. 
-# Retain order --> ob1-low, obs1-up, obs2-low, ...)
-f.A <- as.tibble(f.A) %>% slice(rep(1:n(), each = 2))
-
-```
 
 Unisci vincoli
 ```{r}
