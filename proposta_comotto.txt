@@ -1,0 +1,14 @@
+IDEA COMOTTO:
+
+dataset finale[1 per casino]
+
+Cagetoria, Denominazione, Sezione, numero macchine di quel tipo in quella sezione, profitto unitario della macchina di quella categoria in quella sezione, etc...
+reel 		0.01			intterno			3												500	...
+reel		0.02			ristorante			50												30....
+video		0.01			atrio 				4												300...
+
+Passo 1: trovo le categorie+denominazione per mese;
+Passo 2: faccio una media per trovare il valore unico,se mancano dati penso bisogni imputarli [per i valori dei profitto forse si può usare quel limite superiore ed inferiore];
+passo 3: dataset finale con informazioni circa la sezione. Forse per il discorso sezione occorre portarsi l'informazione fin dall'inizio.
+
+p.s. il codice che ho messo potrebbe aiutarvi nel capire questa cosa: mi manca l'ultimo passo di aggregazione finale
