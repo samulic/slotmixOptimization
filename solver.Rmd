@@ -123,6 +123,7 @@ month_prop <- numslots.section %>%
                                         prop_max = max(prop_per_mese))
 
 b2 <- cbind(nslots, month_prop$prop_min, month_prop$prop_max)
+colnames(b2) <- NULL #altrimenti errore nel solver 
 # to check correctness, compare with 
 #View(numslots.section)
 f.b2 <- c()
@@ -157,7 +158,7 @@ f.A2 <- as.tibble(f.A2) %>% slice(rep(1:n(), each = 2)) %>% as.matrix()
 
 #nslots contiene il numero di slot per ogni casino e mese, alternato per casino (mese1 casino1, mese1 casino2, mese2 casino1, ...)
 # combine nslots in two columns, where rows are months and columns are casino (first for Aries)
-numslots <- matrix(nslots$sum, ncol = 2, byrow = T)
+numslots <- matrix(nslots, ncol = 2, byrow = T)
 f.b2 <- c()
 # probabilmente si puo' fare senza il ciclo for, ma come??
 for (i in 1:nrow(numslots)) {
