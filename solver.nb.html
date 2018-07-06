@@ -178,20 +178,25 @@ $(document).ready(function () {
 <p>Import libraries and dataset</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuc3RyKHNsb3QpXG5cbmBgYFxuYGBgIn0= -->
-<p><code>r</code>r str(slot)</p>
-<pre><code></code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeSh0aWR5dmVyc2UpXG5saWJyYXJ5KGx1YnJpZGF0ZSlcbmxpYnJhcnkoY2FyZXQpXG5saWJyYXJ5KGxpbnByb2cpXG5vcHRpb25zKHNjaXBlbiA9IDk5OSlcbnNsb3QgPC0gcmVhZHhsOjpyZWFkX2V4Y2VsKFwiZGF0YS9MdWNreSBEdWNrIEVudGVydGFpbm1lbnQgcmV2ZW51ZSAyMDEzLnhsc1wiLCBuYSA9IGMoXCIuXCIsIFwiTkFcIiwgXCJOYU5cIikpXG5zdHIoc2xvdClcbmBgYCJ9 -->
+<pre class="r"><code>library(tidyverse)
+library(lubridate)
+library(caret)
+library(linprog)
+options(scipen = 999)
+slot &lt;- readxl::read_excel(&quot;data/Lucky Duck Entertainment revenue 2013.xls&quot;, na = c(&quot;.&quot;, &quot;NA&quot;, &quot;NaN&quot;))
+str(slot)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiQ2xhc3NlcyDigJh0YmxfZGbigJksIOKAmHRibOKAmSBhbmQgJ2RhdGEuZnJhbWUnOlx0NDE0OSBvYnMuIG9mICAxNyB2YXJpYWJsZXM6XG4gJCBNYWNoaW5lTmFtZSAgICAgICAgICAgOiBjaHIgIFxcQnJlYWtzdG9uZVxcIFxcQmhhZ2EgU3RlaW5ib2tcXCBcXExlcGlvdGFjZWFlXFwgXFxJc29wZWN0aWMgSHlwZXRocmFsXFwgLi4uXG4gJCBDYXNpbm8gICAgICAgICAgICAgICAgOiBjaHIgIFxcQXJpZXNcXCBcXEFyaWVzXFwgXFxBcmllc1xcIFxcTGlicmFcXCAuLi5cbiAkIFNlY3Rpb24gICAgICAgICAgICAgICA6IGNociAgXFxSZXN0YXVyYW50UGxhemFcXCBcXEJvdW5kYXJ5XFwgXFxSZXN0YXVyYW50UGxhemFcXCBcXEludGVyaW9yXFwgLi4uXG4gJCBEZW5vbWluYXRpb24gICAgICAgICAgOiBudW0gIDAuMDUgMC4wMSAxIDIgMC4yNSAxIDAuMjUgMC4yNSAxIDIgLi4uXG4gJCBNYWNoaW5lVHlwZSAgICAgICAgICAgOiBjaHIgIFxcdmlkZW9cXCBcXHJlZWxcXCBcXHZpZGVvXFwgXFx2aWRlb1xcIC4uLlxuICQgTWFudWZhY3R1cmVyICAgICAgICAgIDogY2hyICBcXFJlYWxtXFwgXFxUc3VuYW1pXFwgXFxUc3VuYW1pXFwgXFxFbnRlbGx1c1xcIC4uLlxuICQgTW9kZWwgICAgICAgICAgICAgICAgIDogY2hyICBcXEFlb2xpYW4gUFJPIFZpc2lvblxcIFxcUGVkYWxmZXJcXCBcXExhbnRhbmFcXCBcXE1pcmllclxcIC4uLlxuICQgTW9udGggICAgICAgICAgICAgICAgIDogUE9TSVhjdCwgZm9ybWF0OiBcXDIwMTItMDUtMDFcXCBcXDIwMTEtMTEtMDFcXCBcXDIwMTEtMTAtMDFcXCBcXDIwMTItMDQtMDFcXCAuLi5cbiAkIEdyb3NzUmV2ZW51ZSAgICAgICAgICA6IG51bSAgOTU5MjkgMTMyMDQgMzM3NDE3IDgzNDM2IDgwOTc0IC4uLlxuICQgRmNzdExvd2VyICAgICAgICAgICAgIDogbnVtICA3NTEyNCAzNDEyIDI4NzI3MSA0NzI4NSA0Njc5OCAuLi5cbiAkIEZjc3RVcHBlciAgICAgICAgICAgICA6IG51bSAgMTE3OTQxIDIyOTUxIDUzNDk5MyAxMTM4NjggODg0NDYgLi4uXG4gJCBOb01hY2hpbmVzICAgICAgICAgICAgOiBudW0gIDEgMiA0IDEgMSAxIDEgMSAxIDEgLi4uXG4gJCBQbGF5cyAgICAgICAgICAgICAgICAgOiBudW0gIDI4MDUwNyA3MTAyNDUgNzUxNDMgMjk0MzMgMjkyODEgLi4uXG4gJCBHcm9zc1JldmVudWVQZXJNYWNoaW5lOiBudW0gIDk1OTI5IDY2MDIgODQzNTQgODM0MzYgODA5NzQgLi4uXG4gJCBQbGF5c1Blck1hY2hpbmUgICAgICAgOiBudW0gIDI4MDUwNyAzNTUxMjIgMTg3ODYgMjk0MzMgMjkyODEgLi4uXG4gJCBEaWZmX3dfVXBwZXIgICAgICAgICAgOiBudW0gIDEyMjY3IDUxNzEgMTAxMDU1IDQ3NzI4IDQzNTU3IC4uLlxuICQgRGlmZl93X0xvd2VyICAgICAgICAgIDogbnVtICAxMjIwOCA1MTgzIDEwMTExNiA0Nzc4MCA0MzYwMCAuLi5cbiJ9 -->
+<!-- rnb-output-begin eyJkYXRhIjoiQ2xhc3NlcyDigJh0YmxfZGbigJksIOKAmHRibOKAmSBhbmQgJ2RhdGEuZnJhbWUnOlx0NDE0OSBvYnMuIG9mICAxNyB2YXJpYWJsZXM6XG4gJCBNYWNoaW5lTmFtZSAgICAgICAgICAgOiBjaHIgIFwiQnJlYWtzdG9uZVwiIFwiQmhhZ2EgU3RlaW5ib2tcIiBcIkxlcGlvdGFjZWFlXCIgXCJJc29wZWN0aWMgSHlwZXRocmFsXCIgLi4uXG4gJCBDYXNpbm8gICAgICAgICAgICAgICAgOiBjaHIgIFwiQXJpZXNcIiBcIkFyaWVzXCIgXCJBcmllc1wiIFwiTGlicmFcIiAuLi5cbiAkIFNlY3Rpb24gICAgICAgICAgICAgICA6IGNociAgXCJSZXN0YXVyYW50UGxhemFcIiBcIkJvdW5kYXJ5XCIgXCJSZXN0YXVyYW50UGxhemFcIiBcIkludGVyaW9yXCIgLi4uXG4gJCBEZW5vbWluYXRpb24gICAgICAgICAgOiBudW0gIDAuMDUgMC4wMSAxIDIgMC4yNSAxIDAuMjUgMC4yNSAxIDIgLi4uXG4gJCBNYWNoaW5lVHlwZSAgICAgICAgICAgOiBjaHIgIFwidmlkZW9cIiBcInJlZWxcIiBcInZpZGVvXCIgXCJ2aWRlb1wiIC4uLlxuICQgTWFudWZhY3R1cmVyICAgICAgICAgIDogY2hyICBcIlJlYWxtXCIgXCJUc3VuYW1pXCIgXCJUc3VuYW1pXCIgXCJFbnRlbGx1c1wiIC4uLlxuICQgTW9kZWwgICAgICAgICAgICAgICAgIDogY2hyICBcIkFlb2xpYW4gUFJPIFZpc2lvblwiIFwiUGVkYWxmZXJcIiBcIkxhbnRhbmFcIiBcIk1pcmllclwiIC4uLlxuICQgTW9udGggICAgICAgICAgICAgICAgIDogUE9TSVhjdCwgZm9ybWF0OiBcIjIwMTItMDUtMDFcIiBcIjIwMTEtMTEtMDFcIiBcIjIwMTEtMTAtMDFcIiBcIjIwMTItMDQtMDFcIiAuLi5cbiAkIEdyb3NzUmV2ZW51ZSAgICAgICAgICA6IG51bSAgOTU5MjkgMTMyMDQgMzM3NDE3IDgzNDM2IDgwOTc0IC4uLlxuICQgRmNzdExvd2VyICAgICAgICAgICAgIDogbnVtICA3NTEyNCAzNDEyIDI4NzI3MSA0NzI4NSA0Njc5OCAuLi5cbiAkIEZjc3RVcHBlciAgICAgICAgICAgICA6IG51bSAgMTE3OTQxIDIyOTUxIDUzNDk5MyAxMTM4NjggODg0NDYgLi4uXG4gJCBOb01hY2hpbmVzICAgICAgICAgICAgOiBudW0gIDEgMiA0IDEgMSAxIDEgMSAxIDEgLi4uXG4gJCBQbGF5cyAgICAgICAgICAgICAgICAgOiBudW0gIDI4MDUwNyA3MTAyNDUgNzUxNDMgMjk0MzMgMjkyODEgLi4uXG4gJCBHcm9zc1JldmVudWVQZXJNYWNoaW5lOiBudW0gIDk1OTI5IDY2MDIgODQzNTQgODM0MzYgODA5NzQgLi4uXG4gJCBQbGF5c1Blck1hY2hpbmUgICAgICAgOiBudW0gIDI4MDUwNyAzNTUxMjIgMTg3ODYgMjk0MzMgMjkyODEgLi4uXG4gJCBEaWZmX3dfVXBwZXIgICAgICAgICAgOiBudW0gIDEyMjY3IDUxNzEgMTAxMDU1IDQ3NzI4IDQzNTU3IC4uLlxuICQgRGlmZl93X0xvd2VyICAgICAgICAgIDogbnVtICAxMjIwOCA1MTgzIDEwMTExNiA0Nzc4MCA0MzYwMCAuLi5cbiJ9 -->
 <pre><code>Classes ‘tbl_df’, ‘tbl’ and 'data.frame':   4149 obs. of  17 variables:
- $ MachineName           : chr  \Breakstone\ \Bhaga Steinbok\ \Lepiotaceae\ \Isopectic Hypethral\ ...
- $ Casino                : chr  \Aries\ \Aries\ \Aries\ \Libra\ ...
- $ Section               : chr  \RestaurantPlaza\ \Boundary\ \RestaurantPlaza\ \Interior\ ...
+ $ MachineName           : chr  &quot;Breakstone&quot; &quot;Bhaga Steinbok&quot; &quot;Lepiotaceae&quot; &quot;Isopectic Hypethral&quot; ...
+ $ Casino                : chr  &quot;Aries&quot; &quot;Aries&quot; &quot;Aries&quot; &quot;Libra&quot; ...
+ $ Section               : chr  &quot;RestaurantPlaza&quot; &quot;Boundary&quot; &quot;RestaurantPlaza&quot; &quot;Interior&quot; ...
  $ Denomination          : num  0.05 0.01 1 2 0.25 1 0.25 0.25 1 2 ...
- $ MachineType           : chr  \video\ \reel\ \video\ \video\ ...
- $ Manufacturer          : chr  \Realm\ \Tsunami\ \Tsunami\ \Entellus\ ...
- $ Model                 : chr  \Aeolian PRO Vision\ \Pedalfer\ \Lantana\ \Mirier\ ...
- $ Month                 : POSIXct, format: \2012-05-01\ \2011-11-01\ \2011-10-01\ \2012-04-01\ ...
+ $ MachineType           : chr  &quot;video&quot; &quot;reel&quot; &quot;video&quot; &quot;video&quot; ...
+ $ Manufacturer          : chr  &quot;Realm&quot; &quot;Tsunami&quot; &quot;Tsunami&quot; &quot;Entellus&quot; ...
+ $ Model                 : chr  &quot;Aeolian PRO Vision&quot; &quot;Pedalfer&quot; &quot;Lantana&quot; &quot;Mirier&quot; ...
+ $ Month                 : POSIXct, format: &quot;2012-05-01&quot; &quot;2011-11-01&quot; &quot;2011-10-01&quot; &quot;2012-04-01&quot; ...
  $ GrossRevenue          : num  95929 13204 337417 83436 80974 ...
  $ FcstLower             : num  75124 3412 287271 47285 46798 ...
  $ FcstUpper             : num  117941 22951 534993 113868 88446 ...
@@ -207,14 +212,10 @@ $(document).ready(function () {
 <p>Create dataset to be used for further analysis, i.e. aggregate slots by categories (MachineType+Denomination) for each month and section in each casino.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZGYgPC0gc2xvdCAlPiVcbiAgZ3JvdXBfYnkoQ2FzaW5vLCBNb250aCwgU2VjdGlvbiwgTWFjaGluZVR5cGUsIERlbm9taW5hdGlvbikgJT4lXG4gIHN1bW1hcmlzZShudW1lcm9fbWFjY2hpbmUgPSBzdW0oTm9NYWNoaW5lcyksXG4gICAgICAgICAgICByaWNhdmlfdG90YWxpID0gc3VtKEdyb3NzUmV2ZW51ZSksXG4gICAgICAgICAgICByaWNhdm9fdW5pdGFyaW8gPSByaWNhdmlfdG90YWxpL251bWVyb19tYWNjaGluZSxcbiAgICAgICAgICAgIGdpb2NhdGVfdG90YWxpID0gc3VtKFBsYXlzKSxcbiAgICAgICAgICAgIGdpb2NhdGVfdW5pdGFyaWUgPSByb3VuZChnaW9jYXRlX3RvdGFsaS9udW1lcm9fbWFjY2hpbmUpLFxuICAgICAgICAgICAgcmljYXZvX3Blcl9naW9jYXRhID0gcmljYXZpX3RvdGFsaS9naW9jYXRlX3RvdGFsaSkgJT4lXG4gIGFycmFuZ2UoTW9udGgsIFNlY3Rpb24sIE1hY2hpbmVUeXBlLCBEZW5vbWluYXRpb24pICU+JVxuICBtdXRhdGUodGlwbyA9IHBhc3RlMChNYWNoaW5lVHlwZSwgXFxfXFwsIERlbm9taW5hdGlvbikpXG5oZWFkKGRmKVxuYGBgXG5gYGAifQ== -->
-<p><code>r</code>r df &lt;- slot %&gt;% group_by(Casino, Month, Section, MachineType, Denomination) %&gt;% summarise(numero_macchine = sum(NoMachines), ricavi_totali = sum(GrossRevenue), ricavo_unitario = ricavi_totali/numero_macchine, giocate_totali = sum(Plays), giocate_unitarie = round(giocate_totali/numero_macchine), ricavo_per_giocata = ricavi_totali/giocate_totali) %&gt;% arrange(Month, Section, MachineType, Denomination) %&gt;% mutate(tipo = paste0(MachineType, _, Denomination)) head(df)</p>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5jb2wiOjEyLCJucm93Ijo2fSwicmRmIjoiSDRzSUFBQUFBQUFBQXd0eWlURGlpdUJpWUdCZ1ltQm1CWkxNUUNZTEU1QmdaR0JoNEFUUkZRd016TUpBQmc4UUN3QXhHMVNDMWJFb003VVlLOGNuTTZrb2tWaGxETXg4SUZNZEwwL2ZkQURJSUpaR2N5WnJjazVpY1RIVWlVeFFRZllBLzJEUGlPUVNLSmNOekMxQjExbFNsWitYQ3RVSkUyUU9EWEVHVXYvUS9NemhsRithbDVKWVZFbDFQcW85TEVXcHFUa1VzUmtZd0tGcTMxTDEwSDJkU0xYOUZEUjY1VXdRbUdWL0FSeVVEREFhcHM5QkRjSnhFSUhLZjREeU9hQzBCaW9mcnUvdmFiQktoNmRTQ1dENjhHMkl1dDhud0xRajd5NEhNUDkxZ3dPS3ZxT3JwN3RlTElsMU9QRHdXUm9Rd1BVOWFnMEZBWWZMRnh2QS9FdWhEY2o2SEIzVk9VQUNqcnEvRE1EeUgzakFpY05SY2NrYk1HMFhVUWNXZjV1QjRrNUhqazgvd1BMc3Z5TlE5TEczVFFEVExOWVEreS9QT29Dc3ozNzE2YXc5TEZ2OTdaZTFQYjIzZXMxLys4T25yWGozOGtiYW56UzBYeXg5c005K2Y2Umk3NElDTmZ1M2I2MXFON0JFb2NVckp5aHU0ZzMwREF6UkJZd0lDcGlpQ1JoaEVRQ25iS2IvREtpSm1Tc2xzU1JSTDYwb01UY1ZQZTNuQWNWZ3VZWUhsazJjRTRzejgvSmhTbnp6ODBveVlCa3FPRFc1SkRNL0Q4cmw5azFNenNqTVN3MnBMRWlGQ3ZHNHBPYmw1MmJtSlNJcDQ4OHJ6VTB0eW8vUFRVd0dLNGNLOHhabEppZVdaY2FYNUpjazVtVEMxSUlGOCtOTDh6SkxFb3N5WWE3Z1M4L01UMDRzU1VWVkxBQVRoYXFHbVN3RU5hUWd0U2dlb2dSV0dyR1VaQmJrb3dVQ1oxRit1UjRzSUhpQm1BbVVvdjcvLy8rTEFWd0NvQ2htenk4QStReW9sQWxVS0xLaUJUVmpFWm9BZjJrZXlPZ1UzZVNNMHJ4c1hYTlFkSUNsSVlBWHltWkRZdk5BckdTQlJTTXJMRjVTODlJUm9jZWFrNWdFei9OOFFDK0FmYUJYVUpTWkJ5dnZ1SUNpeFhyZ0VJT0pKT2Zud0VRZ3Bkcy9BSlR6ams4Q0JnQUEifQ== -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5jb2wiOjEyLCJucm93Ijo3fSwicmRmIjoiSDRzSUFBQUFBQUFBQTVWVVcwaFVRUmdlOTNiY2RiMVVMOUdUUVcvaHBvSVI5ZUR4OWlCbGlWcElJTnQ0ZHRLaDNabGxkblpUSWRpSGhKNkNIZ29LSDdhbmlsNUVDb0tDWGdRcEtnb2hnbnFvaHk2RVFYUUJnM1NiTXhmZGMxTEtBK2Q4ODMzei8vK2NtWC8rZjZCN3VEVTJIQU1BQkVBd0xMNUJNUXdGeEtjS2hFRFV4UWtBZ2p2RUlDNndUcURWc1hqN2FVa00xdkh1N0Z1SkR6OFZKWDU4cFBpM3FtSUYrZ0tIblRUTTVjU2dRYTZ1Ukt2LzJHRHZzTU0xalVqSy9aNThpaEtrUFkwWVBEN1VKV0JWeTVheFBZSkhHVFNrZzJHVTI1QnN5Y3k3UkhVbnpaTVVaSk9HOXhET0lIR1E1dlVES01kaFhraThQdzJuekNyVnZZUWpoaW5iTXZjdUgySUlwYzMvRlhBSzBYK1NTcGNOM0FHUWVXNy9LcE1HMnAvN2NEUDkxbFgzdVdiOGJTVURlNC9HUnAvL0pyam0vL09BVk93UEt5VVhPN2JWTkV2Ky9jcXN4R2M5S3U1Q3FTangxWTJpeC8rOTlwOUxxZmwzVy9TZmp5ajlma0hadlNnb1B2Tkc4UkcxUS92eWI0V1h6bnYvLzA1RTZkUExDcS9yT1AvcjMvamo1ZUxDOG95OTYvSEUzcmtuTisxOWgwNCtPSGo0Z3QxekQ1OG9GVXYycVl2elMwZm5sK3pkcmRHZFh6cXh2WDk2NVBYbmxYUEFlejhpYm9LVExackZaSXFUelluV3RrMFZTeW5HSlNvRFZNei9KYXlGYUc1VHBSb29BMjkxeGxLUXc4UnBCalBJWDh4RWFLWU54STNZUndrZk54dm9namxNek4yMUJwSERNU1dhMXZSQlp4d1RORFNaTmZVVzcwYUVaakNCRldiMUpKOUJqQ1l6MEpIbVdxNWwySUVGbk9TVXd6UTJ0bEtreVR6QkhJcUMwM0xkR0tZTzVNaHIzR0JVYlcwaWI5ZEJzb2dsbFltcCt4REhXZW83aENpalp4UG1JR3JGRzNCdldybGMvZ1ZrUy9NWVd6VHI3a3lZQnR5K0hQWWRkUlh6Q1ExNTRvWk9OVG5qZVhLbXFhWE56WWVjVjArdEhsc1Y0N2hhTTJUeUdEYTVRR1JzL2ZqQ2FUaTYxanpxeEI3a0ZoSlpob25wNERHaDVoTHl5SXppMExSUlZMOWUvUU0zTi82QmhnWUFBQT09In0= -->
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["Casino"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Month"],"name":[2],"type":["S3: POSIXct"],"align":["right"]},{"label":["Section"],"name":[3],"type":["chr"],"align":["left"]},{"label":["MachineType"],"name":[4],"type":["chr"],"align":["left"]},{"label":["Denomination"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["numero_macchine"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["ricavi_totali"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["ricavo_unitario"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["giocate_totali"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["giocate_unitarie"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["ricavo_per_giocata"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["tipo"],"name":[12],"type":["chr"],"align":["left"]}],"data":[{"1":"Aries","2":"2011-09-01","3":"Boundary","4":"reel","5":"0.01","6":"11","7":"122047","8":"11095.18","9":"2248209","10":"204383","11":"0.05428632","12":"reel_0.01"},{"1":"Aries","2":"2011-09-01","3":"Boundary","4":"reel","5":"0.02","6":"5","7":"43219","8":"8643.80","9":"982296","10":"196459","11":"0.04399794","12":"reel_0.02"},{"1":"Libra","2":"2011-09-01","3":"Boundary","4":"reel","5":"0.02","6":"1","7":"10166","8":"10166.00","9":"65740","10":"65740","11":"0.15463949","12":"reel_0.02"},{"1":"Aries","2":"2011-09-01","3":"Boundary","4":"reel","5":"0.05","6":"3","7":"113792","8":"37930.67","9":"578166","10":"192722","11":"0.19681545","12":"reel_0.05"},{"1":"Aries","2":"2011-09-01","3":"Boundary","4":"reel","5":"0.25","6":"12","7":"243528","8":"20294.00","9":"1988734","10":"165728","11":"0.12245378","12":"reel_0.25"},{"1":"Libra","2":"2011-09-01","3":"Boundary","4":"reel","5":"0.25","6":"3","7":"56322","8":"18774.00","9":"60224","10":"20075","11":"0.93520855","12":"reel_0.25"}],"options":{"columns":{"min":{},"max":[10],"total":[12]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
+{"columns":[{"label":["Month"],"name":[1],"type":["S3: POSIXct"],"align":["right"]},{"label":["Casino"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Section"],"name":[3],"type":["chr"],"align":["left"]},{"label":["MachineType"],"name":[4],"type":["chr"],"align":["left"]},{"label":["Denomination"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["numero_macchine"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["ricavi_totali"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["ricavo_unitario"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["giocate_totali"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["giocate_unitarie"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["ricavo_per_giocata"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["tipo"],"name":[12],"type":["chr"],"align":["left"]}],"data":[{"1":"2011-11-01","2":"Libra","3":"Boundary","4":"reel","5":"1.00","6":"2","7":"86927","8":"43463.5","9":"10253","10":"5126","11":"8.478202","12":"reel_1"},{"1":"2011-11-01","2":"Aries","3":"Entrance","4":"video","5":"0.25","6":"10","7":"47085","8":"4708.5","9":"7030","10":"703","11":"6.697724","12":"video_0.25"},{"1":"2011-12-01","2":"Aries","3":"RestaurantPlaza","4":"video","5":"0.25","6":"8","7":"279244","8":"34905.5","9":"17882","10":"2235","11":"15.615927","12":"video_0.25"},{"1":"2012-01-01","2":"Libra","3":"Interior","4":"video","5":"1.00","6":"1","7":"80235","8":"80235.0","9":"1847","10":"1847","11":"43.440715","12":"video_1"},{"1":"2012-05-01","2":"Aries","3":"Interior","4":"reel","5":"0.25","6":"1","7":"15498","8":"15498.0","9":"117","10":"117","11":"132.461538","12":"reel_0.25"},{"1":"2012-06-01","2":"Aries","3":"Interior","4":"reel","5":"0.25","6":"1","7":"12097","8":"12097.0","9":"1407","10":"1407","11":"8.597726","12":"reel_0.25"},{"1":"2012-06-01","2":"Libra","3":"Interior","4":"video","5":"0.05","6":"1","7":"25246","8":"25246.0","9":"1121","10":"1121","11":"22.520963","12":"video_0.05"}],"options":{"columns":{"min":{},"max":[10],"total":[12]},"rows":{"min":[10],"max":[10],"total":[7]},"pages":{}}}
   </script>
 </div>
 <!-- rnb-frame-end -->
@@ -239,251 +240,565 @@ $(document).ready(function () {
 <p>Costruzione dei vincoli Primo vincolo: numero massimo di slot per ogni casino e ogni mese.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuI090dGllbmkgbnVtZXJvIGRpIHNsb3QgcHJlc2VudGkgaW4gb2duaSBjYXNpbm8gcGVyIG1lc2UgZGEgdXNhcmUgY29tZSB1cHBlciBib3VuZFxubnNsb3RzIDwtIGRmICU+JVxuICBncm91cF9ieShDYXNpbm8sIE1vbnRoKSAlPiVcbiAgc3VtbWFyaXNlKG1heCA9IHN1bShudW1lcm9fbWFjY2hpbmUpKSAlPiVcbiAgYXJyYW5nZShNb250aClcbm5zbG90cyA8LSB0KG5zbG90cyRtYXgpWzEsXSAjbnVtZXJvIGRpIHNsb3QgcGVyIGNhc2lubyBlIG1lc2VcbiNGaXJzdCBjcmVhdGUgZHVtbXkgdmFyIGZvciBDYXNpbm8gYW5kIG1vbnRoLCB1c2VkIHRvIGFjdGl2YXRlIGVhY2ggY29uc3RyYWludCBkZXBlbmRpbmcgb24gdGhlIGNhc2lubyBhbmQgbW9udGhcbmYuQTEgPC0gdChwcmVkaWN0KGR1bW15VmFycyh+IENhc2lubyA6IGZhY3RvcihNb250aCksIGRhdGEgPSBkZiksIG5ld2RhdGEgPSBkZikpXG4jVmlldyhyYmluZCh0KGRmWywgXFxDYXNpbm9cXF0pLCB0KGRmJE1vbnRoKSwgZi5BKSkgI0NoZWNrIHJlc3VsdHNcbiNDb2VmZmljaWVudHNcbmYuYjEgPC0gbnNsb3RzICMgdmVjdG9yIG9mIHJpZ2h0LWhhbmQgc2lkZSB2YWx1ZXMgLSB1cHBlciBib3VuZHMgb2YgdG90YWwgbnVtYmVyIG9mIHNsb3RzIHBlciBtb250aFxuZi5kaXIxIDwtIHJlcChcXDw9XFwsIGxlbmd0aChmLmIpKSAjIGRpcmVjdGlvbiBvZiB0aGUgaW5lcXVhbGl0aWVzXG5zb2wxIDwtIHNvbHZlTFAoZi5vYmosIGYuYjEsIGYuQTEsIG1heGltdW0gPSBUUlVFLCBjb25zdC5kaXIgPSBmLmRpcjEpICNzb2x2ZXIgXG5zb2wxYmlzIDwtIGxwKGRpcmVjdGlvbiA9IFxcbWF4XFwsIG9iamVjdGl2ZS5pbiA9IGYub2JqLCBjb25zdC5tYXQgPSBmLkExLCBjb25zdC5kaXIgPSBmLmRpcjEsIGNvbnN0LnJocyA9IGYuYjEpXG5zb2wxJGNvblxuYGBgXG5gYGAifQ== -->
-<p><code>r</code>r #Ottieni numero di slot presenti in ogni casino per mese da usare come upper bound nslots &lt;- df %&gt;% group_by(Casino, Month) %&gt;% summarise(max = sum(numero_macchine)) %&gt;% arrange(Month) nslots &lt;- t(nslots<span class="math inline">\(max)[1,] #numero di slot per casino e mese #First create dummy var for Casino and month, used to activate each constraint depending on the casino and month f.A1 &lt;- t(predict(dummyVars(~ Casino : factor(Month), data = df), newdata = df)) #View(rbind(t(df[, \Casino\]), t(df\)</span>Month), f.A)) #Check results #Coefficients f.b1 &lt;- nslots # vector of right-hand side values - upper bounds of total number of slots per month f.dir1 &lt;- rep(&lt;=, length(f.b)) # direction of the inequalities sol1 &lt;- solveLP(f.obj, f.b1, f.A1, maximum = TRUE, const.dir = f.dir1) #solver sol1bis &lt;- lp(direction = , objective.in = f.obj, const.mat = f.A1, const.dir = f.dir1, const.rhs = f.b1) sol1$con</p>
-<pre><code></code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc29sMSRpdGVyMVxuXG5gYGAifQ== -->
+<pre class="r"><code>sol1$iter1
+</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiICAgYWN0dWFsIGRpciBidmVjIGZyZWUgIGR1YWwgZHVhbC5yZWdcbjEgICAgIDQ1MCAgPD0gIDQ1MCAgICAwIDg3OTQ3ICAgICAgNDUwXG4yICAgICAgOTkgIDw9ICAgOTkgICAgMCA0NDY4NiAgICAgICA5OVxuMyAgICAgNDE2ICA8PSAgNDE2ICAgIDAgMzc4MzIgICAgICA0MTZcbjQgICAgIDEyOSAgPD0gIDEyOSAgICAwIDQzNDY0ICAgICAgMTI5XG41ICAgICA0NDMgIDw9ICA0NDMgICAgMCA0MjU3MiAgICAgIDQ0M1xuNiAgICAgMTE3ICA8PSAgMTE3ICAgIDAgMzg5MzEgICAgICAxMTdcbjcgICAgIDQ5NSAgPD0gIDQ5NSAgICAwIDQ2NjEwICAgICAgNDk1XG44ICAgICAxMDYgIDw9ICAxMDYgICAgMCA4MDk3NCAgICAgIDEwNlxuOSAgICAgNDg3ICA8PSAgNDg3ICAgIDAgNjUzOTAgICAgICA0ODdcbjEwICAgIDExMCAgPD0gIDExMCAgICAwIDQ1OTQzICAgICAgMTEwXG4xMSAgICA0MDQgIDw9ICA0MDQgICAgMCA2MTY5OCAgICAgIDQwNFxuMTIgICAgMTA3ICA8PSAgMTA3ICAgIDAgNzk0NTggICAgICAxMDdcbjEzICAgIDQ3NCAgPD0gIDQ3NCAgICAwIDU2MzAwICAgICAgNDc0XG4xNCAgICAxMDEgIDw9ICAxMDEgICAgMCAyOTYyOSAgICAgIDEwMVxuMTUgICAgNDk4ICA8PSAgNDk4ICAgIDAgMzgzMzAgICAgICA0OThcbjE2ICAgIDExNiAgPD0gIDExNiAgICAwIDczOTU2ICAgICAgMTE2XG4xNyAgICA0NzggIDw9ICA0NzggICAgMCA3MzM5MyAgICAgIDQ3OFxuMTggICAgMTI0ICA8PSAgMTI0ICAgIDAgNzUyNzggICAgICAxMjRcbjE5ICAgIDQzOCAgPD0gIDQzOCAgICAwIDU0NjEzICAgICAgNDM4XG4yMCAgICAxMjQgIDw9ICAxMjQgICAgMCA0MTcyNSAgICAgIDEyNFxuMjEgICAgNDY0ICA8PSAgNDY0ICAgIDAgNDIzMjIgICAgICA0NjRcbjIyICAgIDEzMiAgPD0gIDEzMiAgICAwIDQzMTAxICAgICAgMTMyXG4ifQ== -->
-<pre><code>   actual dir bvec free  dual dual.reg
-1     450  &lt;=  450    0 87947      450
-2      99  &lt;=   99    0 44686       99
-3     416  &lt;=  416    0 37832      416
-4     129  &lt;=  129    0 43464      129
-5     443  &lt;=  443    0 42572      443
-6     117  &lt;=  117    0 38931      117
-7     495  &lt;=  495    0 46610      495
-8     106  &lt;=  106    0 80974      106
-9     487  &lt;=  487    0 65390      487
-10    110  &lt;=  110    0 45943      110
-11    404  &lt;=  404    0 61698      404
-12    107  &lt;=  107    0 79458      107
-13    474  &lt;=  474    0 56300      474
-14    101  &lt;=  101    0 29629      101
-15    498  &lt;=  498    0 38330      498
-16    116  &lt;=  116    0 73956      116
-17    478  &lt;=  478    0 73393      478
-18    124  &lt;=  124    0 75278      124
-19    438  &lt;=  438    0 54613      438
-20    124  &lt;=  124    0 41725      124
-21    464  &lt;=  464    0 42322      464
-22    132  &lt;=  132    0 43101      132</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDBcbiJ9 -->
+<pre><code>[1] 0</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Secondo vincolo: la proporzione del tipo (MachineType+Denomination) di slot all’interno di ciascuna sezione dev’essere rispettato per ogni mese. Ovvero, non ci puo’ essere un numero di slot di una categoria estremamente alto, ma deve rispettare dei vincoli ‘di proporzione’. Questo vincolo include il fatto che non ci possano essere sezioni vuote. Vincolo 2</p>
+<p>Secondo vincolo: la proporzione del tipo (MachineType+Denomination) di slot all’interno di ciascuna sezione dev’essere rispettato per ogni mese. Ovvero, non ci puo’ essere un numero di slot di una categoria estremamente alto, ma deve rispettare dei vincoli ‘di proporzione’. Questo vincolo include il fatto che non ci possano essere sezioni vuote. ##Vincolo 2 #Soluzione Fede Cambia proporzione minima e massima per ogni mese.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZi5BMiA8LSB0KHByZWRpY3QoZHVtbXlWYXJzKH4gU2VjdGlvbiA6IENhc2lubyA6IGZhY3RvcihNb250aCksIGRhdGEgPSBkZiksIG5ld2RhdGEgPSBkZikpXG4jIER1cGxpY2F0ZSBldmVyeSByb3csIG5lZWRlZCBiZWNhdXNlIGZvciBlYWNoIHNlY3Rpb24vbW9udGgvY2FzaW5vIHdlIG5lZWQgYSBsb3dlciBhbmQgdXBwZXIgYm91bmQuIFxuIyBSZXRhaW4gb3JkZXIgLS0+IG9iMS1sb3csIG9iczEtdXAsIG9iczItbG93LCAuLi4pXG5mLkEyIDwtIGFzLnRpYmJsZShmLkEyKSAlPiUgc2xpY2UocmVwKDE6bigpLCBlYWNoID0gMikpICU+JSBhcy5tYXRyaXgoKVxuXG4jSSB2aW5jb2xpIHNvbm8gYXR0aXZhdGkgbmVsIHNlZ3VlbnRlIG1vZG8gXG4jIG1lc2UxLWNhc2lubzEtc2V6MS1sb3csXG4jIG1lc2UxLWNhc2lubzEtc2V6MS11cCxcbiMgbWVzZTEtY2FzaW5vMS1zZXoyO1xuIyBtZXNlMS1jYXNpbm8yO1xuIyBtZXNlMjsuLi5cbiMgcXVpbmRpIGkgcHJpbWkgOCAoNCBzZXogKiAyIHVwL2xvdykgdmluY29saSBzb25vIGFzc29jaWF0byBhZCB1biBtZWRlc2ltbyB1cHBlciBlIGxvd2VyIGJvdW5kLCBsZWdhdG8gYWwgcHJpbW8gdmFsb3JlIGRpIG5zbG90cy5cblxuIyBwcm9iYWJpbG1lbnRlIHNpIHB1bycgZmFyZSBzZW56YSBpbCBjaWNsbyBmb3IsIG1hIGNvbWU/P1xuI25zbG90cyBjb250aWVuZSBpbCBudW1lcm8gZGkgc2xvdCBwZXIgb2duaSBjYXNpbm8gZSBtZXNlLCBhbHRlcm5hdG8gcGVyIGNhc2lubyAobWVzZTEgY2FzaW5vMSwgbWVzZTEgY2FzaW5vMiwgbWVzZTIgY2FzaW5vMSwgLi4uKVxuZi5iMiA8LSBjKClcbmZvciAobiBpbiBuc2xvdHMpIHtcbiAgZi5iMiA8LSBjKGYuYjIsIHJlcChyb3VuZChjKG4qLjIsIG4qLjMpKSwgNCkgKVxufVxuZi5kaXIyIDwtIHJlcChjKFwiPj1cIiwgXCI8PVwiKSwgbGVuZ3RoKGYuYjIpLzIpICMgZGlyZWN0aW9uIG9mIHRoZSBpbmVxdWFsaXRpZXNcblxuc29sMiA8LSBzb2x2ZUxQKGYub2JqLCBmLmIyLCBmLkEyLCBtYXhpbXVtID0gVFJVRSwgY29uc3QuZGlyID0gZi5kaXIyKSAjc29sdmVyIFxuc29sMmJpcyA8LSBscChkaXJlY3Rpb24gPSBcIm1heFwiLCBvYmplY3RpdmUuaW4gPSBmLm9iaiwgY29uc3QubWF0ID0gZi5BMiwgY29uc3QuZGlyID0gZi5kaXIyLCBjb25zdC5yaHMgPSBmLmIyKVxuXG5zb2wyJGNvblxuYGBgIn0= -->
-<pre class="r"><code>f.A2 &lt;- t(predict(dummyVars(~ Section : Casino : factor(Month), data = df), newdata = df))
-# Duplicate every row, needed because for each section/month/casino we need a lower and upper bound. 
-# Retain order --&gt; ob1-low, obs1-up, obs2-low, ...)
-f.A2 &lt;- as.tibble(f.A2) %&gt;% slice(rep(1:n(), each = 2)) %&gt;% as.matrix()
-
-#I vincoli sono attivati nel seguente modo 
-# mese1-casino1-sez1-low,
-# mese1-casino1-sez1-up,
-# mese1-casino1-sez2;
-# mese1-casino2;
-# mese2;...
-# quindi i primi 8 (4 sez * 2 up/low) vincoli sono associato ad un medesimo upper e lower bound, legato al primo valore di nslots.
-
-# probabilmente si puo' fare senza il ciclo for, ma come??
-#nslots contiene il numero di slot per ogni casino e mese, alternato per casino (mese1 casino1, mese1 casino2, mese2 casino1, ...)
-f.b2 &lt;- c()
-for (n in nslots) {
-  f.b2 &lt;- c(f.b2, rep(round(c(n*.2, n*.3)), 4) )
-}
-f.dir2 &lt;- rep(c(&quot;&gt;=&quot;, &quot;&lt;=&quot;), length(f.b2)/2) # direction of the inequalities
-
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc29sMiRjb25cblxuYGBgIn0= -->
+<pre class="r"><code>sol2$con
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgIGFjdHVhbCBkaXIgYnZlYyBmcmVlICBkdWFsIGR1YWwucmVnXG4xICAgICAgMjQ4ICA+PSAgMTg3ICAgNjEgICAgIDAgICAgICAgNjFcbjIgICAgICAyNDggIDw9ICAyNDggICAgMCAzNzkzMSAgICAgICA2MVxuMyAgICAgIDI0OCAgPj0gIDE4NyAgIDYxICAgICAwICAgICAgIDYxXG40ICAgICAgMjQ4ICA8PSAgMjQ4ICAgIDAgMTQ4NjAgICAgICAgNjFcbjUgICAgICAyNDggID49ICAxODcgICA2MSAgICAgMCAgICAgICA2MVxuNiAgICAgIDI0OCAgPD0gIDI0OCAgICAwIDE4NTQ5ICAgICAgIDYxXG43ICAgICAgMjQ4ICA+PSAgMTg3ICAgNjEgICAgIDAgICAgICAgNjFcbjggICAgICAyNDggIDw9ICAyNDggICAgMCAzMDkzNiAgICAgICA2MVxuOSAgICAgICA4MiAgPj0gICAzOSAgIDQzICAgICAwICAgICAgIDQzXG4xMCAgICAgIDgyICA8PSAgIDgyICAgIDAgMzE4NjIgICAgICAgNDNcbjExICAgICAgODIgID49ICAgMzkgICA0MyAgICAgMCAgICAgICA0M1xuMTIgICAgICA4MiAgPD0gICA4MiAgICAwICA4MTU0ICAgICAgIDQzXG4xMyAgICAgIDgyICA+PSAgIDM5ICAgNDMgICAgIDAgICAgICAgNDNcbjE0ICAgICAgODIgIDw9ICAgODIgICAgMCAzODQ3MSAgICAgICA0M1xuMTUgICAgICA4MiAgPj0gICAzOSAgIDQzICAgICAwICAgICAgIDQzXG4xNiAgICAgIDgyICA8PSAgIDgyICAgIDAgMTU5MTggICAgICAgNDNcbjE3ICAgICAxMzAgID49ICAgOTcgICAzMyAgICAgMCAgICAgICAzM1xuMTggICAgIDEzMCAgPD0gIDEzMCAgICAwIDg3OTQ3ICAgICAgIDMzXG4xOSAgICAgMTMwICA+PSAgIDk3ICAgMzMgICAgIDAgICAgICAgMzNcbjIwICAgICAxMzAgIDw9ICAxMzAgICAgMCAyNDU0MyAgICAgICAzM1xuMjEgICAgIDEzMCAgPj0gICA5NyAgIDMzICAgICAwICAgICAgIDMzXG4yMiAgICAgMTMwICA8PSAgMTMwICAgIDAgMTE4OTkgICAgICAgMzNcbjIzICAgICAxMzAgID49ICAgOTcgICAzMyAgICAgMCAgICAgICAzM1xuMjQgICAgIDEzMCAgPD0gIDEzMCAgICAwIDg0MzU0ICAgICAgIDMzXG4yNSAgICAgIDMyICA+PSAgIDE5ICAgMTMgICAgIDAgICAgICAgMTNcbjI2ICAgICAgMzIgIDw9ICAgMzIgICAgMCAxMjE5NiAgICAgICAxM1xuMjcgICAgICAzMiAgPj0gICAxOSAgIDEzICAgICAwICAgICAgIDEzXG4yOCAgICAgIDMyICA8PSAgIDMyICAgIDAgIDc5MzggICAgICAgMTNcbjI5ICAgICAgMzIgID49ICAgMTkgICAxMyAgICAgMCAgICAgICAxM1xuMzAgICAgICAzMiAgPD0gICAzMiAgICAwIDQ0Njg2ICAgICAgIDEzXG4zMSAgICAgIDMyICA+PSAgIDE5ICAgMTMgICAgIDAgICAgICAgMTNcbjMyICAgICAgMzIgIDw9ICAgMzIgICAgMCAxMTg3NSAgICAgICAxM1xuMzMgICAgIDExNCAgPj0gICA4NSAgIDI5ICAgICAwICAgICAgIDI5XG4zNCAgICAgMTE0ICA8PSAgMTE0ICAgIDAgMTQ3MzYgICAgICAgMjlcbjM1ICAgICAxMTQgID49ICAgODUgICAyOSAgICAgMCAgICAgICAyOVxuMzYgICAgIDExNCAgPD0gIDExNCAgICAwICA5NzkwICAgICAgIDI5XG4zNyAgICAgMTE0ICA+PSAgIDg1ICAgMjkgICAgIDAgICAgICAgMjlcbjM4ICAgICAxMTQgIDw9ICAxMTQgICAgMCAxNDYyNyAgICAgICAyOVxuMzkgICAgIDExNCAgPj0gICA4NSAgIDI5ICAgICAwICAgICAgIDI5XG40MCAgICAgMTE0ICA8PSAgMTE0ICAgIDAgMzc4MzIgICAgICAgMjlcbjQxICAgICAgNDAgID49ICAgMjQgICAxNiAgICAgMCAgICAgICAxNlxuNDIgICAgICA0MCAgPD0gICA0MCAgICAwIDQzNDY0ICAgICAgIDE2XG40MyAgICAgIDQwICA+PSAgIDI0ICAgMTYgICAgIDAgICAgICAgMTZcbjQ0ICAgICAgNDAgIDw9ICAgNDAgICAgMCAgNzUzNCAgICAgICAxNlxuNDUgICAgICA0MCAgPj0gICAyNCAgIDE2ICAgICAwICAgICAgIDE2XG40NiAgICAgIDQwICA8PSAgIDQwICAgIDAgMjM2MDUgICAgICAgMTZcbjQ3ICAgICAgNDAgID49ICAgMjQgICAxNiAgICAgMCAgICAgICAxNlxuNDggICAgICA0MCAgPD0gICA0MCAgICAwIDEzMTg4ICAgICAgIDE2XG40OSAgICAgMTI1ICA+PSAgIDk0ICAgMzEgICAgIDAgICAgICAgMzFcbjUwICAgICAxMjUgIDw9ICAxMjUgICAgMCAxMjExOSAgICAgICAzMVxuNTEgICAgIDEyNSAgPj0gICA5NCAgIDMxICAgICAwICAgICAgIDMxXG41MiAgICAgMTI1ICA8PSAgMTI1ICAgIDAgNDI1NzIgICAgICAgMzFcbjUzICAgICAxMjUgID49ICAgOTQgICAzMSAgICAgMCAgICAgICAzMVxuNTQgICAgIDEyNSAgPD0gIDEyNSAgICAwIDIwNTU3ICAgICAgIDMxXG41NSAgICAgMTI1ICA+PSAgIDk0ICAgMzEgICAgIDAgICAgICAgMzFcbjU2ICAgICAxMjUgIDw9ICAxMjUgICAgMCAzNDkwNiAgICAgICAzMVxuNTcgICAgICA0MSAgPj0gICAyMSAgIDIwICAgICAwICAgICAgIDIwXG41OCAgICAgIDQxICA8PSAgIDQxICAgIDAgMjcxMDAgICAgICAgMjBcbjU5ICAgICAgNDEgID49ICAgMjEgICAyMCAgICAgMCAgICAgICAyMFxuNjAgICAgICA0MSAgPD0gICA0MSAgICAwICA2MzAzICAgICAgIDIwXG42MSAgICAgIDQxICA+PSAgIDIxICAgMjAgICAgIDAgICAgICAgMjBcbjYyICAgICAgNDEgIDw9ICAgNDEgICAgMCAzODkzMSAgICAgICAyMFxuNjMgICAgICA0MSAgPj0gICAyMSAgIDIwICAgICAwICAgICAgIDIwXG42NCAgICAgIDQxICA8PSAgIDQxICAgIDAgMTMzMzQgICAgICAgMjBcbjY1ICAgICAxNDUgID49ICAgOTcgICA0OCAgICAgMCAgICAgICA0OFxuNjYgICAgIDE0NSAgPD0gIDE0NSAgICAwIDI2ODQzICAgICAgIDQ4XG42NyAgICAgMTQ1ICA+PSAgIDk3ICAgNDggICAgIDAgICAgICAgNDhcbjY4ICAgICAxNDUgIDw9ICAxNDUgICAgMCAxNjg0OSAgICAgICA0OFxuNjkgICAgIDE0NSAgPj0gICA5NyAgIDQ4ICAgICAwICAgICAgIDQ4XG43MCAgICAgMTQ1ICA8PSAgMTQ1ICAgIDAgMTM3NjQgICAgICAgNDhcbjcxICAgICAxNDUgID49ICAgOTcgICA0OCAgICAgMCAgICAgICA0OFxuNzIgICAgIDE0NSAgPD0gIDE0NSAgICAwIDQ2NjEwICAgICAgIDQ4XG43MyAgICAgIDMwICA+PSAgIDI0ICAgIDYgICAgIDAgICAgICAgIDZcbjc0ICAgICAgMzAgIDw9ICAgMzAgICAgMCAyMjI5NCAgICAgICAgNlxuNzUgICAgICAzMCAgPj0gICAyNCAgICA2ICAgICAwICAgICAgICA2XG43NiAgICAgIDMwICA8PSAgIDMwICAgIDAgIDU3NjAgICAgICAgIDZcbjc3ICAgICAgMzAgID49ICAgMjQgICAgNiAgICAgMCAgICAgICAgNlxuNzggICAgICAzMCAgPD0gICAzMCAgICAwIDgwOTc0ICAgICAgICA2XG43OSAgICAgIDMwICA+PSAgIDI0ICAgIDYgICAgIDAgICAgICAgIDZcbjgwICAgICAgMzAgIDw9ICAgMzAgICAgMCAxMjExNCAgICAgICAgNlxuODEgICAgIDE1NCAgPj0gICA5OCAgIDU2ICAgICAwICAgICAgIDU2XG44MiAgICAgMTU0ICA8PSAgMTU0ICAgIDAgMzU3NjIgICAgICAgNTZcbjgzICAgICAxNTQgID49ICAgOTggICA1NiAgICAgMCAgICAgICA1NlxuODQgICAgIDE1NCAgPD0gIDE1NCAgICAwIDIxMDY2ICAgICAgIDU2XG44NSAgICAgMTU0ICA+PSAgIDk4ICAgNTYgICAgIDAgICAgICAgNTZcbjg2ICAgICAxNTQgIDw9ICAxNTQgICAgMCAyMDc0NCAgICAgICA1NlxuODcgICAgIDE1NCAgPj0gICA5OCAgIDU2ICAgICAwICAgICAgIDU2XG44OCAgICAgMTU0ICA8PSAgMTU0ICAgIDAgNjUzOTAgICAgICAgNTZcbjg5ICAgICAgMzYgID49ICAgMjMgICAxMyAgICAgMCAgICAgICAxM1xuOTAgICAgICAzNiAgPD0gICAzNiAgICAwIDIxNTA0ICAgICAgIDEzXG45MSAgICAgIDM2ICA+PSAgIDIzICAgMTMgICAgIDAgICAgICAgMTNcbjkyICAgICAgMzYgIDw9ICAgMzYgICAgMCAgNzc0MCAgICAgICAxM1xuOTMgICAgICAzNiAgPj0gICAyMyAgIDEzICAgICAwICAgICAgIDEzXG45NCAgICAgIDM2ICA8PSAgIDM2ICAgIDAgNDU5NDMgICAgICAgMTNcbjk1ICAgICAgMzYgID49ICAgMjMgICAxMyAgICAgMCAgICAgICAxM1xuOTYgICAgICAzNiAgPD0gICAzNiAgICAwIDEzNjI5ICAgICAgIDEzXG45NyAgICAgMTIwICA+PSAgIDg5ICAgMzEgICAgIDAgICAgICAgMzFcbjk4ICAgICAxMjAgIDw9ICAxMjAgICAgMCAzNzA1OCAgICAgICAzMVxuOTkgICAgIDEyMCAgPj0gICA4OSAgIDMxICAgICAwICAgICAgIDMxXG4xMDAgICAgMTIwICA8PSAgMTIwICAgIDAgMTA3ODkgICAgICAgMzFcbjEwMSAgICAxMjAgID49ICAgODkgICAzMSAgICAgMCAgICAgICAzMVxuMTAyICAgIDEyMCAgPD0gIDEyMCAgICAwIDI3OTA4ICAgICAgIDMxXG4xMDMgICAgMTIwICA+PSAgIDg5ICAgMzEgICAgIDAgICAgICAgMzFcbjEwNCAgICAxMjAgIDw9ICAxMjAgICAgMCA2MTY5OCAgICAgICAzMVxuMTA1ICAgICAzMCAgPj0gICAyMCAgIDEwICAgICAwICAgICAgIDEwXG4xMDYgICAgIDMwICA8PSAgIDMwICAgIDAgMjQ2OTAgICAgICAgMTBcbjEwNyAgICAgMzAgID49ICAgMjAgICAxMCAgICAgMCAgICAgICAxMFxuMTA4ICAgICAzMCAgPD0gICAzMCAgICAwICA2MjMwICAgICAgIDEwXG4xMDkgICAgIDMwICA+PSAgIDIwICAgMTAgICAgIDAgICAgICAgMTBcbjExMCAgICAgMzAgIDw9ICAgMzAgICAgMCA3OTQ1OCAgICAgICAxMFxuMTExICAgICAzMCAgPj0gICAyMCAgIDEwICAgICAwICAgICAgIDEwXG4xMTIgICAgIDMwICA8PSAgIDMwICAgIDAgMTIyNjYgICAgICAgMTBcbjExMyAgICAxNDYgID49ICAgOTkgICA0NyAgICAgMCAgICAgICA0N1xuMTE0ICAgIDE0NiAgPD0gIDE0NiAgICAwIDExMzQ4ICAgICAgIDQ3XG4xMTUgICAgMTQ2ICA+PSAgIDk5ICAgNDcgICAgIDAgICAgICAgNDdcbjExNiAgICAxNDYgIDw9ICAxNDYgICAgMCAgODQyOCAgICAgICA0N1xuMTE3ICAgIDE0NiAgPj0gICA5OSAgIDQ3ICAgICAwICAgICAgIDQ3XG4xMTggICAgMTQ2ICA8PSAgMTQ2ICAgIDAgMTMxNjMgICAgICAgNDdcbjExOSAgICAxNDYgID49ICAgOTkgICA0NyAgICAgMCAgICAgICA0N1xuMTIwICAgIDE0NiAgPD0gIDE0NiAgICAwIDU2MzAwICAgICAgIDQ3XG4xMjEgICAgIDMxICA+PSAgIDIxICAgMTAgICAgIDAgICAgICAgMTBcbjEyMiAgICAgMzEgIDw9ICAgMzEgICAgMCAxMjkyNiAgICAgICAxMFxuMTIzICAgICAzMSAgPj0gICAyMSAgIDEwICAgICAwICAgICAgIDEwXG4xMjQgICAgIDMxICA8PSAgIDMxICAgIDAgIDMwNzMgICAgICAgMTBcbjEyNSAgICAgMzEgID49ICAgMjEgICAxMCAgICAgMCAgICAgICAxMFxuMTI2ICAgICAzMSAgPD0gICAzMSAgICAwIDI5NjI5ICAgICAgIDEwXG4xMjcgICAgIDMxICA+PSAgIDIxICAgMTAgICAgIDAgICAgICAgMTBcbjEyOCAgICAgMzEgIDw9ICAgMzEgICAgMCAxMjEwMSAgICAgICAxMFxuMTI5ICAgIDE0NCAgPj0gIDEwNyAgIDM3ICAgICAwICAgICAgIDM3XG4xMzAgICAgMTQ0ICA8PSAgMTQ0ICAgIDAgMjA5MTYgICAgICAgMzdcbjEzMSAgICAxNDQgID49ICAxMDcgICAzNyAgICAgMCAgICAgICAzN1xuMTMyICAgIDE0NCAgPD0gIDE0NCAgICAwICA5NjM1ICAgICAgIDM3XG4xMzMgICAgMTQ0ICA+PSAgMTA3ICAgMzcgICAgIDAgICAgICAgMzdcbjEzNCAgICAxNDQgIDw9ICAxNDQgICAgMCAyNTc1MyAgICAgICAzN1xuMTM1ICAgIDE0NCAgPj0gIDEwNyAgIDM3ICAgICAwICAgICAgIDM3XG4xMzYgICAgMTQ0ICA8PSAgMTQ0ICAgIDAgMzgzMzAgICAgICAgMzdcbjEzNyAgICAgMzcgID49ICAgMjEgICAxNiAgICAgMCAgICAgICAxNlxuMTM4ICAgICAzNyAgPD0gICAzNyAgICAwIDE1MzE5ICAgICAgIDE2XG4xMzkgICAgIDM3ICA+PSAgIDIxICAgMTYgICAgIDAgICAgICAgMTZcbjE0MCAgICAgMzcgIDw9ICAgMzcgICAgMCAgNjYzMCAgICAgICAxNlxuMTQxICAgICAzNyAgPj0gICAyMSAgIDE2ICAgICAwICAgICAgIDE2XG4xNDIgICAgIDM3ICA8PSAgIDM3ICAgIDAgNzM5NTYgICAgICAgMTZcbjE0MyAgICAgMzcgID49ICAgMjEgICAxNiAgICAgMCAgICAgICAxNlxuMTQ0ICAgICAzNyAgPD0gICAzNyAgICAwIDEyNzU1ICAgICAgIDE2XG4xNDUgICAgMTQ4ICA+PSAgMTAwICAgNDggICAgIDAgICAgICAgNDhcbjE0NiAgICAxNDggIDw9ICAxNDggICAgMCA3MzM5MyAgICAgICA0OFxuMTQ3ICAgIDE0OCAgPj0gIDEwMCAgIDQ4ICAgICAwICAgICAgIDQ4XG4xNDggICAgMTQ4ICA8PSAgMTQ4ICAgIDAgMjg5NDQgICAgICAgNDhcbjE0OSAgICAxNDggID49ICAxMDAgICA0OCAgICAgMCAgICAgICA0OFxuMTUwICAgIDE0OCAgPD0gIDE0OCAgICAwIDEyMjkxICAgICAgIDQ4XG4xNTEgICAgMTQ4ICA+PSAgMTAwICAgNDggICAgIDAgICAgICAgNDhcbjE1MiAgICAxNDggIDw9ICAxNDggICAgMCAyOTA4NiAgICAgICA0OFxuMTUzICAgICAzNSAgPj0gICAyNiAgICA5ICAgICAwICAgICAgICA5XG4xNTQgICAgIDM1ICA8PSAgIDM1ICAgIDAgMjU4MDkgICAgICAgIDlcbjE1NSAgICAgMzUgID49ICAgMjYgICAgOSAgICAgMCAgICAgICAgOVxuMTU2ICAgICAzNSAgPD0gICAzNSAgICAwICA4MjE3ICAgICAgICA5XG4xNTcgICAgIDM1ICA+PSAgIDI2ICAgIDkgICAgIDAgICAgICAgIDlcbjE1OCAgICAgMzUgIDw9ICAgMzUgICAgMCA3NTI3OCAgICAgICAgOVxuMTU5ICAgICAzNSAgPj0gICAyNiAgICA5ICAgICAwICAgICAgICA5XG4xNjAgICAgIDM1ICA8PSAgIDM1ICAgIDAgMTQyMDkgICAgICAgIDlcbjE2MSAgICAxMTkgID49ICAgODcgICAzMiAgICAgMCAgICAgICAzMlxuMTYyICAgIDExOSAgPD0gIDExOSAgICAwIDQ5MzQzICAgICAgIDMyXG4xNjMgICAgMTE5ICA+PSAgIDg3ICAgMzIgICAgIDAgICAgICAgMzJcbjE2NCAgICAxMTkgIDw9ICAxMTkgICAgMCAyMzA4OSAgICAgICAzMlxuMTY1ICAgIDExOSAgPj0gICA4NyAgIDMyICAgICAwICAgICAgIDMyXG4xNjYgICAgMTE5ICA8PSAgMTE5ICAgIDAgMjY3MzMgICAgICAgMzJcbiBbIHJlYWNoZWQgZ2V0T3B0aW9uKFwibWF4LnByaW50XCIpIC0tIG9taXR0ZWQgMjYgcm93cyBdXG4ifQ== -->
+<pre><code>    actual dir bvec free  dual dual.reg
+1      248  &gt;=  187   61     0       61
+2      248  &lt;=  248    0 37931       61
+3      248  &gt;=  187   61     0       61
+4      248  &lt;=  248    0 14860       61
+5      248  &gt;=  187   61     0       61
+6      248  &lt;=  248    0 18549       61
+7      248  &gt;=  187   61     0       61
+8      248  &lt;=  248    0 30936       61
+9       82  &gt;=   39   43     0       43
+10      82  &lt;=   82    0 31862       43
+11      82  &gt;=   39   43     0       43
+12      82  &lt;=   82    0  8154       43
+13      82  &gt;=   39   43     0       43
+14      82  &lt;=   82    0 38471       43
+15      82  &gt;=   39   43     0       43
+16      82  &lt;=   82    0 15918       43
+17     130  &gt;=   97   33     0       33
+18     130  &lt;=  130    0 87947       33
+19     130  &gt;=   97   33     0       33
+20     130  &lt;=  130    0 24543       33
+21     130  &gt;=   97   33     0       33
+22     130  &lt;=  130    0 11899       33
+23     130  &gt;=   97   33     0       33
+24     130  &lt;=  130    0 84354       33
+25      32  &gt;=   19   13     0       13
+26      32  &lt;=   32    0 12196       13
+27      32  &gt;=   19   13     0       13
+28      32  &lt;=   32    0  7938       13
+29      32  &gt;=   19   13     0       13
+30      32  &lt;=   32    0 44686       13
+31      32  &gt;=   19   13     0       13
+32      32  &lt;=   32    0 11875       13
+33     114  &gt;=   85   29     0       29
+34     114  &lt;=  114    0 14736       29
+35     114  &gt;=   85   29     0       29
+36     114  &lt;=  114    0  9790       29
+37     114  &gt;=   85   29     0       29
+38     114  &lt;=  114    0 14627       29
+39     114  &gt;=   85   29     0       29
+40     114  &lt;=  114    0 37832       29
+41      40  &gt;=   24   16     0       16
+42      40  &lt;=   40    0 43464       16
+43      40  &gt;=   24   16     0       16
+44      40  &lt;=   40    0  7534       16
+45      40  &gt;=   24   16     0       16
+46      40  &lt;=   40    0 23605       16
+47      40  &gt;=   24   16     0       16
+48      40  &lt;=   40    0 13188       16
+49     125  &gt;=   94   31     0       31
+50     125  &lt;=  125    0 12119       31
+51     125  &gt;=   94   31     0       31
+52     125  &lt;=  125    0 42572       31
+53     125  &gt;=   94   31     0       31
+54     125  &lt;=  125    0 20557       31
+55     125  &gt;=   94   31     0       31
+56     125  &lt;=  125    0 34906       31
+57      41  &gt;=   21   20     0       20
+58      41  &lt;=   41    0 27100       20
+59      41  &gt;=   21   20     0       20
+60      41  &lt;=   41    0  6303       20
+61      41  &gt;=   21   20     0       20
+62      41  &lt;=   41    0 38931       20
+63      41  &gt;=   21   20     0       20
+64      41  &lt;=   41    0 13334       20
+65     145  &gt;=   97   48     0       48
+66     145  &lt;=  145    0 26843       48
+67     145  &gt;=   97   48     0       48
+68     145  &lt;=  145    0 16849       48
+69     145  &gt;=   97   48     0       48
+70     145  &lt;=  145    0 13764       48
+71     145  &gt;=   97   48     0       48
+72     145  &lt;=  145    0 46610       48
+73      30  &gt;=   24    6     0        6
+74      30  &lt;=   30    0 22294        6
+75      30  &gt;=   24    6     0        6
+76      30  &lt;=   30    0  5760        6
+77      30  &gt;=   24    6     0        6
+78      30  &lt;=   30    0 80974        6
+79      30  &gt;=   24    6     0        6
+80      30  &lt;=   30    0 12114        6
+81     154  &gt;=   98   56     0       56
+82     154  &lt;=  154    0 35762       56
+83     154  &gt;=   98   56     0       56
+84     154  &lt;=  154    0 21066       56
+85     154  &gt;=   98   56     0       56
+86     154  &lt;=  154    0 20744       56
+87     154  &gt;=   98   56     0       56
+88     154  &lt;=  154    0 65390       56
+89      36  &gt;=   23   13     0       13
+90      36  &lt;=   36    0 21504       13
+91      36  &gt;=   23   13     0       13
+92      36  &lt;=   36    0  7740       13
+93      36  &gt;=   23   13     0       13
+94      36  &lt;=   36    0 45943       13
+95      36  &gt;=   23   13     0       13
+96      36  &lt;=   36    0 13629       13
+97     120  &gt;=   89   31     0       31
+98     120  &lt;=  120    0 37058       31
+99     120  &gt;=   89   31     0       31
+100    120  &lt;=  120    0 10789       31
+101    120  &gt;=   89   31     0       31
+102    120  &lt;=  120    0 27908       31
+103    120  &gt;=   89   31     0       31
+104    120  &lt;=  120    0 61698       31
+105     30  &gt;=   20   10     0       10
+106     30  &lt;=   30    0 24690       10
+107     30  &gt;=   20   10     0       10
+108     30  &lt;=   30    0  6230       10
+109     30  &gt;=   20   10     0       10
+110     30  &lt;=   30    0 79458       10
+111     30  &gt;=   20   10     0       10
+112     30  &lt;=   30    0 12266       10
+113    146  &gt;=   99   47     0       47
+114    146  &lt;=  146    0 11348       47
+115    146  &gt;=   99   47     0       47
+116    146  &lt;=  146    0  8428       47
+117    146  &gt;=   99   47     0       47
+118    146  &lt;=  146    0 13163       47
+119    146  &gt;=   99   47     0       47
+120    146  &lt;=  146    0 56300       47
+121     31  &gt;=   21   10     0       10
+122     31  &lt;=   31    0 12926       10
+123     31  &gt;=   21   10     0       10
+124     31  &lt;=   31    0  3073       10
+125     31  &gt;=   21   10     0       10
+126     31  &lt;=   31    0 29629       10
+127     31  &gt;=   21   10     0       10
+128     31  &lt;=   31    0 12101       10
+129    144  &gt;=  107   37     0       37
+130    144  &lt;=  144    0 20916       37
+131    144  &gt;=  107   37     0       37
+132    144  &lt;=  144    0  9635       37
+133    144  &gt;=  107   37     0       37
+134    144  &lt;=  144    0 25753       37
+135    144  &gt;=  107   37     0       37
+136    144  &lt;=  144    0 38330       37
+137     37  &gt;=   21   16     0       16
+138     37  &lt;=   37    0 15319       16
+139     37  &gt;=   21   16     0       16
+140     37  &lt;=   37    0  6630       16
+141     37  &gt;=   21   16     0       16
+142     37  &lt;=   37    0 73956       16
+143     37  &gt;=   21   16     0       16
+144     37  &lt;=   37    0 12755       16
+145    148  &gt;=  100   48     0       48
+146    148  &lt;=  148    0 73393       48
+147    148  &gt;=  100   48     0       48
+148    148  &lt;=  148    0 28944       48
+149    148  &gt;=  100   48     0       48
+150    148  &lt;=  148    0 12291       48
+151    148  &gt;=  100   48     0       48
+152    148  &lt;=  148    0 29086       48
+153     35  &gt;=   26    9     0        9
+154     35  &lt;=   35    0 25809        9
+155     35  &gt;=   26    9     0        9
+156     35  &lt;=   35    0  8217        9
+157     35  &gt;=   26    9     0        9
+158     35  &lt;=   35    0 75278        9
+159     35  &gt;=   26    9     0        9
+160     35  &lt;=   35    0 14209        9
+161    119  &gt;=   87   32     0       32
+162    119  &lt;=  119    0 49343       32
+163    119  &gt;=   87   32     0       32
+164    119  &lt;=  119    0 23089       32
+165    119  &gt;=   87   32     0       32
+166    119  &lt;=  119    0 26733       32
+ [ reached getOption(&quot;max.print&quot;) -- omitted 26 rows ]</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<div id="soluzione-gabri" class="section level1">
+<h1>Soluzione Gabri</h1>
+<p>Proporzione minima e massima per la serie storica intera diventano le soglie per tutti i mesi (cioe’ fisse).</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc29sMiA8LSBzb2x2ZUxQKGYub2JqLCBmLmIyLCBmLkEyLCBtYXhpbXVtID0gVFJVRSwgY29uc3QuZGlyID0gZi5kaXIyKSAjc29sdmVyIFxuc29sMiA8LSBzb2x2ZUxQKGYub2JqLCBmLmIyLCBmLkEyLCBtYXhpbXVtID0gVFJVRSwgY29uc3QuZGlyID0gZi5kaXIyKSAjc29sdmVyIFxuc29sMmJpcyA8LSBscChkaXJlY3Rpb24gPSBcIm1heFwiLCBvYmplY3RpdmUuaW4gPSBmLm9iaiwgY29uc3QubWF0ID0gZi5BMiwgY29uc3QuZGlyID0gZi5kaXIyLCBjb25zdC5yaHMgPSBmLmIyKVxuc29sMiRjb25cblxuYGBgIn0= -->
+<pre class="r"><code>sol2 &lt;- solveLP(f.obj, f.b2, f.A2, maximum = TRUE, const.dir = f.dir2) #solver 
 sol2 &lt;- solveLP(f.obj, f.b2, f.A2, maximum = TRUE, const.dir = f.dir2) #solver 
 sol2bis &lt;- lp(direction = &quot;max&quot;, objective.in = f.obj, const.mat = f.A2, const.dir = f.dir2, const.rhs = f.b2)
-
-sol2$con</code></pre>
+sol2$con
+</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgIGFjdHVhbCBkaXIgYnZlYyBmcmVlICBkdWFsIGR1YWwucmVnXG4xICAgICAgMjcyICA+PSAgMTcwICAxMDIgICAgIDAgICAgICAxMDJcbjIgICAgICAyNzIgIDw9ICAyNzIgICAgMCAzNzkzMSAgICAgIDEwMlxuMyAgICAgICA4MCAgPj0gICA0MSAgIDM5ICAgICAwICAgICAgIDM5XG40ICAgICAgIDgwICA8PSAgIDgwICAgIDAgMzE4NjIgICAgICAgMzlcbjUgICAgICAyNzIgID49ICAxNzAgIDEwMiAgICAgMCAgICAgIDEwMlxuNiAgICAgIDI3MiAgPD0gIDI3MiAgICAwIDE0ODYwICAgICAgMTAyXG43ICAgICAgIDgwICA+PSAgIDQxICAgMzkgICAgIDAgICAgICAgMzlcbjggICAgICAgODAgIDw9ICAgODAgICAgMCAgODE1NCAgICAgICAzOVxuOSAgICAgIDI3MiAgPj0gIDE3MCAgMTAyICAgICAwICAgICAgMTAyXG4xMCAgICAgMjcyICA8PSAgMjcyICAgIDAgMTg1NDkgICAgICAxMDJcbjExICAgICAgODAgID49ICAgNDEgICAzOSAgICAgMCAgICAgICAzOVxuMTIgICAgICA4MCAgPD0gICA4MCAgICAwIDM4NDcxICAgICAgIDM5XG4xMyAgICAgMjcyICA+PSAgMTcwICAxMDIgICAgIDAgICAgICAxMDJcbjE0ICAgICAyNzIgIDw9ICAyNzIgICAgMCAzMDkzNiAgICAgIDEwMlxuMTUgICAgICA4MCAgPj0gICA0MSAgIDM5ICAgICAwICAgICAgIDM5XG4xNiAgICAgIDgwICA8PSAgIDgwICAgIDAgMTU5MTggICAgICAgMzlcbjE3ICAgICAxNDQgID49ICAgOTAgICA1NCAgICAgMCAgICAgICA1NFxuMTggICAgIDE0NCAgPD0gIDE0NCAgICAwIDg3OTQ3ICAgICAgIDU0XG4xOSAgICAgIDM1ICA+PSAgIDE4ICAgMTcgICAgIDAgICAgICAgMTdcbjIwICAgICAgMzUgIDw9ICAgMzUgICAgMCAxMjE5NiAgICAgICAxN1xuMjEgICAgIDE0NCAgPj0gICA5MCAgIDU0ICAgICAwICAgICAgIDU0XG4yMiAgICAgMTQ0ICA8PSAgMTQ0ICAgIDAgMjQ1NDMgICAgICAgNTRcbjIzICAgICAgMzUgID49ICAgMTggICAxNyAgICAgMCAgICAgICAxN1xuMjQgICAgICAzNSAgPD0gICAzNSAgICAwICA3OTM4ICAgICAgIDE3XG4yNSAgICAgMTQ0ICA+PSAgIDkwICAgNTQgICAgIDAgICAgICAgNTRcbjI2ICAgICAxNDQgIDw9ICAxNDQgICAgMCAxMTg5OSAgICAgICA1NFxuMjcgICAgICAzNSAgPj0gICAxOCAgIDE3ICAgICAwICAgICAgIDE3XG4yOCAgICAgIDM1ICA8PSAgIDM1ICAgIDAgNDQ2ODYgICAgICAgMTdcbjI5ICAgICAxNDQgID49ICAgOTAgICA1NCAgICAgMCAgICAgICA1NFxuMzAgICAgIDE0NCAgPD0gIDE0NCAgICAwIDg0MzU0ICAgICAgIDU0XG4zMSAgICAgIDM1ICA+PSAgIDE4ICAgMTcgICAgIDAgICAgICAgMTdcbjMyICAgICAgMzUgIDw9ICAgMzUgICAgMCAxMTg3NSAgICAgICAxN1xuMzMgICAgIDEzMyAgPj0gICA4MyAgIDUwICAgICAwICAgICAgIDUwXG4zNCAgICAgMTMzICA8PSAgMTMzICAgIDAgMTQ3MzYgICAgICAgNTBcbjM1ICAgICAgNDUgID49ICAgMjMgICAyMiAgICAgMCAgICAgICAyMlxuMzYgICAgICA0NSAgPD0gICA0NSAgICAwIDQzNDY0ICAgICAgIDIyXG4zNyAgICAgMTMzICA+PSAgIDgzICAgNTAgICAgIDAgICAgICAgNTBcbjM4ICAgICAxMzMgIDw9ICAxMzMgICAgMCAgOTc5MCAgICAgICA1MFxuMzkgICAgICA0NSAgPj0gICAyMyAgIDIyICAgICAwICAgICAgIDIyXG40MCAgICAgIDQ1ICA8PSAgIDQ1ICAgIDAgIDc1MzQgICAgICAgMjJcbjQxICAgICAxMzMgID49ICAgODMgICA1MCAgICAgMCAgICAgICA1MFxuNDIgICAgIDEzMyAgPD0gIDEzMyAgICAwIDE0NjI3ICAgICAgIDUwXG40MyAgICAgIDQ1ICA+PSAgIDIzICAgMjIgICAgIDAgICAgICAgMjJcbjQ0ICAgICAgNDUgIDw9ICAgNDUgICAgMCAyMzYwNSAgICAgICAyMlxuNDUgICAgIDEzMyAgPj0gICA4MyAgIDUwICAgICAwICAgICAgIDUwXG40NiAgICAgMTMzICA8PSAgMTMzICAgIDAgMzc4MzIgICAgICAgNTBcbjQ3ICAgICAgNDUgID49ICAgMjMgICAyMiAgICAgMCAgICAgICAyMlxuNDggICAgICA0NSAgPD0gICA0NSAgICAwIDEzMTg4ICAgICAgIDIyXG40OSAgICAgMTQyICA+PSAgIDg5ICAgNTMgICAgIDAgICAgICAgNTNcbjUwICAgICAxNDIgIDw9ICAxNDIgICAgMCAxMjExOSAgICAgICA1M1xuNTEgICAgICA0MSAgPj0gICAyMSAgIDIwICAgICAwICAgICAgIDIwXG41MiAgICAgIDQxICA8PSAgIDQxICAgIDAgMjcxMDAgICAgICAgMjBcbjUzICAgICAxNDIgID49ICAgODkgICA1MyAgICAgMCAgICAgICA1M1xuNTQgICAgIDE0MiAgPD0gIDE0MiAgICAwIDQyNTcyICAgICAgIDUzXG41NSAgICAgIDQxICA+PSAgIDIxICAgMjAgICAgIDAgICAgICAgMjBcbjU2ICAgICAgNDEgIDw9ICAgNDEgICAgMCAgNjMwMyAgICAgICAyMFxuNTcgICAgIDE0MiAgPj0gICA4OSAgIDUzICAgICAwICAgICAgIDUzXG41OCAgICAgMTQyICA8PSAgMTQyICAgIDAgMjA1NTcgICAgICAgNTNcbjU5ICAgICAgNDEgID49ICAgMjEgICAyMCAgICAgMCAgICAgICAyMFxuNjAgICAgICA0MSAgPD0gICA0MSAgICAwIDM4OTMxICAgICAgIDIwXG42MSAgICAgMTQyICA+PSAgIDg5ICAgNTMgICAgIDAgICAgICAgNTNcbjYyICAgICAxNDIgIDw9ICAxNDIgICAgMCAzNDkwNiAgICAgICA1M1xuNjMgICAgICA0MSAgPj0gICAyMSAgIDIwICAgICAwICAgICAgIDIwXG42NCAgICAgIDQxICA8PSAgIDQxICAgIDAgMTMzMzQgICAgICAgMjBcbjY1ICAgICAxNTggID49ICAgOTkgICA1OSAgICAgMCAgICAgICA1OVxuNjYgICAgIDE1OCAgPD0gIDE1OCAgICAwIDI2ODQzICAgICAgIDU5XG42NyAgICAgIDM3ICA+PSAgIDE5ICAgMTggICAgIDAgICAgICAgMThcbjY4ICAgICAgMzcgIDw9ICAgMzcgICAgMCAyMjI5NCAgICAgICAxOFxuNjkgICAgIDE1OCAgPj0gICA5OSAgIDU5ICAgICAwICAgICAgIDU5XG43MCAgICAgMTU4ICA8PSAgMTU4ICAgIDAgMTY4NDkgICAgICAgNTlcbjcxICAgICAgMzcgID49ICAgMTkgICAxOCAgICAgMCAgICAgICAxOFxuNzIgICAgICAzNyAgPD0gICAzNyAgICAwICA1NzYwICAgICAgIDE4XG43MyAgICAgMTU4ICA+PSAgIDk5ICAgNTkgICAgIDAgICAgICAgNTlcbjc0ICAgICAxNTggIDw9ICAxNTggICAgMCAxMzc2NCAgICAgICA1OVxuNzUgICAgICAzNyAgPj0gICAxOSAgIDE4ICAgICAwICAgICAgIDE4XG43NiAgICAgIDM3ICA8PSAgIDM3ICAgIDAgODA5NzQgICAgICAgMThcbjc3ICAgICAxNTggID49ICAgOTkgICA1OSAgICAgMCAgICAgICA1OVxuNzggICAgIDE1OCAgPD0gIDE1OCAgICAwIDQ2NjEwICAgICAgIDU5XG43OSAgICAgIDM3ICA+PSAgIDE5ICAgMTggICAgIDAgICAgICAgMThcbjgwICAgICAgMzcgIDw9ICAgMzcgICAgMCAxMjExNCAgICAgICAxOFxuODEgICAgIDE1NiAgPj0gICA5NyAgIDU5ICAgICAwICAgICAgIDU5XG44MiAgICAgMTU2ICA8PSAgMTU2ICAgIDAgMzU3NjIgICAgICAgNTlcbjgzICAgICAgMzggID49ICAgMjAgICAxOCAgICAgMCAgICAgICAxOFxuODQgICAgICAzOCAgPD0gICAzOCAgICAwIDIxNTA0ICAgICAgIDE4XG44NSAgICAgMTU2ICA+PSAgIDk3ICAgNTkgICAgIDAgICAgICAgNTlcbjg2ICAgICAxNTYgIDw9ICAxNTYgICAgMCAyMTA2NiAgICAgICA1OVxuODcgICAgICAzOCAgPj0gICAyMCAgIDE4ICAgICAwICAgICAgIDE4XG44OCAgICAgIDM4ICA8PSAgIDM4ICAgIDAgIDc3NDAgICAgICAgMThcbjg5ICAgICAxNTYgID49ICAgOTcgICA1OSAgICAgMCAgICAgICA1OVxuOTAgICAgIDE1NiAgPD0gIDE1NiAgICAwIDIwNzQ0ICAgICAgIDU5XG45MSAgICAgIDM4ICA+PSAgIDIwICAgMTggICAgIDAgICAgICAgMThcbjkyICAgICAgMzggIDw9ICAgMzggICAgMCA0NTk0MyAgICAgICAxOFxuOTMgICAgIDE1NiAgPj0gICA5NyAgIDU5ICAgICAwICAgICAgIDU5XG45NCAgICAgMTU2ICA8PSAgMTU2ICAgIDAgNjUzOTAgICAgICAgNTlcbjk1ICAgICAgMzggID49ICAgMjAgICAxOCAgICAgMCAgICAgICAxOFxuOTYgICAgICAzOCAgPD0gICAzOCAgICAwIDEzNjI5ICAgICAgIDE4XG45NyAgICAgMTI5ICA+PSAgIDgxICAgNDggICAgIDAgICAgICAgNDhcbjk4ICAgICAxMjkgIDw9ICAxMjkgICAgMCAzNzA1OCAgICAgICA0OFxuOTkgICAgICAzNyAgPj0gICAxOSAgIDE4ICAgICAwICAgICAgIDE4XG4xMDAgICAgIDM3ICA8PSAgIDM3ICAgIDAgMjQ2OTAgICAgICAgMThcbjEwMSAgICAxMjkgID49ICAgODEgICA0OCAgICAgMCAgICAgICA0OFxuMTAyICAgIDEyOSAgPD0gIDEyOSAgICAwIDEwNzg5ICAgICAgIDQ4XG4xMDMgICAgIDM3ICA+PSAgIDE5ICAgMTggICAgIDAgICAgICAgMThcbjEwNCAgICAgMzcgIDw9ICAgMzcgICAgMCAgNjIzMCAgICAgICAxOFxuMTA1ICAgIDEyOSAgPj0gICA4MSAgIDQ4ICAgICAwICAgICAgIDQ4XG4xMDYgICAgMTI5ICA8PSAgMTI5ICAgIDAgMjc5MDggICAgICAgNDhcbjEwNyAgICAgMzcgID49ICAgMTkgICAxOCAgICAgMCAgICAgICAxOFxuMTA4ICAgICAzNyAgPD0gICAzNyAgICAwIDc5NDU4ICAgICAgIDE4XG4xMDkgICAgMTI5ICA+PSAgIDgxICAgNDggICAgIDAgICAgICAgNDhcbjExMCAgICAxMjkgIDw9ICAxMjkgICAgMCA2MTY5OCAgICAgICA0OFxuMTExICAgICAzNyAgPj0gICAxOSAgIDE4ICAgICAwICAgICAgIDE4XG4xMTIgICAgIDM3ICA8PSAgIDM3ICAgIDAgMTIyNjYgICAgICAgMThcbjExMyAgICAxNTIgID49ICAgOTUgICA1NyAgICAgMCAgICAgICA1N1xuMTE0ICAgIDE1MiAgPD0gIDE1MiAgICAwIDExMzQ4ICAgICAgIDU3XG4xMTUgICAgIDM1ICA+PSAgIDE4ICAgMTcgICAgIDAgICAgICAgMTdcbjExNiAgICAgMzUgIDw9ICAgMzUgICAgMCAxMjkyNiAgICAgICAxN1xuMTE3ICAgIDE1MiAgPj0gICA5NSAgIDU3ICAgICAwICAgICAgIDU3XG4xMTggICAgMTUyICA8PSAgMTUyICAgIDAgIDg0MjggICAgICAgNTdcbjExOSAgICAgMzUgID49ICAgMTggICAxNyAgICAgMCAgICAgICAxN1xuMTIwICAgICAzNSAgPD0gICAzNSAgICAwICAzMDczICAgICAgIDE3XG4xMjEgICAgMTUyICA+PSAgIDk1ICAgNTcgICAgIDAgICAgICAgNTdcbjEyMiAgICAxNTIgIDw9ICAxNTIgICAgMCAxMzE2MyAgICAgICA1N1xuMTIzICAgICAzNSAgPj0gICAxOCAgIDE3ICAgICAwICAgICAgIDE3XG4xMjQgICAgIDM1ICA8PSAgIDM1ICAgIDAgMjk2MjkgICAgICAgMTdcbjEyNSAgICAxNTIgID49ICAgOTUgICA1NyAgICAgMCAgICAgICA1N1xuMTI2ICAgIDE1MiAgPD0gIDE1MiAgICAwIDU2MzAwICAgICAgIDU3XG4xMjcgICAgIDM1ICA+PSAgIDE4ICAgMTcgICAgIDAgICAgICAgMTdcbjEyOCAgICAgMzUgIDw9ICAgMzUgICAgMCAxMjEwMSAgICAgICAxN1xuMTI5ICAgIDE1OSAgPj0gIDEwMCAgIDU5ICAgICAwICAgICAgIDU5XG4xMzAgICAgMTU5ICA8PSAgMTU5ICAgIDAgMjA5MTYgICAgICAgNTlcbjEzMSAgICAgNDEgID49ICAgMjEgICAyMCAgICAgMCAgICAgICAyMFxuMTMyICAgICA0MSAgPD0gICA0MSAgICAwIDE1MzE5ICAgICAgIDIwXG4xMzMgICAgMTU5ICA+PSAgMTAwICAgNTkgICAgIDAgICAgICAgNTlcbjEzNCAgICAxNTkgIDw9ICAxNTkgICAgMCAgOTYzNSAgICAgICA1OVxuMTM1ICAgICA0MSAgPj0gICAyMSAgIDIwICAgICAwICAgICAgIDIwXG4xMzYgICAgIDQxICA8PSAgIDQxICAgIDAgIDY2MzAgICAgICAgMjBcbjEzNyAgICAxNTkgID49ICAxMDAgICA1OSAgICAgMCAgICAgICA1OVxuMTM4ICAgIDE1OSAgPD0gIDE1OSAgICAwIDI1NzUzICAgICAgIDU5XG4xMzkgICAgIDQxICA+PSAgIDIxICAgMjAgICAgIDAgICAgICAgMjBcbjE0MCAgICAgNDEgIDw9ICAgNDEgICAgMCA3Mzk1NiAgICAgICAyMFxuMTQxICAgIDE1OSAgPj0gIDEwMCAgIDU5ICAgICAwICAgICAgIDU5XG4xNDIgICAgMTU5ICA8PSAgMTU5ICAgIDAgMzgzMzAgICAgICAgNTlcbjE0MyAgICAgNDEgID49ICAgMjEgICAyMCAgICAgMCAgICAgICAyMFxuMTQ0ICAgICA0MSAgPD0gICA0MSAgICAwIDEyNzU1ICAgICAgIDIwXG4xNDUgICAgMTUzICA+PSAgIDk2ICAgNTcgICAgIDAgICAgICAgNTdcbjE0NiAgICAxNTMgIDw9ICAxNTMgICAgMCA3MzM5MyAgICAgICA1N1xuMTQ3ICAgICA0MyAgPj0gICAyMiAgIDIxICAgICAwICAgICAgIDIxXG4xNDggICAgIDQzICA8PSAgIDQzICAgIDAgMjU4MDkgICAgICAgMjFcbjE0OSAgICAxNTMgID49ICAgOTYgICA1NyAgICAgMCAgICAgICA1N1xuMTUwICAgIDE1MyAgPD0gIDE1MyAgICAwIDI4OTQ0ICAgICAgIDU3XG4xNTEgICAgIDQzICA+PSAgIDIyICAgMjEgICAgIDAgICAgICAgMjFcbjE1MiAgICAgNDMgIDw9ICAgNDMgICAgMCAgODIxNyAgICAgICAyMVxuMTUzICAgIDE1MyAgPj0gICA5NiAgIDU3ICAgICAwICAgICAgIDU3XG4xNTQgICAgMTUzICA8PSAgMTUzICAgIDAgMTIyOTEgICAgICAgNTdcbjE1NSAgICAgNDMgID49ICAgMjIgICAyMSAgICAgMCAgICAgICAyMVxuMTU2ICAgICA0MyAgPD0gICA0MyAgICAwIDc1Mjc4ICAgICAgIDIxXG4xNTcgICAgMTUzICA+PSAgIDk2ICAgNTcgICAgIDAgICAgICAgNTdcbjE1OCAgICAxNTMgIDw9ICAxNTMgICAgMCAyOTA4NiAgICAgICA1N1xuMTU5ICAgICA0MyAgPj0gICAyMiAgIDIxICAgICAwICAgICAgIDIxXG4xNjAgICAgIDQzICA8PSAgIDQzICAgIDAgMTQyMDkgICAgICAgMjFcbjE2MSAgICAxNDAgID49ICAgODggICA1MiAgICAgMCAgICAgICA1MlxuMTYyICAgIDE0MCAgPD0gIDE0MCAgICAwIDQ5MzQzICAgICAgIDUyXG4xNjMgICAgIDQzICA+PSAgIDIyICAgMjEgICAgIDAgICAgICAgMjFcbjE2NCAgICAgNDMgIDw9ICAgNDMgICAgMCA0MDUzNiAgICAgICAyMVxuMTY1ICAgIDE0MCAgPj0gICA4OCAgIDUyICAgICAwICAgICAgIDUyXG4xNjYgICAgMTQwICA8PSAgMTQwICAgIDAgMjMwODkgICAgICAgNTJcbiBbIHJlYWNoZWQgZ2V0T3B0aW9uKFwibWF4LnByaW50XCIpIC0tIG9taXR0ZWQgMjYgcm93cyBdXG4ifQ== -->
+<pre><code>    actual dir bvec free  dual dual.reg
+1      272  &gt;=  170  102     0      102
+2      272  &lt;=  272    0 37931      102
+3       80  &gt;=   41   39     0       39
+4       80  &lt;=   80    0 31862       39
+5      272  &gt;=  170  102     0      102
+6      272  &lt;=  272    0 14860      102
+7       80  &gt;=   41   39     0       39
+8       80  &lt;=   80    0  8154       39
+9      272  &gt;=  170  102     0      102
+10     272  &lt;=  272    0 18549      102
+11      80  &gt;=   41   39     0       39
+12      80  &lt;=   80    0 38471       39
+13     272  &gt;=  170  102     0      102
+14     272  &lt;=  272    0 30936      102
+15      80  &gt;=   41   39     0       39
+16      80  &lt;=   80    0 15918       39
+17     144  &gt;=   90   54     0       54
+18     144  &lt;=  144    0 87947       54
+19      35  &gt;=   18   17     0       17
+20      35  &lt;=   35    0 12196       17
+21     144  &gt;=   90   54     0       54
+22     144  &lt;=  144    0 24543       54
+23      35  &gt;=   18   17     0       17
+24      35  &lt;=   35    0  7938       17
+25     144  &gt;=   90   54     0       54
+26     144  &lt;=  144    0 11899       54
+27      35  &gt;=   18   17     0       17
+28      35  &lt;=   35    0 44686       17
+29     144  &gt;=   90   54     0       54
+30     144  &lt;=  144    0 84354       54
+31      35  &gt;=   18   17     0       17
+32      35  &lt;=   35    0 11875       17
+33     133  &gt;=   83   50     0       50
+34     133  &lt;=  133    0 14736       50
+35      45  &gt;=   23   22     0       22
+36      45  &lt;=   45    0 43464       22
+37     133  &gt;=   83   50     0       50
+38     133  &lt;=  133    0  9790       50
+39      45  &gt;=   23   22     0       22
+40      45  &lt;=   45    0  7534       22
+41     133  &gt;=   83   50     0       50
+42     133  &lt;=  133    0 14627       50
+43      45  &gt;=   23   22     0       22
+44      45  &lt;=   45    0 23605       22
+45     133  &gt;=   83   50     0       50
+46     133  &lt;=  133    0 37832       50
+47      45  &gt;=   23   22     0       22
+48      45  &lt;=   45    0 13188       22
+49     142  &gt;=   89   53     0       53
+50     142  &lt;=  142    0 12119       53
+51      41  &gt;=   21   20     0       20
+52      41  &lt;=   41    0 27100       20
+53     142  &gt;=   89   53     0       53
+54     142  &lt;=  142    0 42572       53
+55      41  &gt;=   21   20     0       20
+56      41  &lt;=   41    0  6303       20
+57     142  &gt;=   89   53     0       53
+58     142  &lt;=  142    0 20557       53
+59      41  &gt;=   21   20     0       20
+60      41  &lt;=   41    0 38931       20
+61     142  &gt;=   89   53     0       53
+62     142  &lt;=  142    0 34906       53
+63      41  &gt;=   21   20     0       20
+64      41  &lt;=   41    0 13334       20
+65     158  &gt;=   99   59     0       59
+66     158  &lt;=  158    0 26843       59
+67      37  &gt;=   19   18     0       18
+68      37  &lt;=   37    0 22294       18
+69     158  &gt;=   99   59     0       59
+70     158  &lt;=  158    0 16849       59
+71      37  &gt;=   19   18     0       18
+72      37  &lt;=   37    0  5760       18
+73     158  &gt;=   99   59     0       59
+74     158  &lt;=  158    0 13764       59
+75      37  &gt;=   19   18     0       18
+76      37  &lt;=   37    0 80974       18
+77     158  &gt;=   99   59     0       59
+78     158  &lt;=  158    0 46610       59
+79      37  &gt;=   19   18     0       18
+80      37  &lt;=   37    0 12114       18
+81     156  &gt;=   97   59     0       59
+82     156  &lt;=  156    0 35762       59
+83      38  &gt;=   20   18     0       18
+84      38  &lt;=   38    0 21504       18
+85     156  &gt;=   97   59     0       59
+86     156  &lt;=  156    0 21066       59
+87      38  &gt;=   20   18     0       18
+88      38  &lt;=   38    0  7740       18
+89     156  &gt;=   97   59     0       59
+90     156  &lt;=  156    0 20744       59
+91      38  &gt;=   20   18     0       18
+92      38  &lt;=   38    0 45943       18
+93     156  &gt;=   97   59     0       59
+94     156  &lt;=  156    0 65390       59
+95      38  &gt;=   20   18     0       18
+96      38  &lt;=   38    0 13629       18
+97     129  &gt;=   81   48     0       48
+98     129  &lt;=  129    0 37058       48
+99      37  &gt;=   19   18     0       18
+100     37  &lt;=   37    0 24690       18
+101    129  &gt;=   81   48     0       48
+102    129  &lt;=  129    0 10789       48
+103     37  &gt;=   19   18     0       18
+104     37  &lt;=   37    0  6230       18
+105    129  &gt;=   81   48     0       48
+106    129  &lt;=  129    0 27908       48
+107     37  &gt;=   19   18     0       18
+108     37  &lt;=   37    0 79458       18
+109    129  &gt;=   81   48     0       48
+110    129  &lt;=  129    0 61698       48
+111     37  &gt;=   19   18     0       18
+112     37  &lt;=   37    0 12266       18
+113    152  &gt;=   95   57     0       57
+114    152  &lt;=  152    0 11348       57
+115     35  &gt;=   18   17     0       17
+116     35  &lt;=   35    0 12926       17
+117    152  &gt;=   95   57     0       57
+118    152  &lt;=  152    0  8428       57
+119     35  &gt;=   18   17     0       17
+120     35  &lt;=   35    0  3073       17
+121    152  &gt;=   95   57     0       57
+122    152  &lt;=  152    0 13163       57
+123     35  &gt;=   18   17     0       17
+124     35  &lt;=   35    0 29629       17
+125    152  &gt;=   95   57     0       57
+126    152  &lt;=  152    0 56300       57
+127     35  &gt;=   18   17     0       17
+128     35  &lt;=   35    0 12101       17
+129    159  &gt;=  100   59     0       59
+130    159  &lt;=  159    0 20916       59
+131     41  &gt;=   21   20     0       20
+132     41  &lt;=   41    0 15319       20
+133    159  &gt;=  100   59     0       59
+134    159  &lt;=  159    0  9635       59
+135     41  &gt;=   21   20     0       20
+136     41  &lt;=   41    0  6630       20
+137    159  &gt;=  100   59     0       59
+138    159  &lt;=  159    0 25753       59
+139     41  &gt;=   21   20     0       20
+140     41  &lt;=   41    0 73956       20
+141    159  &gt;=  100   59     0       59
+142    159  &lt;=  159    0 38330       59
+143     41  &gt;=   21   20     0       20
+144     41  &lt;=   41    0 12755       20
+145    153  &gt;=   96   57     0       57
+146    153  &lt;=  153    0 73393       57
+147     43  &gt;=   22   21     0       21
+148     43  &lt;=   43    0 25809       21
+149    153  &gt;=   96   57     0       57
+150    153  &lt;=  153    0 28944       57
+151     43  &gt;=   22   21     0       21
+152     43  &lt;=   43    0  8217       21
+153    153  &gt;=   96   57     0       57
+154    153  &lt;=  153    0 12291       57
+155     43  &gt;=   22   21     0       21
+156     43  &lt;=   43    0 75278       21
+157    153  &gt;=   96   57     0       57
+158    153  &lt;=  153    0 29086       57
+159     43  &gt;=   22   21     0       21
+160     43  &lt;=   43    0 14209       21
+161    140  &gt;=   88   52     0       52
+162    140  &lt;=  140    0 49343       52
+163     43  &gt;=   22   21     0       21
+164     43  &lt;=   43    0 40536       21
+165    140  &gt;=   88   52     0       52
+166    140  &lt;=  140    0 23089       52
+ [ reached getOption(&quot;max.print&quot;) -- omitted 26 rows ]</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Unisci vincoli</p>
+<p>Unisci vincoli - soluzione totale finora</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuc29sJGNvblxuXG5gYGBcbmBgYCJ9 -->
-<p><code>r</code>r sol$con</p>
-<pre><code></code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZi5BIDwtIHJiaW5kKGYuQTEsIGYuQTIpXG5mLmIgPC0gYyhmLmIxLCBmLmIyKVxuZi5kaXIgPC0gYyhmLmRpcjEsIGYuZGlyMilcbnNvbCA8LSBzb2x2ZUxQKGYub2JqLCBmLmIsIGYuQSwgbWF4aW11bSA9IFRSVUUsIGNvbnN0LmRpciA9IGYuZGlyKSAjc29sdmVyIFxuc29sMmJpcyA8LSBscChkaXJlY3Rpb24gPSBcIm1heFwiLCBvYmplY3RpdmUuaW4gPSBmLm9iaiwgY29uc3QubWF0ID0gZi5BLCBjb25zdC5kaXIgPSBmLmRpciwgY29uc3QucmhzID0gZi5iKVxuc29sJGNvblxuYGBgIn0= -->
+<pre class="r"><code>f.A &lt;- rbind(f.A1, f.A2)
+f.b &lt;- c(f.b1, f.b2)
+f.dir &lt;- c(f.dir1, f.dir2)
+sol &lt;- solveLP(f.obj, f.b, f.A, maximum = TRUE, const.dir = f.dir) #solver 
+sol2bis &lt;- lp(direction = &quot;max&quot;, objective.in = f.obj, const.mat = f.A, const.dir = f.dir, const.rhs = f.b)
+sol$con</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiICAgIGFjdHVhbCBkaXIgYnZlYyBmcmVlICBkdWFsIGR1YWwucmVnXG4xICAgICAgNDUwICA8PSAgNDUwICAgIDAgODQzNTQgICAgICAgNDVcbjIgICAgICAgOTkgIDw9ICAgOTkgICAgMCAxMjE5NiAgICAgICAgOVxuMyAgICAgIDQxNiAgPD0gIDQxNiAgICAwIDE0NzM2ICAgICAgIDQyXG40ICAgICAgMTI5ICA8PSAgMTI5ICAgIDAgMjM2MDUgICAgICAgMTJcbjUgICAgICA0NDMgIDw9ICA0NDMgICAgMCAzNDkwNiAgICAgICA0M1xuNiAgICAgIDExNyAgPD0gIDExNyAgICAwIDEzMzM0ICAgICAgICAxXG43ICAgICAgNDk1ICA8PSAgNDk1ICAgIDAgMTY4NDkgICAgICAgIDFcbjggICAgICAxMDYgIDw9ICAxMDYgICAgMCAyMjI5NCAgICAgICAxMVxuOSAgICAgIDQ4NyAgPD0gIDQ4NyAgICAwIDIxMDY2ICAgICAgICAxXG4xMCAgICAgMTEwICA8PSAgMTEwICAgIDAgMjE1MDQgICAgICAgMTFcbjExICAgICA0MDQgIDw9ICA0MDQgICAgMCAzNzA1OCAgICAgICA0MFxuMTIgICAgIDEwNyAgPD0gIDEwNyAgICAwIDEyMjY2ICAgICAgICAxXG4xMyAgICAgNDc0ICA8PSAgNDc0ICAgIDAgMTMxNjMgICAgICAgNDdcbjE0ICAgICAxMDEgIDw9ICAxMDEgICAgMCAxMjEwMSAgICAgICAgMVxuMTUgICAgIDQ5OCAgPD0gIDQ5OCAgICAwIDI1NzUzICAgICAgIDQ5XG4xNiAgICAgMTE2ICA8PSAgMTE2ICAgIDAgMTUzMTkgICAgICAgMTJcbjE3ICAgICA0NzggIDw9ICA0NzggICAgMCAyOTA4NiAgICAgICA0N1xuMTggICAgIDEyNCAgPD0gIDEyNCAgICAwIDI1ODA5ICAgICAgIDEyXG4xOSAgICAgNDM4ICA8PSAgNDM4ICAgIDAgNDkzNDMgICAgICAgNDNcbjIwICAgICAxMjQgIDw9ICAxMjQgICAgMCA0MDUzNiAgICAgICAxMlxuMjEgICAgIDQ2NCAgPD0gIDQ2NCAgICAwIDM3MzU1ICAgICAgIDQ2XG4yMiAgICAgMTMyICA8PSAgMTMyICAgIDAgMzg5NzQgICAgICAgMTRcbjIzICAgICAxMzUgID49ICAgOTAgICA0NSAgICAgMCAgICAgICA0NVxuMjQgICAgIDEzNSAgPD0gIDEzNSAgICAwICAzNTkzICAgICAgIDQ1XG4yNSAgICAgIDkwICA+PSAgIDkwICAgIDAgNTk4MTEgICAgICAgNDVcbjI2ICAgICAgOTAgIDw9ICAxMzUgICA0NSAgICAgMCAgICAgICA0NVxuMjcgICAgICA5MCAgPj0gICA5MCAgICAwIDcyNDU1ICAgICAgIDQ1XG4yOCAgICAgIDkwICA8PSAgMTM1ICAgNDUgICAgIDAgICAgICAgNDVcbjI5ICAgICAxMzUgID49ICAgOTAgICA0NSAgICAgMCAgICAgICA0NVxuMzAgICAgIDEzNSAgPD0gIDEzNSAgICAwICAgICAwICAgICAgIE5BXG4zMSAgICAgIDI5ICA+PSAgIDIwICAgIDkgICAgIDAgICAgICAgIDlcbjMyICAgICAgMjkgIDw9ICAgMzAgICAgMSAgICAgMCAgICAgICAgMVxuMzMgICAgICAyMCAgPj0gICAyMCAgICAwICA0MjU4ICAgICAgICA5XG4zNCAgICAgIDIwICA8PSAgIDMwICAgMTAgICAgIDAgICAgICAgMTBcbjM1ICAgICAgMzAgID49ICAgMjAgICAxMCAgICAgMCAgICAgICAxMFxuMzYgICAgICAzMCAgPD0gICAzMCAgICAwIDMyNDkwICAgICAgICAxXG4zNyAgICAgIDIwICA+PSAgIDIwICAgIDAgICAzMjEgICAgICAgIDlcbjM4ICAgICAgMjAgIDw9ICAgMzAgICAxMCAgICAgMCAgICAgICAxMFxuMzkgICAgIDEyNSAgPj0gICA4MyAgIDQyICAgICAwICAgICAgIDQyXG40MCAgICAgMTI1ICA8PSAgMTI1ICAgIDAgICAgIDAgICAgICAgTkFcbjQxICAgICAgODMgID49ICAgODMgICAgMCAgNDk0NiAgICAgICA0MlxuNDIgICAgICA4MyAgPD0gIDEyNSAgIDQyICAgICAwICAgICAgIDQyXG40MyAgICAgIDgzICA+PSAgIDgzICAgIDAgICAxMDkgICAgICAgNDJcbjQ0ICAgICAgODMgIDw9ICAxMjUgICA0MiAgICAgMCAgICAgICA0MlxuNDUgICAgIDEyNSAgPj0gICA4MyAgIDQyICAgICAwICAgICAgIDQyXG40NiAgICAgMTI1ICA8PSAgMTI1ICAgIDAgMjMwOTYgICAgICAgNDJcbjQ3ICAgICAgMzkgID49ICAgMjYgICAxMyAgICAgMCAgICAgICAxM1xuNDggICAgICAzOSAgPD0gICAzOSAgICAwIDE5ODU5ICAgICAgICAxXG40OSAgICAgIDI2ICA+PSAgIDI2ICAgIDAgMTYwNzEgICAgICAgMTJcbjUwICAgICAgMjYgIDw9ICAgMzkgICAxMyAgICAgMCAgICAgICAxM1xuNTEgICAgICAzOCAgPj0gICAyNiAgIDEyICAgICAwICAgICAgIDEyXG41MiAgICAgIDM4ICA8PSAgIDM5ICAgIDEgICAgIDAgICAgICAgIDFcbjUzICAgICAgMjYgID49ICAgMjYgICAgMCAxMDQxNyAgICAgICAxMlxuNTQgICAgICAyNiAgPD0gICAzOSAgIDEzICAgICAwICAgICAgIDEzXG41NSAgICAgIDg5ICA+PSAgIDg5ICAgIDAgMjI3ODcgICAgICAgNDNcbjU2ICAgICAgODkgIDw9ICAxMzMgICA0NCAgICAgMCAgICAgICA0NFxuNTcgICAgIDEzMyAgPj0gICA4OSAgIDQ0ICAgICAwICAgICAgIDQ0XG41OCAgICAgMTMzICA8PSAgMTMzICAgIDAgIDc2NjYgICAgICAgIDFcbjU5ICAgICAgODkgID49ICAgODkgICAgMCAxNDM0OSAgICAgICA0M1xuNjAgICAgICA4OSAgPD0gIDEzMyAgIDQ0ICAgICAwICAgICAgIDQ0XG42MSAgICAgMTMyICA+PSAgIDg5ICAgNDMgICAgIDAgICAgICAgNDNcbjYyICAgICAxMzIgIDw9ICAxMzMgICAgMSAgICAgMCAgICAgICAgMVxuNjMgICAgICAzNSAgPj0gICAyMyAgIDEyICAgICAwICAgICAgIDEyXG42NCAgICAgIDM1ICA8PSAgIDM1ICAgIDAgMTM3NjYgICAgICAgMTFcbjY1ICAgICAgMjMgID49ICAgMjMgICAgMCAgNzAzMSAgICAgICAgMVxuNjYgICAgICAyMyAgPD0gICAzNSAgIDEyICAgICAwICAgICAgIDEyXG42NyAgICAgIDM1ICA+PSAgIDIzICAgMTIgICAgIDAgICAgICAgMTJcbjY4ICAgICAgMzUgIDw9ICAgMzUgICAgMCAyNTU5NyAgICAgICAxMVxuNjkgICAgICAyNCAgPj0gICAyMyAgICAxICAgICAwICAgICAgICAxXG43MCAgICAgIDI0ICA8PSAgIDM1ICAgMTEgICAgIDAgICAgICAgMTFcbjcxICAgICAxNDggID49ICAgOTkgICA0OSAgICAgMCAgICAgICA0OVxuNzIgICAgIDE0OCAgPD0gIDE0OCAgICAwICA5OTk0ICAgICAgIDQ4XG43MyAgICAgMTAwICA+PSAgIDk5ICAgIDEgICAgIDAgICAgICAgIDFcbjc0ICAgICAxMDAgIDw9ICAxNDggICA0OCAgICAgMCAgICAgICA0OFxuNzUgICAgICA5OSAgPj0gICA5OSAgICAwICAzMDg1ICAgICAgICAxXG43NiAgICAgIDk5ICA8PSAgMTQ4ICAgNDkgICAgIDAgICAgICAgNDlcbjc3ICAgICAxNDggID49ICAgOTkgICA0OSAgICAgMCAgICAgICA0OVxuNzggICAgIDE0OCAgPD0gIDE0OCAgICAwIDI5NzYxICAgICAgIDQ4XG43OSAgICAgIDMyICA+PSAgIDIxICAgMTEgICAgIDAgICAgICAgMTFcbjgwICAgICAgMzIgIDw9ICAgMzIgICAgMCAgICAgMCAgICAgICBOQVxuODEgICAgICAyMSAgPj0gICAyMSAgICAwIDE2NTM0ICAgICAgIDExXG44MiAgICAgIDIxICA8PSAgIDMyICAgMTEgICAgIDAgICAgICAgMTFcbjgzICAgICAgMzIgID49ICAgMjEgICAxMSAgICAgMCAgICAgICAxMVxuODQgICAgICAzMiAgPD0gICAzMiAgICAwIDU4NjgwICAgICAgIDExXG44NSAgICAgIDIxICA+PSAgIDIxICAgIDAgMTAxODAgICAgICAgMTFcbjg2ICAgICAgMjEgIDw9ICAgMzIgICAxMSAgICAgMCAgICAgICAxMVxuODcgICAgIDE0NiAgPj0gICA5NyAgIDQ5ICAgICAwICAgICAgIDQ5XG44OCAgICAgMTQ2ICA8PSAgMTQ2ICAgIDAgMTQ2OTYgICAgICAgNDhcbjg5ICAgICAgOTggID49ICAgOTcgICAgMSAgICAgMCAgICAgICAgMVxuOTAgICAgICA5OCAgPD0gIDE0NiAgIDQ4ICAgICAwICAgICAgIDQ4XG45MSAgICAgIDk3ICA+PSAgIDk3ICAgIDAgICAzMjIgICAgICAgIDFcbjkyICAgICAgOTcgIDw9ICAxNDYgICA0OSAgICAgMCAgICAgICA0OVxuOTMgICAgIDE0NiAgPj0gICA5NyAgIDQ5ICAgICAwICAgICAgIDQ5XG45NCAgICAgMTQ2ICA8PSAgMTQ2ICAgIDAgNDQzMjQgICAgICAgNDhcbjk1ICAgICAgMzMgID49ICAgMjIgICAxMSAgICAgMCAgICAgICAxMVxuOTYgICAgICAzMyAgPD0gICAzMyAgICAwICAgICAwICAgICAgIE5BXG45NyAgICAgIDIyICA+PSAgIDIyICAgIDAgMTM3NjQgICAgICAgMTFcbjk4ICAgICAgMjIgIDw9ICAgMzMgICAxMSAgICAgMCAgICAgICAxMVxuOTkgICAgICAzMyAgPj0gICAyMiAgIDExICAgICAwICAgICAgIDExXG4xMDAgICAgIDMzICA8PSAgIDMzICAgIDAgMjQ0MzkgICAgICAgMTFcbjEwMSAgICAgMjIgID49ICAgMjIgICAgMCAgNzg3NSAgICAgICAxMVxuMTAyICAgICAyMiAgPD0gICAzMyAgIDExICAgICAwICAgICAgIDExXG4xMDMgICAgMTIxICA+PSAgIDgxICAgNDAgICAgIDAgICAgICAgNDBcbjEwNCAgICAxMjEgIDw9ICAxMjEgICAgMCAgICAgMCAgICAgICBOQVxuMTA1ICAgICA4MSAgPj0gICA4MSAgICAwIDI2MjY5ICAgICAgIDQwXG4xMDYgICAgIDgxICA8PSAgMTIxICAgNDAgICAgIDAgICAgICAgNDBcbjEwNyAgICAgODEgID49ICAgODEgICAgMCAgOTE1MCAgICAgICA0MFxuMTA4ICAgICA4MSAgPD0gIDEyMSAgIDQwICAgICAwICAgICAgIDQwXG4xMDkgICAgMTIxICA+PSAgIDgxICAgNDAgICAgIDAgICAgICAgNDBcbjExMCAgICAxMjEgIDw9ICAxMjEgICAgMCAyNDY0MCAgICAgICA0MFxuMTExICAgICAzMiAgPj0gICAyMSAgIDExICAgICAwICAgICAgIDExXG4xMTIgICAgIDMyICA8PSAgIDMyICAgIDAgMTI0MjQgICAgICAgMTBcbjExMyAgICAgMjEgID49ICAgMjEgICAgMCAgNjAzNiAgICAgICAgMVxuMTE0ICAgICAyMSAgPD0gICAzMiAgIDExICAgICAwICAgICAgIDExXG4xMTUgICAgIDMyICA+PSAgIDIxICAgMTEgICAgIDAgICAgICAgMTFcbjExNiAgICAgMzIgIDw9ICAgMzIgICAgMCA2NzE5MiAgICAgICAxMFxuMTE3ICAgICAyMiAgPj0gICAyMSAgICAxICAgICAwICAgICAgICAxXG4xMTggICAgIDIyICA8PSAgIDMyICAgMTAgICAgIDAgICAgICAgMTBcbjExOSAgICAgOTUgID49ICAgOTUgICAgMCAgMTgxNSAgICAgICA0N1xuMTIwICAgICA5NSAgPD0gIDE0MiAgIDQ3ICAgICAwICAgICAgIDQ3XG4xMjEgICAgIDk1ICA+PSAgIDk1ICAgIDAgIDQ3MzUgICAgICAgNDdcbjEyMiAgICAgOTUgIDw9ICAxNDIgICA0NyAgICAgMCAgICAgICA0N1xuMTIzICAgIDE0MiAgPj0gICA5NSAgIDQ3ICAgICAwICAgICAgIDQ3XG4xMjQgICAgMTQyICA8PSAgMTQyICAgIDAgICAgIDAgICAgICAgTkFcbjEyNSAgICAxNDIgID49ICAgOTUgICA0NyAgICAgMCAgICAgICA0N1xuMTI2ICAgIDE0MiAgPD0gIDE0MiAgICAwIDQzMTM3ICAgICAgIDQ3XG4xMjcgICAgIDMwICA+PSAgIDIwICAgMTAgICAgIDAgICAgICAgMTBcbjEyOCAgICAgMzAgIDw9ICAgMzAgICAgMCAgIDgyNSAgICAgICAgOVxuMTI5ICAgICAyMCAgPj0gICAyMCAgICAwICA5MDI4ICAgICAgICAxXG4xMzAgICAgIDIwICA8PSAgIDMwICAgMTAgICAgIDAgICAgICAgMTBcbjEzMSAgICAgMzAgID49ICAgMjAgICAxMCAgICAgMCAgICAgICAxMFxuMTMyICAgICAzMCAgPD0gICAzMCAgICAwIDE3NTI4ICAgICAgICA5XG4xMzMgICAgIDIxICA+PSAgIDIwICAgIDEgICAgIDAgICAgICAgIDFcbjEzNCAgICAgMjEgIDw9ICAgMzAgICAgOSAgICAgMCAgICAgICAgOVxuMTM1ICAgIDEwMCAgPj0gIDEwMCAgICAwICA0ODM3ICAgICAgIDQ5XG4xMzYgICAgMTAwICA8PSAgMTQ5ICAgNDkgICAgIDAgICAgICAgNDlcbjEzNyAgICAxMDAgID49ICAxMDAgICAgMCAxNjExOCAgICAgICA0OVxuMTM4ICAgIDEwMCAgPD0gIDE0OSAgIDQ5ICAgICAwICAgICAgIDQ5XG4xMzkgICAgMTQ5ICA+PSAgMTAwICAgNDkgICAgIDAgICAgICAgNDlcbjE0MCAgICAxNDkgIDw9ICAxNDkgICAgMCAgICAgMCAgICAgICBOQVxuMTQxICAgIDE0OSAgPj0gIDEwMCAgIDQ5ICAgICAwICAgICAgIDQ5XG4xNDIgICAgMTQ5ICA8PSAgMTQ5ICAgIDAgMTI1NzcgICAgICAgNDlcbjE0MyAgICAgMzUgID49ICAgMjMgICAxMiAgICAgMCAgICAgICAxMlxuMTQ0ICAgICAzNSAgPD0gICAzNSAgICAwICAgICAwICAgICAgIE5BXG4xNDUgICAgIDIzICA+PSAgIDIzICAgIDAgIDg2ODkgICAgICAgMTJcbjE0NiAgICAgMjMgIDw9ICAgMzUgICAxMiAgICAgMCAgICAgICAxMlxuMTQ3ICAgICAzNSAgPj0gICAyMyAgIDEyICAgICAwICAgICAgIDEyXG4xNDggICAgIDM1ICA8PSAgIDM1ICAgIDAgNTg2MzcgICAgICAgMTJcbjE0OSAgICAgMjMgID49ICAgMjMgICAgMCAgMjU2NCAgICAgICAxMlxuMTUwICAgICAyMyAgPD0gICAzNSAgIDEyICAgICAwICAgICAgIDEyXG4xNTEgICAgMTQzICA+PSAgIDk2ICAgNDcgICAgIDAgICAgICAgNDdcbjE1MiAgICAxNDMgIDw9ICAxNDMgICAgMCA0NDMwNyAgICAgICA0N1xuMTUzICAgICA5NiAgPj0gICA5NiAgICAwICAgMTQyICAgICAgIDQ3XG4xNTQgICAgIDk2ICA8PSAgMTQzICAgNDcgICAgIDAgICAgICAgNDdcbjE1NSAgICAgOTYgID49ICAgOTYgICAgMCAxNjc5NSAgICAgICA0N1xuMTU2ICAgICA5NiAgPD0gIDE0MyAgIDQ3ICAgICAwICAgICAgIDQ3XG4xNTcgICAgMTQzICA+PSAgIDk2ICAgNDcgICAgIDAgICAgICAgNDdcbjE1OCAgICAxNDMgIDw9ICAxNDMgICAgMCAgICAgMCAgICAgICBOQVxuMTU5ICAgICAzNyAgPj0gICAyNSAgIDEyICAgICAwICAgICAgIDEyXG4xNjAgICAgIDM3ICA8PSAgIDM3ICAgIDAgICAgIDAgICAgICAgTkFcbjE2MSAgICAgMjUgID49ICAgMjUgICAgMCAxNzU5MiAgICAgICAxMlxuMTYyICAgICAyNSAgPD0gICAzNyAgIDEyICAgICAwICAgICAgIDEyXG4xNjMgICAgIDM3ICA+PSAgIDI1ICAgMTIgICAgIDAgICAgICAgMTJcbjE2NCAgICAgMzcgIDw9ICAgMzcgICAgMCA0OTQ2OSAgICAgICAxMlxuMTY1ICAgICAyNSAgPj0gICAyNSAgICAwIDExNjAwICAgICAgIDEyXG4xNjYgICAgIDI1ICA8PSAgIDM3ICAgMTIgICAgIDAgICAgICAgMTJcbiBbIHJlYWNoZWQgZ2V0T3B0aW9uKFxcbWF4LnByaW50XFwpIC0tIG9taXR0ZWQgMzIgcm93cyBdXG4ifQ== -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgIGFjdHVhbCBkaXIgYnZlYyBmcmVlICBkdWFsIGR1YWwucmVnXG4xICAgICAgODQ5ICA8PSAgODQ5ICAgIDAgMzA5MzYgICAgICAgNDBcbjIgICAgICAyMzAgIDw9ICAyMzAgICAgMCAzMTg2MiAgICAgICAzMVxuMyAgICAgIDQ1MCAgPD0gIDQ1MCAgICAwIDg0MzU0ICAgICAgIDI5XG40ICAgICAgIDk5ICA8PSAgIDk5ICAgIDAgMTIxOTYgICAgICAgMTBcbjUgICAgICA0MTYgIDw9ICA0MTYgICAgMCAxNDYyNyAgICAgICAxOFxuNiAgICAgIDEyOSAgPD0gIDEyOSAgICAwIDEzMTg4ICAgICAgICAxXG43ICAgICAgNDQzICA8PSAgNDQzICAgIDAgMjA1NTcgICAgICAgIDVcbjggICAgICAxMTcgIDw9ICAxMTcgICAgMCAyNzEwMCAgICAgICAxM1xuOSAgICAgIDQ5NSAgPD0gIDQ5NSAgICAwIDE2ODQ5ICAgICAgIDExXG4xMCAgICAgMTA2ICA8PSAgMTA2ICAgIDAgMjIyOTQgICAgICAgIDRcbjExICAgICA0ODcgIDw9ICA0ODcgICAgMCAzNTc2MiAgICAgICAzOVxuMTIgICAgIDExMCAgPD0gIDExMCAgICAwIDIxNTA0ICAgICAgICA1XG4xMyAgICAgNDA0ICA8PSAgNDA0ICAgIDAgMzcwNTggICAgICAgMTdcbjE0ICAgICAxMDcgIDw9ICAxMDcgICAgMCAxMjI2NiAgICAgICAgN1xuMTUgICAgIDQ3NCAgPD0gIDQ3NCAgICAwIDEzMTYzICAgICAgIDMxXG4xNiAgICAgMTAxICA8PSAgMTAxICAgIDAgMTI5MjYgICAgICAgIDdcbjE3ICAgICA0OTggIDw9ICA0OTggICAgMCAyNTc1MyAgICAgICAzM1xuMTggICAgIDExNiAgPD0gIDExNiAgICAwIDE1MzE5ICAgICAgIDE2XG4xOSAgICAgNDc4ICA8PSAgNDc4ICAgIDAgMjkwODYgICAgICAgMzBcbjIwICAgICAxMjQgIDw9ICAxMjQgICAgMCAxNDIwOSAgICAgICAgMlxuMjEgICAgIDQzOCAgPD0gIDQzOCAgICAwIDI2NzMzICAgICAgIDI2XG4yMiAgICAgMTI0ICA8PSAgMTI0ICAgIDAgMTIzMDcgICAgICAgIDZcbjIzICAgICA0NjQgIDw9ICA0NjQgICAgMCAzNzM1NSAgICAgICAzMlxuMjQgICAgIDEzMiAgPD0gIDEzMiAgICAwIDM4OTc0ICAgICAgICAyXG4yNSAgICAgMjQ4ICA+PSAgMTg3ICAgNjEgICAgIDAgICAgICAgNjFcbjI2ICAgICAyNDggIDw9ICAyNDggICAgMCAgNjk5NSAgICAgICAyMVxuMjcgICAgIDE4NyAgPj0gIDE4NyAgICAwIDE2MDc2ICAgICAgIDQwXG4yOCAgICAgMTg3ICA8PSAgMjQ4ICAgNjEgICAgIDAgICAgICAgNjFcbjI5ICAgICAxODcgID49ICAxODcgICAgMCAxMjM4NyAgICAgICA0MFxuMzAgICAgIDE4NyAgPD0gIDI0OCAgIDYxICAgICAwICAgICAgIDYxXG4zMSAgICAgMjI3ICA+PSAgMTg3ICAgNDAgICAgIDAgICAgICAgNDBcbjMyICAgICAyMjcgIDw9ICAyNDggICAyMSAgICAgMCAgICAgICAyMVxuMzMgICAgICA3MCAgPj0gICAzOSAgIDMxICAgICAwICAgICAgIDMxXG4zNCAgICAgIDcwICA8PSAgIDgyICAgMTIgICAgIDAgICAgICAgMTJcbjM1ICAgICAgMzkgID49ICAgMzkgICAgMCAyMzcwOCAgICAgICAzMVxuMzYgICAgICAzOSAgPD0gICA4MiAgIDQzICAgICAwICAgICAgIDQzXG4zNyAgICAgIDgyICA+PSAgIDM5ICAgNDMgICAgIDAgICAgICAgNDNcbjM4ICAgICAgODIgIDw9ICAgODIgICAgMCAgNjYwOSAgICAgICAxMlxuMzkgICAgICAzOSAgPj0gICAzOSAgICAwIDE1OTQ0ICAgICAgIDMxXG40MCAgICAgIDM5ICA8PSAgIDgyICAgNDMgICAgIDAgICAgICAgNDNcbjQxICAgICAxMzAgID49ICAgOTcgICAzMyAgICAgMCAgICAgICAzM1xuNDIgICAgIDEzMCAgPD0gIDEzMCAgICAwICAzNTkzICAgICAgICA0XG40MyAgICAgIDk3ICA+PSAgIDk3ICAgIDAgNTk4MTEgICAgICAgMjlcbjQ0ICAgICAgOTcgIDw9ICAxMzAgICAzMyAgICAgMCAgICAgICAzM1xuNDUgICAgICA5NyAgPj0gICA5NyAgICAwIDcyNDU1ICAgICAgIDI5XG40NiAgICAgIDk3ICA8PSAgMTMwICAgMzMgICAgIDAgICAgICAgMzNcbjQ3ICAgICAxMjYgID49ICAgOTcgICAyOSAgICAgMCAgICAgICAyOVxuNDggICAgIDEyNiAgPD0gIDEzMCAgICA0ICAgICAwICAgICAgICA0XG40OSAgICAgIDI5ICA+PSAgIDE5ICAgMTAgICAgIDAgICAgICAgMTBcbjUwICAgICAgMjkgIDw9ICAgMzIgICAgMyAgICAgMCAgICAgICAgM1xuNTEgICAgICAxOSAgPj0gICAxOSAgICAwICA0MjU4ICAgICAgIDEwXG41MiAgICAgIDE5ICA8PSAgIDMyICAgMTMgICAgIDAgICAgICAgMTNcbjUzICAgICAgMzIgID49ICAgMTkgICAxMyAgICAgMCAgICAgICAxM1xuNTQgICAgICAzMiAgPD0gICAzMiAgICAwIDMyNDkwICAgICAgICAzXG41NSAgICAgIDE5ICA+PSAgIDE5ICAgIDAgICAzMjEgICAgICAgMTBcbjU2ICAgICAgMTkgIDw9ICAgMzIgICAxMyAgICAgMCAgICAgICAxM1xuNTcgICAgIDExNCAgPj0gICA4NSAgIDI5ICAgICAwICAgICAgIDI5XG41OCAgICAgMTE0ICA8PSAgMTE0ICAgIDAgICAxMDkgICAgICAgMTFcbjU5ICAgICAgODUgID49ICAgODUgICAgMCAgNDgzNyAgICAgICAxOFxuNjAgICAgICA4NSAgPD0gIDExNCAgIDI5ICAgICAwICAgICAgIDI5XG42MSAgICAgMTAzICA+PSAgIDg1ICAgMTggICAgIDAgICAgICAgMThcbjYyICAgICAxMDMgIDw9ICAxMTQgICAxMSAgICAgMCAgICAgICAxMVxuNjMgICAgIDExNCAgPj0gICA4NSAgIDI5ICAgICAwICAgICAgIDI5XG42NCAgICAgMTE0ICA8PSAgMTE0ICAgIDAgMjMyMDUgICAgICAgMTFcbjY1ICAgICAgNDAgID49ICAgMjQgICAxNiAgICAgMCAgICAgICAxNlxuNjYgICAgICA0MCAgPD0gICA0MCAgICAwIDMwMjc2ICAgICAgIDE1XG42NyAgICAgIDI0ICA+PSAgIDI0ICAgIDAgIDU2NTQgICAgICAgIDFcbjY4ICAgICAgMjQgIDw9ICAgNDAgICAxNiAgICAgMCAgICAgICAxNlxuNjkgICAgICA0MCAgPj0gICAyNCAgIDE2ICAgICAwICAgICAgIDE2XG43MCAgICAgIDQwICA8PSAgIDQwICAgIDAgMTA0MTcgICAgICAgMTVcbjcxICAgICAgMjUgID49ICAgMjQgICAgMSAgICAgMCAgICAgICAgMVxuNzIgICAgICAyNSAgPD0gICA0MCAgIDE1ICAgICAwICAgICAgIDE1XG43MyAgICAgIDk0ICA+PSAgIDk0ICAgIDAgIDg0MzggICAgICAgIDVcbjc0ICAgICAgOTQgIDw9ICAxMjUgICAzMSAgICAgMCAgICAgICAzMVxuNzUgICAgIDEyNSAgPj0gICA5NCAgIDMxICAgICAwICAgICAgIDMxXG43NiAgICAgMTI1ICA8PSAgMTI1ICAgIDAgMjIwMTUgICAgICAgMjZcbjc3ICAgICAgOTkgID49ICAgOTQgICAgNSAgICAgMCAgICAgICAgNVxuNzggICAgICA5OSAgPD0gIDEyNSAgIDI2ICAgICAwICAgICAgIDI2XG43OSAgICAgMTI1ICA+PSAgIDk0ICAgMzEgICAgIDAgICAgICAgMzFcbjgwICAgICAxMjUgIDw9ICAxMjUgICAgMCAxNDM0OSAgICAgICAyNlxuODEgICAgICAzNCAgPj0gICAyMSAgIDEzICAgICAwICAgICAgIDEzXG44MiAgICAgIDM0ICA8PSAgIDQxICAgIDcgICAgIDAgICAgICAgIDdcbjgzICAgICAgMjEgID49ICAgMjEgICAgMCAyMDc5NyAgICAgICAxM1xuODQgICAgICAyMSAgPD0gICA0MSAgIDIwICAgICAwICAgICAgIDIwXG44NSAgICAgIDQxICA+PSAgIDIxICAgMjAgICAgIDAgICAgICAgMjBcbjg2ICAgICAgNDEgIDw9ICAgNDEgICAgMCAxMTgzMSAgICAgICAgN1xuODcgICAgICAyMSAgPj0gICAyMSAgICAwIDEzNzY2ICAgICAgIDEzXG44OCAgICAgIDIxICA8PSAgIDQxICAgMjAgICAgIDAgICAgICAgMjBcbjg5ICAgICAxNDUgID49ICAgOTcgICA0OCAgICAgMCAgICAgICA0OFxuOTAgICAgIDE0NSAgPD0gIDE0NSAgICAwICA5OTk0ICAgICAgIDM3XG45MSAgICAgMTA4ICA+PSAgIDk3ICAgMTEgICAgIDAgICAgICAgMTFcbjkyICAgICAxMDggIDw9ICAxNDUgICAzNyAgICAgMCAgICAgICAzN1xuOTMgICAgICA5NyAgPj0gICA5NyAgICAwICAzMDg1ICAgICAgIDExXG45NCAgICAgIDk3ICA8PSAgMTQ1ICAgNDggICAgIDAgICAgICAgNDhcbjk1ICAgICAxNDUgID49ICAgOTcgICA0OCAgICAgMCAgICAgICA0OFxuOTYgICAgIDE0NSAgPD0gIDE0NSAgICAwIDI5NzYxICAgICAgIDM3XG45NyAgICAgIDI4ICA+PSAgIDI0ICAgIDQgICAgIDAgICAgICAgIDRcbjk4ICAgICAgMjggIDw9ICAgMzAgICAgMiAgICAgMCAgICAgICAgMlxuOTkgICAgICAyNCAgPj0gICAyNCAgICAwIDE2NTM0ICAgICAgICA0XG4xMDAgICAgIDI0ICA8PSAgIDMwICAgIDYgICAgIDAgICAgICAgIDZcbjEwMSAgICAgMzAgID49ICAgMjQgICAgNiAgICAgMCAgICAgICAgNlxuMTAyICAgICAzMCAgPD0gICAzMCAgICAwIDU4NjgwICAgICAgICAyXG4xMDMgICAgIDI0ICA+PSAgIDI0ICAgIDAgMTAxODAgICAgICAgIDRcbjEwNCAgICAgMjQgIDw9ICAgMzAgICAgNiAgICAgMCAgICAgICAgNlxuMTA1ICAgIDEzNyAgPj0gICA5OCAgIDM5ICAgICAwICAgICAgIDM5XG4xMDYgICAgMTM3ICA8PSAgMTU0ICAgMTcgICAgIDAgICAgICAgMTdcbjEwNyAgICAgOTggID49ICAgOTggICAgMCAxNDY5NiAgICAgICAzOVxuMTA4ICAgICA5OCAgPD0gIDE1NCAgIDU2ICAgICAwICAgICAgIDU2XG4xMDkgICAgIDk4ICA+PSAgIDk4ICAgIDAgMTUwMTggICAgICAgMzlcbjExMCAgICAgOTggIDw9ICAxNTQgICA1NiAgICAgMCAgICAgICA1NlxuMTExICAgIDE1NCAgPj0gICA5OCAgIDU2ICAgICAwICAgICAgIDU2XG4xMTIgICAgMTU0ICA8PSAgMTU0ICAgIDAgMjk2MjggICAgICAgMTdcbjExMyAgICAgMjggID49ICAgMjMgICAgNSAgICAgMCAgICAgICAgNVxuMTE0ICAgICAyOCAgPD0gICAzNiAgICA4ICAgICAwICAgICAgICA4XG4xMTUgICAgIDIzICA+PSAgIDIzICAgIDAgMTM3NjQgICAgICAgIDVcbjExNiAgICAgMjMgIDw9ICAgMzYgICAxMyAgICAgMCAgICAgICAxM1xuMTE3ICAgICAzNiAgPj0gICAyMyAgIDEzICAgICAwICAgICAgIDEzXG4xMTggICAgIDM2ICA8PSAgIDM2ICAgIDAgMjQ0MzkgICAgICAgIDhcbjExOSAgICAgMjMgID49ICAgMjMgICAgMCAgNzg3NSAgICAgICAgNVxuMTIwICAgICAyMyAgPD0gICAzNiAgIDEzICAgICAwICAgICAgIDEzXG4xMjEgICAgMTA2ICA+PSAgIDg5ICAgMTcgICAgIDAgICAgICAgMTdcbjEyMiAgICAxMDYgIDw9ICAxMjAgICAxNCAgICAgMCAgICAgICAxNFxuMTIzICAgICA4OSAgPj0gICA4OSAgICAwIDI2MjY5ICAgICAgIDE3XG4xMjQgICAgIDg5ICA8PSAgMTIwICAgMzEgICAgIDAgICAgICAgMzFcbjEyNSAgICAgODkgID49ICAgODkgICAgMCAgOTE1MCAgICAgICAxN1xuMTI2ICAgICA4OSAgPD0gIDEyMCAgIDMxICAgICAwICAgICAgIDMxXG4xMjcgICAgMTIwICA+PSAgIDg5ICAgMzEgICAgIDAgICAgICAgMzFcbjEyOCAgICAxMjAgIDw9ICAxMjAgICAgMCAyNDY0MCAgICAgICAxNFxuMTI5ICAgICAzMCAgPj0gICAyMCAgIDEwICAgICAwICAgICAgIDEwXG4xMzAgICAgIDMwICA8PSAgIDMwICAgIDAgMTI0MjQgICAgICAgIDNcbjEzMSAgICAgMjAgID49ICAgMjAgICAgMCAgNjAzNiAgICAgICAgN1xuMTMyICAgICAyMCAgPD0gICAzMCAgIDEwICAgICAwICAgICAgIDEwXG4xMzMgICAgIDMwICA+PSAgIDIwICAgMTAgICAgIDAgICAgICAgMTBcbjEzNCAgICAgMzAgIDw9ICAgMzAgICAgMCA2NzE5MiAgICAgICAgM1xuMTM1ICAgICAyNyAgPj0gICAyMCAgICA3ICAgICAwICAgICAgICA3XG4xMzYgICAgIDI3ICA8PSAgIDMwICAgIDMgICAgIDAgICAgICAgIDNcbjEzNyAgICAgOTkgID49ICAgOTkgICAgMCAgMTgxNSAgICAgICAzMVxuMTM4ICAgICA5OSAgPD0gIDE0NiAgIDQ3ICAgICAwICAgICAgIDQ3XG4xMzkgICAgIDk5ICA+PSAgIDk5ICAgIDAgIDQ3MzUgICAgICAgMzFcbjE0MCAgICAgOTkgIDw9ICAxNDYgICA0NyAgICAgMCAgICAgICA0N1xuMTQxICAgIDEzMCAgPj0gICA5OSAgIDMxICAgICAwICAgICAgIDMxXG4xNDIgICAgMTMwICA8PSAgMTQ2ICAgMTYgICAgIDAgICAgICAgMTZcbjE0MyAgICAxNDYgID49ICAgOTkgICA0NyAgICAgMCAgICAgICA0N1xuMTQ0ICAgIDE0NiAgPD0gIDE0NiAgICAwIDQzMTM3ICAgICAgIDE2XG4xNDUgICAgIDI4ICA+PSAgIDIxICAgIDcgICAgIDAgICAgICAgIDdcbjE0NiAgICAgMjggIDw9ICAgMzEgICAgMyAgICAgMCAgICAgICAgM1xuMTQ3ICAgICAyMSAgPj0gICAyMSAgICAwICA5ODUzICAgICAgICA3XG4xNDggICAgIDIxICA8PSAgIDMxICAgMTAgICAgIDAgICAgICAgMTBcbjE0OSAgICAgMzEgID49ICAgMjEgICAxMCAgICAgMCAgICAgICAxMFxuMTUwICAgICAzMSAgPD0gICAzMSAgICAwIDE2NzAzICAgICAgICAzXG4xNTEgICAgIDIxICA+PSAgIDIxICAgIDAgICA4MjUgICAgICAgIDdcbjE1MiAgICAgMjEgIDw9ICAgMzEgICAxMCAgICAgMCAgICAgICAxMFxuMTUzICAgIDEwNyAgPj0gIDEwNyAgICAwICA0ODM3ICAgICAgIDMzXG4xNTQgICAgMTA3ICA8PSAgMTQ0ICAgMzcgICAgIDAgICAgICAgMzdcbjE1NSAgICAxMDcgID49ICAxMDcgICAgMCAxNjExOCAgICAgICAzM1xuMTU2ICAgIDEwNyAgPD0gIDE0NCAgIDM3ICAgICAwICAgICAgIDM3XG4xNTcgICAgMTQwICA+PSAgMTA3ICAgMzMgICAgIDAgICAgICAgMzNcbjE1OCAgICAxNDAgIDw9ICAxNDQgICAgNCAgICAgMCAgICAgICAgNFxuMTU5ICAgIDE0NCAgPj0gIDEwNyAgIDM3ICAgICAwICAgICAgIDM3XG4xNjAgICAgMTQ0ICA8PSAgMTQ0ICAgIDAgMTI1NzcgICAgICAgIDRcbjE2MSAgICAgMzcgID49ICAgMjEgICAxNiAgICAgMCAgICAgICAxNlxuMTYyICAgICAzNyAgPD0gICAzNyAgICAwICAgICAwICAgICAgIE5BXG4xNjMgICAgIDIxICA+PSAgIDIxICAgIDAgIDg2ODkgICAgICAgMTZcbjE2NCAgICAgMjEgIDw9ICAgMzcgICAxNiAgICAgMCAgICAgICAxNlxuMTY1ICAgICAzNyAgPj0gICAyMSAgIDE2ICAgICAwICAgICAgIDE2XG4xNjYgICAgIDM3ICA8PSAgIDM3ICAgIDAgNTg2MzcgICAgICAgMTZcbiBbIHJlYWNoZWQgZ2V0T3B0aW9uKFwibWF4LnByaW50XCIpIC0tIG9taXR0ZWQgNTAgcm93cyBdXG4ifQ== -->
 <pre><code>    actual dir bvec free  dual dual.reg
-1      450  &lt;=  450    0 84354       45
-2       99  &lt;=   99    0 12196        9
-3      416  &lt;=  416    0 14736       42
-4      129  &lt;=  129    0 23605       12
-5      443  &lt;=  443    0 34906       43
-6      117  &lt;=  117    0 13334        1
-7      495  &lt;=  495    0 16849        1
-8      106  &lt;=  106    0 22294       11
-9      487  &lt;=  487    0 21066        1
-10     110  &lt;=  110    0 21504       11
-11     404  &lt;=  404    0 37058       40
-12     107  &lt;=  107    0 12266        1
-13     474  &lt;=  474    0 13163       47
-14     101  &lt;=  101    0 12101        1
-15     498  &lt;=  498    0 25753       49
-16     116  &lt;=  116    0 15319       12
-17     478  &lt;=  478    0 29086       47
-18     124  &lt;=  124    0 25809       12
-19     438  &lt;=  438    0 49343       43
-20     124  &lt;=  124    0 40536       12
-21     464  &lt;=  464    0 37355       46
-22     132  &lt;=  132    0 38974       14
-23     135  &gt;=   90   45     0       45
-24     135  &lt;=  135    0  3593       45
-25      90  &gt;=   90    0 59811       45
-26      90  &lt;=  135   45     0       45
-27      90  &gt;=   90    0 72455       45
-28      90  &lt;=  135   45     0       45
-29     135  &gt;=   90   45     0       45
-30     135  &lt;=  135    0     0       NA
-31      29  &gt;=   20    9     0        9
-32      29  &lt;=   30    1     0        1
-33      20  &gt;=   20    0  4258        9
-34      20  &lt;=   30   10     0       10
-35      30  &gt;=   20   10     0       10
-36      30  &lt;=   30    0 32490        1
-37      20  &gt;=   20    0   321        9
-38      20  &lt;=   30   10     0       10
-39     125  &gt;=   83   42     0       42
-40     125  &lt;=  125    0     0       NA
-41      83  &gt;=   83    0  4946       42
-42      83  &lt;=  125   42     0       42
-43      83  &gt;=   83    0   109       42
-44      83  &lt;=  125   42     0       42
-45     125  &gt;=   83   42     0       42
-46     125  &lt;=  125    0 23096       42
-47      39  &gt;=   26   13     0       13
-48      39  &lt;=   39    0 19859        1
-49      26  &gt;=   26    0 16071       12
-50      26  &lt;=   39   13     0       13
-51      38  &gt;=   26   12     0       12
-52      38  &lt;=   39    1     0        1
-53      26  &gt;=   26    0 10417       12
-54      26  &lt;=   39   13     0       13
-55      89  &gt;=   89    0 22787       43
-56      89  &lt;=  133   44     0       44
-57     133  &gt;=   89   44     0       44
-58     133  &lt;=  133    0  7666        1
-59      89  &gt;=   89    0 14349       43
-60      89  &lt;=  133   44     0       44
-61     132  &gt;=   89   43     0       43
-62     132  &lt;=  133    1     0        1
-63      35  &gt;=   23   12     0       12
-64      35  &lt;=   35    0 13766       11
-65      23  &gt;=   23    0  7031        1
-66      23  &lt;=   35   12     0       12
-67      35  &gt;=   23   12     0       12
-68      35  &lt;=   35    0 25597       11
-69      24  &gt;=   23    1     0        1
-70      24  &lt;=   35   11     0       11
-71     148  &gt;=   99   49     0       49
-72     148  &lt;=  148    0  9994       48
-73     100  &gt;=   99    1     0        1
-74     100  &lt;=  148   48     0       48
-75      99  &gt;=   99    0  3085        1
-76      99  &lt;=  148   49     0       49
-77     148  &gt;=   99   49     0       49
-78     148  &lt;=  148    0 29761       48
-79      32  &gt;=   21   11     0       11
-80      32  &lt;=   32    0     0       NA
-81      21  &gt;=   21    0 16534       11
-82      21  &lt;=   32   11     0       11
-83      32  &gt;=   21   11     0       11
-84      32  &lt;=   32    0 58680       11
-85      21  &gt;=   21    0 10180       11
-86      21  &lt;=   32   11     0       11
-87     146  &gt;=   97   49     0       49
-88     146  &lt;=  146    0 14696       48
-89      98  &gt;=   97    1     0        1
-90      98  &lt;=  146   48     0       48
-91      97  &gt;=   97    0   322        1
-92      97  &lt;=  146   49     0       49
-93     146  &gt;=   97   49     0       49
-94     146  &lt;=  146    0 44324       48
-95      33  &gt;=   22   11     0       11
-96      33  &lt;=   33    0     0       NA
-97      22  &gt;=   22    0 13764       11
-98      22  &lt;=   33   11     0       11
-99      33  &gt;=   22   11     0       11
-100     33  &lt;=   33    0 24439       11
-101     22  &gt;=   22    0  7875       11
-102     22  &lt;=   33   11     0       11
-103    121  &gt;=   81   40     0       40
-104    121  &lt;=  121    0     0       NA
-105     81  &gt;=   81    0 26269       40
-106     81  &lt;=  121   40     0       40
-107     81  &gt;=   81    0  9150       40
-108     81  &lt;=  121   40     0       40
-109    121  &gt;=   81   40     0       40
-110    121  &lt;=  121    0 24640       40
-111     32  &gt;=   21   11     0       11
-112     32  &lt;=   32    0 12424       10
-113     21  &gt;=   21    0  6036        1
-114     21  &lt;=   32   11     0       11
-115     32  &gt;=   21   11     0       11
-116     32  &lt;=   32    0 67192       10
-117     22  &gt;=   21    1     0        1
-118     22  &lt;=   32   10     0       10
-119     95  &gt;=   95    0  1815       47
-120     95  &lt;=  142   47     0       47
-121     95  &gt;=   95    0  4735       47
-122     95  &lt;=  142   47     0       47
-123    142  &gt;=   95   47     0       47
-124    142  &lt;=  142    0     0       NA
-125    142  &gt;=   95   47     0       47
-126    142  &lt;=  142    0 43137       47
-127     30  &gt;=   20   10     0       10
-128     30  &lt;=   30    0   825        9
-129     20  &gt;=   20    0  9028        1
-130     20  &lt;=   30   10     0       10
-131     30  &gt;=   20   10     0       10
-132     30  &lt;=   30    0 17528        9
-133     21  &gt;=   20    1     0        1
-134     21  &lt;=   30    9     0        9
-135    100  &gt;=  100    0  4837       49
-136    100  &lt;=  149   49     0       49
-137    100  &gt;=  100    0 16118       49
-138    100  &lt;=  149   49     0       49
-139    149  &gt;=  100   49     0       49
-140    149  &lt;=  149    0     0       NA
-141    149  &gt;=  100   49     0       49
-142    149  &lt;=  149    0 12577       49
-143     35  &gt;=   23   12     0       12
-144     35  &lt;=   35    0     0       NA
-145     23  &gt;=   23    0  8689       12
-146     23  &lt;=   35   12     0       12
-147     35  &gt;=   23   12     0       12
-148     35  &lt;=   35    0 58637       12
-149     23  &gt;=   23    0  2564       12
-150     23  &lt;=   35   12     0       12
-151    143  &gt;=   96   47     0       47
-152    143  &lt;=  143    0 44307       47
-153     96  &gt;=   96    0   142       47
-154     96  &lt;=  143   47     0       47
-155     96  &gt;=   96    0 16795       47
-156     96  &lt;=  143   47     0       47
-157    143  &gt;=   96   47     0       47
-158    143  &lt;=  143    0     0       NA
-159     37  &gt;=   25   12     0       12
-160     37  &lt;=   37    0     0       NA
-161     25  &gt;=   25    0 17592       12
-162     25  &lt;=   37   12     0       12
-163     37  &gt;=   25   12     0       12
-164     37  &lt;=   37    0 49469       12
-165     25  &gt;=   25    0 11600       12
-166     25  &lt;=   37   12     0       12
- [ reached getOption(\max.print\) -- omitted 32 rows ]</code></pre>
+1      849  &lt;=  849    0 30936       40
+2      230  &lt;=  230    0 31862       31
+3      450  &lt;=  450    0 84354       29
+4       99  &lt;=   99    0 12196       10
+5      416  &lt;=  416    0 14627       18
+6      129  &lt;=  129    0 13188        1
+7      443  &lt;=  443    0 20557        5
+8      117  &lt;=  117    0 27100       13
+9      495  &lt;=  495    0 16849       11
+10     106  &lt;=  106    0 22294        4
+11     487  &lt;=  487    0 35762       39
+12     110  &lt;=  110    0 21504        5
+13     404  &lt;=  404    0 37058       17
+14     107  &lt;=  107    0 12266        7
+15     474  &lt;=  474    0 13163       31
+16     101  &lt;=  101    0 12926        7
+17     498  &lt;=  498    0 25753       33
+18     116  &lt;=  116    0 15319       16
+19     478  &lt;=  478    0 29086       30
+20     124  &lt;=  124    0 14209        2
+21     438  &lt;=  438    0 26733       26
+22     124  &lt;=  124    0 12307        6
+23     464  &lt;=  464    0 37355       32
+24     132  &lt;=  132    0 38974        2
+25     248  &gt;=  187   61     0       61
+26     248  &lt;=  248    0  6995       21
+27     187  &gt;=  187    0 16076       40
+28     187  &lt;=  248   61     0       61
+29     187  &gt;=  187    0 12387       40
+30     187  &lt;=  248   61     0       61
+31     227  &gt;=  187   40     0       40
+32     227  &lt;=  248   21     0       21
+33      70  &gt;=   39   31     0       31
+34      70  &lt;=   82   12     0       12
+35      39  &gt;=   39    0 23708       31
+36      39  &lt;=   82   43     0       43
+37      82  &gt;=   39   43     0       43
+38      82  &lt;=   82    0  6609       12
+39      39  &gt;=   39    0 15944       31
+40      39  &lt;=   82   43     0       43
+41     130  &gt;=   97   33     0       33
+42     130  &lt;=  130    0  3593        4
+43      97  &gt;=   97    0 59811       29
+44      97  &lt;=  130   33     0       33
+45      97  &gt;=   97    0 72455       29
+46      97  &lt;=  130   33     0       33
+47     126  &gt;=   97   29     0       29
+48     126  &lt;=  130    4     0        4
+49      29  &gt;=   19   10     0       10
+50      29  &lt;=   32    3     0        3
+51      19  &gt;=   19    0  4258       10
+52      19  &lt;=   32   13     0       13
+53      32  &gt;=   19   13     0       13
+54      32  &lt;=   32    0 32490        3
+55      19  &gt;=   19    0   321       10
+56      19  &lt;=   32   13     0       13
+57     114  &gt;=   85   29     0       29
+58     114  &lt;=  114    0   109       11
+59      85  &gt;=   85    0  4837       18
+60      85  &lt;=  114   29     0       29
+61     103  &gt;=   85   18     0       18
+62     103  &lt;=  114   11     0       11
+63     114  &gt;=   85   29     0       29
+64     114  &lt;=  114    0 23205       11
+65      40  &gt;=   24   16     0       16
+66      40  &lt;=   40    0 30276       15
+67      24  &gt;=   24    0  5654        1
+68      24  &lt;=   40   16     0       16
+69      40  &gt;=   24   16     0       16
+70      40  &lt;=   40    0 10417       15
+71      25  &gt;=   24    1     0        1
+72      25  &lt;=   40   15     0       15
+73      94  &gt;=   94    0  8438        5
+74      94  &lt;=  125   31     0       31
+75     125  &gt;=   94   31     0       31
+76     125  &lt;=  125    0 22015       26
+77      99  &gt;=   94    5     0        5
+78      99  &lt;=  125   26     0       26
+79     125  &gt;=   94   31     0       31
+80     125  &lt;=  125    0 14349       26
+81      34  &gt;=   21   13     0       13
+82      34  &lt;=   41    7     0        7
+83      21  &gt;=   21    0 20797       13
+84      21  &lt;=   41   20     0       20
+85      41  &gt;=   21   20     0       20
+86      41  &lt;=   41    0 11831        7
+87      21  &gt;=   21    0 13766       13
+88      21  &lt;=   41   20     0       20
+89     145  &gt;=   97   48     0       48
+90     145  &lt;=  145    0  9994       37
+91     108  &gt;=   97   11     0       11
+92     108  &lt;=  145   37     0       37
+93      97  &gt;=   97    0  3085       11
+94      97  &lt;=  145   48     0       48
+95     145  &gt;=   97   48     0       48
+96     145  &lt;=  145    0 29761       37
+97      28  &gt;=   24    4     0        4
+98      28  &lt;=   30    2     0        2
+99      24  &gt;=   24    0 16534        4
+100     24  &lt;=   30    6     0        6
+101     30  &gt;=   24    6     0        6
+102     30  &lt;=   30    0 58680        2
+103     24  &gt;=   24    0 10180        4
+104     24  &lt;=   30    6     0        6
+105    137  &gt;=   98   39     0       39
+106    137  &lt;=  154   17     0       17
+107     98  &gt;=   98    0 14696       39
+108     98  &lt;=  154   56     0       56
+109     98  &gt;=   98    0 15018       39
+110     98  &lt;=  154   56     0       56
+111    154  &gt;=   98   56     0       56
+112    154  &lt;=  154    0 29628       17
+113     28  &gt;=   23    5     0        5
+114     28  &lt;=   36    8     0        8
+115     23  &gt;=   23    0 13764        5
+116     23  &lt;=   36   13     0       13
+117     36  &gt;=   23   13     0       13
+118     36  &lt;=   36    0 24439        8
+119     23  &gt;=   23    0  7875        5
+120     23  &lt;=   36   13     0       13
+121    106  &gt;=   89   17     0       17
+122    106  &lt;=  120   14     0       14
+123     89  &gt;=   89    0 26269       17
+124     89  &lt;=  120   31     0       31
+125     89  &gt;=   89    0  9150       17
+126     89  &lt;=  120   31     0       31
+127    120  &gt;=   89   31     0       31
+128    120  &lt;=  120    0 24640       14
+129     30  &gt;=   20   10     0       10
+130     30  &lt;=   30    0 12424        3
+131     20  &gt;=   20    0  6036        7
+132     20  &lt;=   30   10     0       10
+133     30  &gt;=   20   10     0       10
+134     30  &lt;=   30    0 67192        3
+135     27  &gt;=   20    7     0        7
+136     27  &lt;=   30    3     0        3
+137     99  &gt;=   99    0  1815       31
+138     99  &lt;=  146   47     0       47
+139     99  &gt;=   99    0  4735       31
+140     99  &lt;=  146   47     0       47
+141    130  &gt;=   99   31     0       31
+142    130  &lt;=  146   16     0       16
+143    146  &gt;=   99   47     0       47
+144    146  &lt;=  146    0 43137       16
+145     28  &gt;=   21    7     0        7
+146     28  &lt;=   31    3     0        3
+147     21  &gt;=   21    0  9853        7
+148     21  &lt;=   31   10     0       10
+149     31  &gt;=   21   10     0       10
+150     31  &lt;=   31    0 16703        3
+151     21  &gt;=   21    0   825        7
+152     21  &lt;=   31   10     0       10
+153    107  &gt;=  107    0  4837       33
+154    107  &lt;=  144   37     0       37
+155    107  &gt;=  107    0 16118       33
+156    107  &lt;=  144   37     0       37
+157    140  &gt;=  107   33     0       33
+158    140  &lt;=  144    4     0        4
+159    144  &gt;=  107   37     0       37
+160    144  &lt;=  144    0 12577        4
+161     37  &gt;=   21   16     0       16
+162     37  &lt;=   37    0     0       NA
+163     21  &gt;=   21    0  8689       16
+164     21  &lt;=   37   16     0       16
+165     37  &gt;=   21   16     0       16
+166     37  &lt;=   37    0 58637       16
+ [ reached getOption(&quot;max.print&quot;) -- omitted 50 rows ]</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
+</div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ2FzaW5vIGZsb29yIG1peCBvcHRpbWl6YXRpb24iCmF1dGhvcjogIkFuZHJlb3NlIEUsIENhbGRhcmEgRywgQ29tb3R0byBGLCBTY2FyZG92ZWxsaSBNIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKLS0tCgpJbXBvcnQgbGlicmFyaWVzIGFuZCBkYXRhc2V0CmBgYHtyfQpsaWJyYXJ5KHRpZHl2ZXJzZSkKbGlicmFyeShsdWJyaWRhdGUpCmxpYnJhcnkoY2FyZXQpCmxpYnJhcnkobGlucHJvZykKb3B0aW9ucyhzY2lwZW4gPSA5OTkpCnNsb3QgPC0gcmVhZHhsOjpyZWFkX2V4Y2VsKCJkYXRhL0x1Y2t5IER1Y2sgRW50ZXJ0YWlubWVudCByZXZlbnVlIDIwMTMueGxzIiwgbmEgPSBjKCIuIiwgIk5BIiwgIk5hTiIpKQpzdHIoc2xvdCkKYGBgCgpDcmVhdGUgZGF0YXNldCB0byBiZSB1c2VkIGZvciBmdXJ0aGVyIGFuYWx5c2lzLCBpLmUuIGFnZ3JlZ2F0ZSBzbG90cyBieSBjYXRlZ29yaWVzIChNYWNoaW5lVHlwZStEZW5vbWluYXRpb24pIGZvciBlYWNoIG1vbnRoIGFuZCBzZWN0aW9uIGluIGVhY2ggY2FzaW5vLgpgYGB7cn0KZGYgPC0gc2xvdCAlPiUKICBncm91cF9ieShDYXNpbm8sIE1vbnRoLCBTZWN0aW9uLCBNYWNoaW5lVHlwZSwgRGVub21pbmF0aW9uKSAlPiUKICBzdW1tYXJpc2UobnVtZXJvX21hY2NoaW5lICAgID0gc3VtKE5vTWFjaGluZXMpLAogICAgICAgICAgICByaWNhdmlfdG90YWxpICAgICAgPSBzdW0oR3Jvc3NSZXZlbnVlKSwKICAgICAgICAgICAgcmljYXZvX3VuaXRhcmlvICAgID0gcmljYXZpX3RvdGFsaS9udW1lcm9fbWFjY2hpbmUsCiAgICAgICAgICAgIGdpb2NhdGVfdG90YWxpICAgICA9IHN1bShQbGF5cyksCiAgICAgICAgICAgIGdpb2NhdGVfdW5pdGFyaWUgICA9IHJvdW5kKGdpb2NhdGVfdG90YWxpL251bWVyb19tYWNjaGluZSksCiAgICAgICAgICAgIHJpY2F2b19wZXJfZ2lvY2F0YSA9IHJpY2F2aV90b3RhbGkvZ2lvY2F0ZV90b3RhbGkpICU+JQogIGFycmFuZ2UoTW9udGgsIFNlY3Rpb24sIE1hY2hpbmVUeXBlLCBEZW5vbWluYXRpb24pICU+JQogIG11dGF0ZSh0aXBvID0gcGFzdGUwKE1hY2hpbmVUeXBlLCAiXyIsIERlbm9taW5hdGlvbikpIApoZWFkKGRmKQpgYGAKClRlbXBvcmFyeTogcmVtb3ZlIHRoZSBtb250aCBvZiBTZXB0ZW1iZXIKYGBge3J9CmRmIDwtIGZpbHRlcihkZiwgTW9udGggIT0geW1kKCIyMDExLTA5LTAxIikpCmBgYAoKRGVmaW5pdGlvbiBvZiB0aGUgb2JqZWN0aXZlIGZ1bmN0aW9uIHVzaW5nIHByb2ZpdCBjb2VmZmljaWVudHMKYGBge3J9CmYub2JqIDwtIHJvdW5kKGRmJHJpY2F2b191bml0YXJpbykKYGBgCgpDb3N0cnV6aW9uZSBkZWkgdmluY29saQpQcmltbyB2aW5jb2xvOiBudW1lcm8gbWFzc2ltbyBkaSBzbG90IHBlciBvZ25pIGNhc2lubyBlIG9nbmkgbWVzZS4gCmBgYHtyfQojT3R0aWVuaSBudW1lcm8gZGkgc2xvdCBwcmVzZW50aSBpbiBvZ25pIGNhc2lubyBwZXIgbWVzZSBkYSB1c2FyZSBjb21lIHVwcGVyIGJvdW5kCm5zbG90cyA8LSBkZiAlPiUKICBncm91cF9ieShDYXNpbm8sIE1vbnRoKSAlPiUKICBzdW1tYXJpc2UobWF4ID0gc3VtKG51bWVyb19tYWNjaGluZSkpICU+JQogIGFycmFuZ2UoTW9udGgpCm5zbG90cyA8LSB0KG5zbG90cyRtYXgpWzEsXSAjbnVtZXJvIGRpIHNsb3QgcGVyIGNhc2lubyBlIG1lc2UKI0ZpcnN0IGNyZWF0ZSBkdW1teSB2YXIgZm9yIENhc2lubyBhbmQgbW9udGgsIHVzZWQgdG8gYWN0aXZhdGUgZWFjaCBjb25zdHJhaW50IGRlcGVuZGluZyBvbiB0aGUgY2FzaW5vIGFuZCBtb250aApmLkExIDwtIHQocHJlZGljdChkdW1teVZhcnMofiBDYXNpbm8gOiBmYWN0b3IoTW9udGgpLCBkYXRhID0gZGYpLCBuZXdkYXRhID0gZGYpKQojVmlldyhyYmluZCh0KGRmWywgIkNhc2lubyJdKSwgdChkZiRNb250aCksIGYuQSkpICNDaGVjayByZXN1bHRzCgoKI0NvZWZmaWNpZW50cwpmLmIxIDwtIG5zbG90cyAjIHZlY3RvciBvZiByaWdodC1oYW5kIHNpZGUgdmFsdWVzIC0gdXBwZXIgYm91bmRzIG9mIHRvdGFsIG51bWJlciBvZiBzbG90cyBwZXIgbW9udGgKZi5kaXIxIDwtIHJlcCgiPD0iLCBsZW5ndGgoZi5iKSkgIyBkaXJlY3Rpb24gb2YgdGhlIGluZXF1YWxpdGllcwoKc29sMSA8LSBzb2x2ZUxQKGYub2JqLCBmLmIxLCBmLkExLCBtYXhpbXVtID0gVFJVRSwgY29uc3QuZGlyID0gZi5kaXIxKSAjc29sdmVyIApzb2wxYmlzIDwtIGxwKGRpcmVjdGlvbiA9ICJtYXgiLCBvYmplY3RpdmUuaW4gPSBmLm9iaiwgY29uc3QubWF0ID0gZi5BMSwgY29uc3QuZGlyID0gZi5kaXIxLCBjb25zdC5yaHMgPSBmLmIxKQoKc29sMSRjb24KYGBgCgpTZWNvbmRvIHZpbmNvbG86IGxhIHByb3Bvcnppb25lIGRlbCB0aXBvIChNYWNoaW5lVHlwZStEZW5vbWluYXRpb24pIGRpIHNsb3QgYWxsJ2ludGVybm8gZGkgY2lhc2N1bmEgc2V6aW9uZSBkZXYnZXNzZXJlIHJpc3BldHRhdG8gcGVyIG9nbmkgbWVzZS4gT3Z2ZXJvLCBub24gY2kgcHVvJyBlc3NlcmUgdW4gbnVtZXJvIGRpIHNsb3QgZGkgdW5hIGNhdGVnb3JpYSBlc3RyZW1hbWVudGUgYWx0bywgbWEgZGV2ZSByaXNwZXR0YXJlIGRlaSB2aW5jb2xpICdkaSBwcm9wb3J6aW9uZScuClF1ZXN0byB2aW5jb2xvIGluY2x1ZGUgaWwgZmF0dG8gY2hlIG5vbiBjaSBwb3NzYW5vIGVzc2VyZSBzZXppb25pIHZ1b3RlLgpWaW5jb2xvIDIKYGBge3J9CmYuQTIgPC0gdChwcmVkaWN0KGR1bW15VmFycyh+IFNlY3Rpb24gOiBDYXNpbm8gOiBmYWN0b3IoTW9udGgpLCBkYXRhID0gZGYpLCBuZXdkYXRhID0gZGYpKQojIER1cGxpY2F0ZSBldmVyeSByb3csIG5lZWRlZCBiZWNhdXNlIGZvciBlYWNoIHNlY3Rpb24vbW9udGgvY2FzaW5vIHdlIG5lZWQgYSBsb3dlciBhbmQgdXBwZXIgYm91bmQuIAojIFJldGFpbiBvcmRlciAtLT4gb2IxLWxvdywgb2JzMS11cCwgb2JzMi1sb3csIC4uLikKZi5BMiA8LSBhcy50aWJibGUoZi5BMikgJT4lIHNsaWNlKHJlcCgxOm4oKSwgZWFjaCA9IDIpKSAlPiUgYXMubWF0cml4KCkKCiNJIHZpbmNvbGkgc29ubyBhdHRpdmF0aSBuZWwgc2VndWVudGUgbW9kbyAKIyBtZXNlMS1jYXNpbm8xLXNlejEtbG93LAojIG1lc2UxLWNhc2lubzEtc2V6MS11cCwKIyBtZXNlMS1jYXNpbm8xLXNlejI7CiMgbWVzZTEtY2FzaW5vMjsKIyBtZXNlMjsuLi4KIyBxdWluZGkgaSBwcmltaSA4ICg0IHNleiAqIDIgdXAvbG93KSB2aW5jb2xpIHNvbm8gYXNzb2NpYXRvIGFkIHVuIG1lZGVzaW1vIHVwcGVyIGUgbG93ZXIgYm91bmQsIGxlZ2F0byBhbCBwcmltbyB2YWxvcmUgZGkgbnNsb3RzLgoKIyBwcm9iYWJpbG1lbnRlIHNpIHB1bycgZmFyZSBzZW56YSBpbCBjaWNsbyBmb3IsIG1hIGNvbWU/PwojbnNsb3RzIGNvbnRpZW5lIGlsIG51bWVybyBkaSBzbG90IHBlciBvZ25pIGNhc2lubyBlIG1lc2UsIGFsdGVybmF0byBwZXIgY2FzaW5vIChtZXNlMSBjYXNpbm8xLCBtZXNlMSBjYXNpbm8yLCBtZXNlMiBjYXNpbm8xLCAuLi4pCmYuYjIgPC0gYygpCmZvciAobiBpbiBuc2xvdHMpIHsKICBmLmIyIDwtIGMoZi5iMiwgcmVwKHJvdW5kKGMobiouMiwgbiouMykpLCA0KSApCn0KZi5kaXIyIDwtIHJlcChjKCI+PSIsICI8PSIpLCBsZW5ndGgoZi5iMikvMikgIyBkaXJlY3Rpb24gb2YgdGhlIGluZXF1YWxpdGllcwoKc29sMiA8LSBzb2x2ZUxQKGYub2JqLCBmLmIyLCBmLkEyLCBtYXhpbXVtID0gVFJVRSwgY29uc3QuZGlyID0gZi5kaXIyKSAjc29sdmVyIApzb2wyYmlzIDwtIGxwKGRpcmVjdGlvbiA9ICJtYXgiLCBvYmplY3RpdmUuaW4gPSBmLm9iaiwgY29uc3QubWF0ID0gZi5BMiwgY29uc3QuZGlyID0gZi5kaXIyLCBjb25zdC5yaHMgPSBmLmIyKQoKc29sMiRjb24KYGBgCgpVbmlzY2kgdmluY29saQpgYGB7cn0KZi5BIDwtIHJiaW5kKGYuQTEsIGYuQTIpCmYuYiA8LSBjKGYuYjEsIGYuYjIpCmYuZGlyIDwtIGMoZi5kaXIxLCBmLmRpcjIpCgpzb2wgPC0gc29sdmVMUChmLm9iaiwgZi5iLCBmLkEsIG1heGltdW0gPSBUUlVFLCBjb25zdC5kaXIgPSBmLmRpcikgI3NvbHZlciAKc29sMmJpcyA8LSBscChkaXJlY3Rpb24gPSAibWF4Iiwgb2JqZWN0aXZlLmluID0gZi5vYmosIGNvbnN0Lm1hdCA9IGYuQSwgY29uc3QuZGlyID0gZi5kaXIsIGNvbnN0LnJocyA9IGYuYikKCnNvbCRjb24KYGBgCgo=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ2FzaW5vIGZsb29yIG1peCBvcHRpbWl6YXRpb24iCmF1dGhvcjogIkFuZHJlb3NlIEUsIENhbGRhcmEgRywgQ29tb3R0byBGLCBTY2FyZG92ZWxsaSBNIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKLS0tCgpJbXBvcnQgbGlicmFyaWVzIGFuZCBkYXRhc2V0CmBgYHtyfQpsaWJyYXJ5KHRpZHl2ZXJzZSkKbGlicmFyeShsdWJyaWRhdGUpCmxpYnJhcnkoY2FyZXQpCmxpYnJhcnkobGlucHJvZykKb3B0aW9ucyhzY2lwZW4gPSA5OTkpCnNsb3QgPC0gcmVhZHhsOjpyZWFkX2V4Y2VsKCJkYXRhL0x1Y2t5IER1Y2sgRW50ZXJ0YWlubWVudCByZXZlbnVlIDIwMTMueGxzIiwgbmEgPSBjKCIuIiwgIk5BIiwgIk5hTiIpKQpzdHIoc2xvdCkKYGBgCgpDcmVhdGUgZGF0YXNldCB0byBiZSB1c2VkIGZvciBmdXJ0aGVyIGFuYWx5c2lzLCBpLmUuIGFnZ3JlZ2F0ZSBzbG90cyBieSBjYXRlZ29yaWVzIChNYWNoaW5lVHlwZStEZW5vbWluYXRpb24pIGZvciBlYWNoIG1vbnRoIGFuZCBzZWN0aW9uIGluIGVhY2ggY2FzaW5vLgpgYGB7cn0KZGYgPC0gc2xvdCAlPiUKICBncm91cF9ieShNb250aCwgQ2FzaW5vLCBTZWN0aW9uLCBNYWNoaW5lVHlwZSwgRGVub21pbmF0aW9uKSAlPiUKICBzdW1tYXJpc2UobnVtZXJvX21hY2NoaW5lICAgID0gc3VtKE5vTWFjaGluZXMpLAogICAgICAgICAgICByaWNhdmlfdG90YWxpICAgICAgPSBzdW0oR3Jvc3NSZXZlbnVlKSwKICAgICAgICAgICAgcmljYXZvX3VuaXRhcmlvICAgID0gcmljYXZpX3RvdGFsaS9udW1lcm9fbWFjY2hpbmUsCiAgICAgICAgICAgIGdpb2NhdGVfdG90YWxpICAgICA9IHN1bShQbGF5cyksCiAgICAgICAgICAgIGdpb2NhdGVfdW5pdGFyaWUgICA9IHJvdW5kKGdpb2NhdGVfdG90YWxpL251bWVyb19tYWNjaGluZSksCiAgICAgICAgICAgIHJpY2F2b19wZXJfZ2lvY2F0YSA9IHJpY2F2aV90b3RhbGkvZ2lvY2F0ZV90b3RhbGkpICU+JQogIGFycmFuZ2UoTW9udGgsIFNlY3Rpb24sIE1hY2hpbmVUeXBlLCBEZW5vbWluYXRpb24pICU+JQogIG11dGF0ZSh0aXBvID0gcGFzdGUwKE1hY2hpbmVUeXBlLCAiXyIsIERlbm9taW5hdGlvbikpIApoZWFkKGRmKQoKZGYgJT4lIGdncGxvdChhZXMoeCA9IGdpb2NhdGVfdG90YWxpLCB5ID0gcmljYXZvX3Blcl9naW9jYXRhKSkgKwogIGdlb21fcG9pbnQoKQpkZltkZiQicmljYXZvX3Blcl9naW9jYXRhIiA+IDUsXQpgYGAKClRlbXBvcmFyeTogcmVtb3ZlIHRoZSBtb250aCBvZiBTZXB0ZW1iZXIKYGBge3J9CmRmIDwtIGZpbHRlcihkZiwgTW9udGggIT0geW1kKCIyMDExLTA5LTAxIikpCmBgYAoKRGVmaW5pdGlvbiBvZiB0aGUgb2JqZWN0aXZlIGZ1bmN0aW9uIHVzaW5nIHByb2ZpdCBjb2VmZmljaWVudHMKYGBge3J9CmYub2JqIDwtIHJvdW5kKGRmJHJpY2F2b191bml0YXJpbykKYGBgCgpDb3N0cnV6aW9uZSBkZWkgdmluY29saQpQcmltbyB2aW5jb2xvOiBudW1lcm8gbWFzc2ltbyBkaSBzbG90IHBlciBvZ25pIGNhc2lubyBlIG9nbmkgbWVzZS4gCmBgYHtyfQpudW1zbG90cy5zZWN0aW9uIDwtIGRmICU+JQogIGdyb3VwX2J5KE1vbnRoLCBDYXNpbm8sIFNlY3Rpb24pICU+JQogIHN1bW1hcmlzZShzdW0gPSBzdW0obnVtZXJvX21hY2NoaW5lKSwKICAgICAgICAgICAgcmljYXZvID0gc3VtKHJpY2F2aV90b3RhbGkpKSAlPiUKICAjaWwgbXV0YXRlIHBlcmRlIHVuIGxpdmVsbG8gZG9wbyBpbCBzdW1tYXJpc2UKICBtdXRhdGUoc3VtX2Nhc2lubyA9IHN1bShzdW0pLCBwcm9wX3Blcl9tZXNlID0gcm91bmQoc3VtIC8gc3VtKHN1bSksIDMpKQoKCmdncGxvdChkYXRhID0gbnVtc2xvdHMuc2VjdGlvbiwgYWVzKHggPSBzdW0sIHkgPSBwcm9wX3Blcl9tZXNlKSkgKwogIGdlb21fcG9pbnQoYWVzKGNvbG9yID0gQ2FzaW5vLCBzaXplID0gcmljYXZvKSkKCiNPdHRpZW5pIG51bWVybyBkaSBzbG90IHByZXNlbnRpIGluIG9nbmkgY2FzaW5vIHBlciBtZXNlIGRhIHVzYXJlIGNvbWUgdXBwZXIgYm91bmQKbnVtc2xvdHMuY2FzaW5vIDwtIE5VTEwKbnNsb3RzIDwtIGRmICU+JQogIGdyb3VwX2J5KE1vbnRoLCBDYXNpbm8pICU+JQogIHN1bW1hcmlzZShzdW0gPSBzdW0obnVtZXJvX21hY2NoaW5lKSkgJT4lCiAgYXJyYW5nZShNb250aCkgI2Vuc3VyZSBvcmRlcgoKbnNsb3RzIDwtIHQobnNsb3RzJHN1bSlbMSxdICNudW1lcm8gZGkgc2xvdCBwZXIgY2FzaW5vIGUgbWVzZQojRmlyc3QgY3JlYXRlIGR1bW15IHZhciBmb3IgQ2FzaW5vIGFuZCBtb250aCwgdXNlZCB0byBhY3RpdmF0ZSBlYWNoIGNvbnN0cmFpbnQgZGVwZW5kaW5nIG9uIHRoZSBjYXNpbm8gYW5kIG1vbnRoCmYuQTEgPC0gdChwcmVkaWN0KGR1bW15VmFycyh+IENhc2lubyA6IEkoZmFjdG9yKE1vbnRoKSksIGRhdGEgPSBkZiksIG5ld2RhdGEgPSBkZikpCiNWaWV3KHJiaW5kKHQoZGZbLCAiQ2FzaW5vIl0pLCB0KGRmJE1vbnRoKSwgZi5BKSkgI0NoZWNrIHJlc3VsdHMKCgojQ29lZmZpY2llbnRzCmIxIDwtIG5zbG90cyRzdW0gI21vbnRoMS0+IGNhc2lubzEsIG1vbnRoMSAtPmNhc2lubzIsIG1vbnRoMiAtPiBjYXNpbm8xLCAuLi4KZi5iMSA8LSAgYjEjIHZlY3RvciBvZiByaWdodC1oYW5kIHNpZGUgdmFsdWVzIC0gdXBwZXIgYm91bmRzIG9mIHRvdGFsIG51bWJlciBvZiBzbG90cyBwZXIgbW9udGgKZi5kaXIxIDwtIHJlcCgiPD0iLCBsZW5ndGgoZi5iMSkpICMgZGlyZWN0aW9uIG9mIHRoZSBpbmVxdWFsaXRpZXMKCnNvbDEgPC0gc29sdmVMUChmLm9iaiwgZi5iMSwgZi5BMSwgbWF4aW11bSA9IFRSVUUsIGNvbnN0LmRpciA9IGYuZGlyMSkgI3NvbHZlciAKc29sMWJpcyA8LSBscChkaXJlY3Rpb24gPSAibWF4Iiwgb2JqZWN0aXZlLmluID0gZi5vYmosIGNvbnN0Lm1hdCA9IGYuQTEsIGNvbnN0LmRpciA9IGYuZGlyMSwgY29uc3QucmhzID0gZi5iMSkKCnNvbDEkY29uCmBgYAoKU2Vjb25kbyB2aW5jb2xvOiBsYSBwcm9wb3J6aW9uZSBkZWwgdGlwbyAoTWFjaGluZVR5cGUrRGVub21pbmF0aW9uKSBkaSBzbG90IGFsbCdpbnRlcm5vIGRpIGNpYXNjdW5hIHNlemlvbmUgZGV2J2Vzc2VyZSByaXNwZXR0YXRvIHBlciBvZ25pIG1lc2UuIE92dmVybywgbm9uIGNpIHB1bycgZXNzZXJlIHVuIG51bWVybyBkaSBzbG90IGRpIHVuYSBjYXRlZ29yaWEgZXN0cmVtYW1lbnRlIGFsdG8sIG1hIGRldmUgcmlzcGV0dGFyZSBkZWkgdmluY29saSAnZGkgcHJvcG9yemlvbmUnLgpRdWVzdG8gdmluY29sbyBpbmNsdWRlIGlsIGZhdHRvIGNoZSBub24gY2kgcG9zc2FubyBlc3NlcmUgc2V6aW9uaSB2dW90ZS4KIyNWaW5jb2xvIDIKI1NvbHV6aW9uZSBGZWRlCkNhbWJpYSBwcm9wb3J6aW9uZSBtaW5pbWEgZSBtYXNzaW1hIHBlciBvZ25pIG1lc2UuIApgYGB7cn0KZi5BMiA8LSB0KHByZWRpY3QoZHVtbXlWYXJzKH4gU2VjdGlvbiA6IENhc2lubyA6IGZhY3RvcihNb250aCksIGRhdGEgPSBkZiksIG5ld2RhdGEgPSBkZikpCiMgRHVwbGljYXRlIGV2ZXJ5IHJvdywgbmVlZGVkIGJlY2F1c2UgZm9yIGVhY2ggc2VjdGlvbi9tb250aC9jYXNpbm8gd2UgbmVlZCBhIGxvd2VyIGFuZCB1cHBlciBib3VuZC4gCiMgUmV0YWluIG9yZGVyIC0tPiBvYjEtbG93LCBvYnMxLXVwLCBvYnMyLWxvdywgLi4uKQpmLkEyIDwtIGFzLnRpYmJsZShmLkEyKSAlPiUgc2xpY2UocmVwKDE6bigpLCBlYWNoID0gMikpICU+JSBhcy5tYXRyaXgoKQoKI0kgdmluY29saSBzb25vIGF0dGl2YXRpIG5lbCBzZWd1ZW50ZSBtb2RvIAojIG1lc2UxLWNhc2lubzEtc2V6MS1sb3csCiMgbWVzZTEtY2FzaW5vMS1zZXoxLXVwLAojIG1lc2UxLWNhc2lubzEtc2V6MjsKIyBtZXNlMS1jYXNpbm8yOwojIG1lc2UyOy4uLgojIHF1aW5kaSBpIHByaW1pIDggKDQgc2V6ICogMiB1cC9sb3cpIHZpbmNvbGkgc29ubyBhc3NvY2lhdG8gYWQgdW4gbWVkZXNpbW8gdXBwZXIgZSBsb3dlciBib3VuZCwgbGVnYXRvIGFsIHByaW1vIHZhbG9yZSBkaSBuc2xvdHMuCgojbnNsb3RzIGNvbnRpZW5lIGlsIG51bWVybyBkaSBzbG90IHBlciBvZ25pIGNhc2lubyBlIG1lc2UsIGFsdGVybmF0byBwZXIgY2FzaW5vIChtZXNlMSBjYXNpbm8xLCBtZXNlMSBjYXNpbm8yLCBtZXNlMiBjYXNpbm8xLCAuLi4pCiMgY29tYmluZSBuc2xvdHMgaW4gdHdvIGNvbHVtbnMsIHdoZXJlIHJvd3MgYXJlIG1vbnRocyBhbmQgY29sdW1ucyBhcmUgY2FzaW5vIChmaXJzdCBmb3IgQXJpZXMpCihudW1zbG90cyA8LSBtYXRyaXgobnNsb3RzJHN1bSwgbmNvbCA9IDIsIGJ5cm93ID0gVCkpCmYuYjIgPC0gYygpCgoKbW9udGhfcHJvcCA8LSBudW1zbG90cy5zZWN0aW9uICU+JQogIGdyb3VwX2J5KE1vbnRoLCBDYXNpbm8pICU+JSBzdW1tYXJpc2UocHJvcF9taW4gPSBtaW4ocHJvcF9wZXJfbWVzZSksCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBwcm9wX21heCA9IG1heChwcm9wX3Blcl9tZXNlKSkKCmIyIDwtIGNiaW5kKG5zbG90cyRzdW0sIG1vbnRoX3Byb3AkcHJvcF9taW4sIG1vbnRoX3Byb3AkcHJvcF9tYXgpCiMgdG8gY2hlY2sgY29ycmVjdG5lc3MsIGNvbXBhcmUgd2l0aCAKI1ZpZXcobnVtc2xvdHMuc2VjdGlvbikKZi5iMiA8LSBjKCkKIyBwcm9iYWJpbG1lbnRlIHNpIHB1bycgZmFyZSBzZW56YSBpbCBjaWNsbyBmb3IsIG1hIGNvbWU/Pwpmb3IgKGkgaW4gMTpucm93KGIyKSkgewogIGYuYjIgPC0gYyhmLmIyLCByZXAocm91bmQoYyhiMltpLDFdKmIyW2ksMl0sIGIyW2ksMV0qYjJbaSwzXSkpLCA0KSkKfQoKZi5kaXIyIDwtIHJlcChjKCI+PSIsICI8PSIpLCBsZW5ndGgoZi5iMikvMikgIyBkaXJlY3Rpb24gb2YgdGhlIGluZXF1YWxpdGllcwoKc29sMiA8LSBzb2x2ZUxQKGYub2JqLCBmLmIyLCBmLkEyLCBtYXhpbXVtID0gVFJVRSwgY29uc3QuZGlyID0gZi5kaXIyKSAjc29sdmVyIApzb2wyYmlzIDwtIGxwKGRpcmVjdGlvbiA9ICJtYXgiLCBvYmplY3RpdmUuaW4gPSBmLm9iaiwgY29uc3QubWF0ID0gZi5BMiwgY29uc3QuZGlyID0gZi5kaXIyLCBjb25zdC5yaHMgPSBmLmIyKQoKc29sMiRjb24KYGBgCgojU29sdXppb25lIEdhYnJpClByb3Bvcnppb25lIG1pbmltYSBlIG1hc3NpbWEgcGVyIGxhIHNlcmllIHN0b3JpY2EgaW50ZXJhIGRpdmVudGFubyBsZSBzb2dsaWUgcGVyIHR1dHRpIGkgbWVzaSAoY2lvZScgZmlzc2UpLiAKYGBge3J9CiMgRGEgbm90YXJlLCByaXNwZXR0byBhbGxhIHNvbHV6aW9uZSBwcmVjZWRlbnRlLCBsJ29yZGluZSBpbiBkdW1teVZhcnMgZGlmZmVyZW50ZQpmLkEyIDwtIHQocHJlZGljdChkdW1teVZhcnMofiBDYXNpbm8gOiBTZWN0aW9uIDogZmFjdG9yKE1vbnRoKSwgZGF0YSA9IGRmKSwgbmV3ZGF0YSA9IGRmKSkKIyBEdXBsaWNhdGUgZXZlcnkgcm93LCBuZWVkZWQgYmVjYXVzZSBmb3IgZWFjaCBzZWN0aW9uL21vbnRoL2Nhc2lubyB3ZSBuZWVkIGEgbG93ZXIgYW5kIHVwcGVyIGJvdW5kLiAKIyBSZXRhaW4gb3JkZXIgLS0+IG9iMS1sb3csIG9iczEtdXAsIG9iczItbG93LCAuLi4pCmYuQTIgPC0gYXMudGliYmxlKGYuQTIpICU+JSBzbGljZShyZXAoMTpuKCksIGVhY2ggPSAyKSkgJT4lIGFzLm1hdHJpeCgpCgojSSB2aW5jb2xpIHNvbm8gYXR0aXZhdGkgbmVsIHNlZ3VlbnRlIG1vZG8gCiMgbWVzZTEtY2FzaW5vMS1zZXoxLWxvdywKIyBtZXNlMS1jYXNpbm8xLXNlejEtdXAsCiMgbWVzZTEtY2FzaW5vMi1zZXoxOwojIG1lc2UxLWNhc2lubzEtc2V6MjsKIyBtZXNlMjsuLi4KCiNuc2xvdHMgY29udGllbmUgaWwgbnVtZXJvIGRpIHNsb3QgcGVyIG9nbmkgY2FzaW5vIGUgbWVzZSwgYWx0ZXJuYXRvIHBlciBjYXNpbm8gKG1lc2UxIGNhc2lubzEsIG1lc2UxIGNhc2lubzIsIG1lc2UyIGNhc2lubzEsIC4uLikKIyBjb21iaW5lIG5zbG90cyBpbiB0d28gY29sdW1ucywgd2hlcmUgcm93cyBhcmUgbW9udGhzIGFuZCBjb2x1bW5zIGFyZSBjYXNpbm8gKGZpcnN0IGZvciBBcmllcykKbnVtc2xvdHMgPC0gbWF0cml4KG5zbG90cyRzdW0sIG5jb2wgPSAyLCBieXJvdyA9IFQpCmYuYjIgPC0gYygpCiMgcHJvYmFiaWxtZW50ZSBzaSBwdW8nIGZhcmUgc2VuemEgaWwgY2ljbG8gZm9yLCBtYSBjb21lPz8KZm9yIChpIGluIDE6bnJvdyhudW1zbG90cykpIHsKICBmLmIyIDwtIGMoZi5iMiwgcmVwKHJvdW5kKGMobnVtc2xvdHNbaSwxXSouMiwgbnVtc2xvdHNbaSwxXSouMzIsIG51bXNsb3RzW2ksMl0qMC4xOCwgbnVtc2xvdHNbaSwyXSowLjM1KSksIDQpKQp9CmYuZGlyMiA8LSByZXAoYygiPj0iLCAiPD0iKSwgbGVuZ3RoKGYuYjIpLzIpICMgZGlyZWN0aW9uIG9mIHRoZSBpbmVxdWFsaXRpZXMKCnNvbDIgPC0gc29sdmVMUChmLm9iaiwgZi5iMiwgZi5BMiwgbWF4aW11bSA9IFRSVUUsIGNvbnN0LmRpciA9IGYuZGlyMikgI3NvbHZlciAKc29sMmJpcyA8LSBscChkaXJlY3Rpb24gPSAibWF4Iiwgb2JqZWN0aXZlLmluID0gZi5vYmosIGNvbnN0Lm1hdCA9IGYuQTIsIGNvbnN0LmRpciA9IGYuZGlyMiwgY29uc3QucmhzID0gZi5iMikKCnNvbDIkY29uCmBgYAoKVW5pc2NpIHZpbmNvbGkgLSBzb2x1emlvbmUgdG90YWxlIGZpbm9yYQpgYGB7cn0KZi5BIDwtIHJiaW5kKGYuQTEsIGYuQTIpCmYuYiA8LSBjKGYuYjEsIGYuYjIpCmYuZGlyIDwtIGMoZi5kaXIxLCBmLmRpcjIpCgpzb2wgPC0gc29sdmVMUChmLm9iaiwgZi5iLCBmLkEsIG1heGltdW0gPSBUUlVFLCBjb25zdC5kaXIgPSBmLmRpcikgI3NvbHZlciAKc29sMmJpcyA8LSBscChkaXJlY3Rpb24gPSAibWF4Iiwgb2JqZWN0aXZlLmluID0gZi5vYmosIGNvbnN0Lm1hdCA9IGYuQSwgY29uc3QuZGlyID0gZi5kaXIsIGNvbnN0LnJocyA9IGYuYikKCnNvbCRjb24KYGBgCgo=</div>
 
 
 
