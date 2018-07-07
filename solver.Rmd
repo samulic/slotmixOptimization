@@ -38,7 +38,7 @@ head(df)
 
 Temporary: use only ...
 ```{r echo=TRUE, eval=FALSE}
-df <- filter(df, Month == ymd("2012-03-01")) #!= 
+df <- filter(df, Month == ymd("2011-09-01")) #!= 
 ```
 
 Some preprocessing
@@ -226,22 +226,27 @@ for (b in unique(df$bin_giocate)) {
 par(mfrow = c(1,1))
 ```
 
+GABRI DOVREI AVER RISOLTO...SEMPLICEMENTE CREANDO LA VARIABILE CON DIAG.  
+Domani fai i dovuti check che io studio web marketing, poi direi che puoi fare il famoso for o quello che vuoi per iterare su tutti i mesi e salvare i risultati.  
+Rimane un unico mistero che non riesco a capire: perchè se lancio "as.tibble(df) %>% slice(rep(1:n(), each = 2)) %>% as.matrix() " il nuovo dataset raddoppiato è ordinato per casinò? mentre la matrice che raddoppio (f.A3) mantiene lo stesso ordinamento?
+
 Vincolo 3 - vincola il numero di slot di ogni categoria tra un min e max calcolato per gruppi di slot che condividono uno stesso range di numero di giocate.
 ```{r}
 # create all combinations of ...
-f.A3 <- t(predict(dummyVars(~ bin_giocate : factor(Denomination) : MachineType : Casino : Section , data = df), newdata = df))
+A3 <- t(predict(dummyVars(~ bin_giocate : factor(Denomination) : MachineType : Casino : Section , data = df), newdata = df))
 #see previous ": factor(Month)"
 
 # we must remove empty rows (that is no observation matches the combination, 
 # think for example about bins belonging to another Casino, they will still be computed but with no matching observation)
 # exclude all rows that have all zeros (sum is not more than zero)
-f.A3 <- f.A3[rowSums(f.A3[,])>0, ]
+A3 <- A3[rowSums(A3[,])>0, ]
 # check dimension, it should have a number of rows equal to the number of observation in the dataset 
 # since we are constraining each Month/Casino/Section/category(tipo) of slots, that is how our dataset is constructed
 dim(f.A3) #bingo!
 # Nowm duplicate every row, needed because we need to set a lower and upper bound for the number of slots. 
 # Retain order --> ob1-low, obs1-up, obs2-low, ...)
-f.A3 <- as.tibble(f.A3) %>% slice(rep(1:n(), each = 2)) %>% as.matrix()
+A3 <- as.tibble(A3) %>% slice(rep(1:n(), each = 2)) %>% as.matrix()   
+#l'errore sta nella creazione della matrice A
 
 b <- c()
 for (i in 1:nrow(df)) {
@@ -264,6 +269,28 @@ sol3bis <- lp(direction = "max", objective.in = f.obj, const.mat = f.A3, const.d
 summary(sol3)
 sol3bis
 ```
+
+#PROVA FEDERICO
+
+```{r}
+f.A3 <- diag(nrow(df))
+f.A3 <- as.tibble(f.A3) %>% slice(rep(1:n(), each = 2)) %>% as.matrix()
+
+b <- c()
+for (i in 1:nrow(df)) {
+  #get the correct row index to identify the bin reference
+  idx <- match(df[i,"bin_giocate"], bin_stats$bin_giocate)
+  # create vector of constraint coefficient, lower then upper bounds
+  b <- append(b, bin_stats[idx, "minimo_macchine"])
+  b <- append(b, bin_stats[idx, "massimo_macchine"])
+}
+
+f.b3 <- unlist(b, use.names=FALSE)
+f.dir3 <- rep(c(">=", "<="), dim(df)[1]) # direction of the inequalities
+
+#check if A3 is equal to f.A3 -> all(A3 == f.A3) FALSE
+```
+
 
 
 Unisci vincoli - soluzione totale finora
