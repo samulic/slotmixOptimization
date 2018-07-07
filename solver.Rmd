@@ -31,15 +31,14 @@ df <- slot %>%
   mutate(tipo = paste0(MachineType, "_", Denomination)) 
 head(df)
 
-df %>% ggplot(aes(x = giocate_totali, y = ricavo_per_giocata)) +
-  geom_point()
-df[df$"ricavo_per_giocata" > 5,]
+# df %>% ggplot(aes(x = giocate_totali, y = ricavo_per_giocata)) +
+#   geom_point()
+# df[df$"ricavo_per_giocata" > 5,]
 ```
 
-Temporary: remove the month of September
+Temporary: use only ...
 ```{r echo=TRUE, eval=FALSE}
-#Funziona tutto anche includendolo..
-df <- filter(df, Month != ymd("2011-09-01"))
+df <- filter(df, Month == ymd("2012-03-01")) #!= 
 ```
 
 Some preprocessing
@@ -52,14 +51,14 @@ numslots.section <- df %>%
   mutate(sum_casino = sum(sum), prop_per_mese = round(sum / sum(sum), 3))
 
 
-ggplot(data = numslots.section, aes(x = sum, y = prop_per_mese)) +
-  geom_point(aes(color = Casino, size = ricavo)) +
-  ggtitle("Distribuzione della proporzione del numero di slot sul totale del casino per ogni mese") +
-  xlab("Numero slot per sezione (per mese)") +
-  ylab("Proporzione di slot in ogni mese") #+ facet_wrap(~Section)
+# ggplot(data = numslots.section, aes(x = sum, y = prop_per_mese)) +
+#   geom_point(aes(color = Casino, size = ricavo)) +
+#   ggtitle("Distribuzione della proporzione del numero di slot sul totale del casino per ogni mese") +
+#   xlab("Numero slot per sezione (per mese)") +
+#   ylab("Proporzione di slot in ogni mese") #+ facet_wrap(~Section)
 
 #Ottieni numero di slot presenti in ogni casino per mese da usare come upper bound
-numslots.casino <- NULL
+numslots.casino <- NULL #a cosa serve ? 
 nslots <- df %>%
   group_by(Month, Casino) %>%
   summarise(sum = sum(numero_macchine)) %>%
@@ -78,8 +77,10 @@ Costruzione dei vincoli
 Primo vincolo: numero massimo di slot per ogni casino e ogni mese. 
 ```{r}
 #First create dummy var for Casino and month, used to activate each constraint depending on the casino and month
-f.A1 <- t(predict(dummyVars(~ Casino : I(factor(Month)), data = df), newdata = df))
+f.A1 <- t(predict(dummyVars(~ Casino, data = df), newdata = df))
 #View(rbind(t(df[, "Casino"]), t(df$Month), f.A)) #Check results
+
+#with one month don't require " : I(factor(Month)" after Casino
 
 
 #Coefficients
@@ -91,6 +92,7 @@ sol1 <- solveLP(f.obj, f.b1, f.A1, maximum = TRUE, const.dir = f.dir1) #solver
 sol1bis <- lp(direction = "max", objective.in = f.obj, const.mat = f.A1, const.dir = f.dir1, const.rhs = f.b1)
 
 sol1$con
+sol1$solution
 ```
 
 Secondo vincolo: la proporzione del tipo (MachineType+Denomination) di slot all'interno di ciascuna sezione dev'essere rispettato per ogni mese. Ovvero, non ci puo' essere un numero di slot di una categoria estremamente alto, ma deve rispettare dei vincoli 'di proporzione'.
@@ -99,7 +101,9 @@ Questo vincolo include il fatto che non ci possano essere sezioni vuote.
 #Soluzione Fede
 Cambia proporzione minima e massima per ogni mese. 
 ```{r}
-f.A2 <- t(predict(dummyVars(~ Section : Casino : factor(Month), data = df), newdata = df))
+f.A2 <- t(predict(dummyVars(~ Section : Casino, data = df), newdata = df))
+#with one month don't require " : factor(Month)" after Casino
+
 # Duplicate every row, needed because for each section/month/casino we need a lower and upper bound. 
 # Retain order --> ob1-low, obs1-up, obs2-low, ...)
 f.A2 <- as.tibble(f.A2) %>% slice(rep(1:n(), each = 2)) %>% as.matrix()
@@ -137,6 +141,7 @@ f.dir2 <- rep(c(">=", "<="), length(f.b2)/2) # direction of the inequalities
 sol2 <- solveLP(f.obj, f.b2, f.A2, maximum = TRUE, const.dir = f.dir2) #solver 
 sol2bis <- lp(direction = "max", objective.in = f.obj, const.mat = f.A2, const.dir = f.dir2, const.rhs = f.b2)
 
+summary(sol2)
 sol2$con
 ```
 
@@ -144,7 +149,9 @@ sol2$con
 Proporzione minima e massima per la serie storica intera diventano le soglie per tutti i mesi (cioe' fisse). 
 ```{r}
 # Da notare, rispetto alla soluzione precedente, l'ordine in dummyVars differente
-f.A2 <- t(predict(dummyVars(~ Casino : Section : factor(Month), data = df), newdata = df))
+f.A2 <- t(predict(dummyVars(~ Casino : Section, data = df), newdata = df))
+# see previous ": factor(Month)". In this case i think that putting Section or Casino first doesn't change the result.
+
 # Duplicate every row, needed because for each section/month/casino we need a lower and upper bound. 
 # Retain order --> ob1-low, obs1-up, obs2-low, ...)
 f.A2 <- as.tibble(f.A2) %>% slice(rep(1:n(), each = 2)) %>% as.matrix()
@@ -169,7 +176,13 @@ f.dir2 <- rep(c(">=", "<="), length(f.b2)/2) # direction of the inequalities
 sol2 <- solveLP(f.obj, f.b2, f.A2, maximum = TRUE, const.dir = f.dir2) #solver 
 sol2bis <- lp(direction = "max", objective.in = f.obj, const.mat = f.A2, const.dir = f.dir2, const.rhs = f.b2)
 
+summary(sol2)
 sol2$con
+
+#To see solution on the original dataset
+# df[which(sol2$solution != 0),] %>%
+#   arrange(Casino, tipo) %>%
+#   View()
 ```
 
 Vincolo 3 - Preprocessing
@@ -216,7 +229,9 @@ par(mfrow = c(1,1))
 Vincolo 3 - vincola il numero di slot di ogni categoria tra un min e max calcolato per gruppi di slot che condividono uno stesso range di numero di giocate.
 ```{r}
 # create all combinations of ...
-f.A3 <- t(predict(dummyVars(~ bin_giocate : factor(Denomination) : MachineType : Casino : Section : factor(Month), data = df), newdata = df))
+f.A3 <- t(predict(dummyVars(~ bin_giocate : factor(Denomination) : MachineType : Casino : Section , data = df), newdata = df))
+#see previous ": factor(Month)"
+
 # we must remove empty rows (that is no observation matches the combination, 
 # think for example about bins belonging to another Casino, they will still be computed but with no matching observation)
 # exclude all rows that have all zeros (sum is not more than zero)
@@ -261,7 +276,15 @@ sol <- solveLP(f.obj, f.b, f.A, maximum = TRUE, const.dir = f.dir) #solver
 sol.bis <- lp(direction = "max", objective.in = f.obj, const.mat = f.A, const.dir = f.dir, const.rhs = f.b)
 
 sol$solution
-summary(sol)
 sol.bis
+summary(sol)
+shadow_price <- sol$con
 ```
+
+OKAY GABRI HO FILTRATO PER I DIVERSI MESI E C'E' UNA BUONA ED UNA CATTIVA NOTIZIA:  
+- la buona è che il codice funziona per tutti i mesi quindi con quindi con un ciclo FOR che itera sui 12 mesi penso che possiamo cavarcela facilmente. Possiamo salvare i risultati in una lista o vedi se ti viene un'idea migliore. Magari nella lista ci conviene salvare anche i ricavi totali del mese per il quale si è MAX la funzione per poi fare le varie comparazioni;  
+- la brutta è che per 3 mesi la soluzione non è "feasible". I mesi in questione sono: marzo, aprile e luglio. I solver che hai implementato tu non restituisce una soluzione mentre quello che ho messo io sì, ma è chiaramente tarocca. Quindi il tuo codice era giusto, ma c'erano mesi dove la soluzione non poteva essere trovata. 
+
+
+
 
