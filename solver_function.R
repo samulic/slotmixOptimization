@@ -122,42 +122,70 @@ solver <- function(data, month) {
   
   # Vincolo 3 - preprocessing
   ## ------------------------------------------------------------------------
-  df <- plyr::ddply(df, c("Month", "Casino", "Section"), transform, 
-                    bin_giocate = cut(giocate_totali, 
-                                      breaks = quantile(giocate_totali, probs = seq(0, 1, 1/3)), #1/4 per avere i quartili
-                                      include.lowest = T, dig.lab=10))
-  head(df)
-  
-  unique(df$bin_giocate) # 32 -> 1 month * 2 casino * 4 sections * 4 breaks
+  #Calcola i bin per le giocate totali del casino Libra, per differenziare dai bin di Aries
+  quartili.aries <- c(quantile(df[df$Casino == "Aries", ]$"giocate_totali", probs = seq(0, 1, by = 0.25)))
+  quartili.libra <- c(quantile(df[df$Casino == "Libra", ]$"giocate_totali", probs = seq(0, 1, by = 0.25)))
+  #Check dataset ordering --> arrange(Month, Section, MachineType, Denomination, Casino)
+  head(df, n = 100)
+  head(arrange(df, Month, Section, MachineType, Denomination, Casino), n = 100) #ok, e' cosi'
+  # split dataset based on casino, to differentiate bins
+  aries.idx <- which(df$Casino == "Aries")
+  aries <- df[aries.idx,]
+  libra <- df[-aries.idx,]
+  # Create bins based on total plays, include lowest value, and display digits instead of scientific notation
+  aries$bin_giocate <- cut(aries$giocate_totali, breaks = quartili.aries, include.lowest = T, dig.lab=10)
+  libra$bin_giocate <- cut(libra$giocate_totali, breaks = quartili.libra, include.lowest = T, dig.lab=10)
+  # merge the two casino into the original dataset, with the additional column bin_giocate
+  df <- rbind(aries, libra) %>% arrange(Month, Section, MachineType, Denomination, Casino)
+  # reorder columns, set bin_giocate next to giocate_totali
   df[c(1:9, 13, 10:12)]
+  # Confirm ordering is the same as before
+  all(which(df$Casino == "Aries") == aries.idx)
   
   bin_stats <- df %>% 
     group_by(bin_giocate, Casino) %>%
-    summarise(minimo_macchine  = min(numero_macchine),
+    summarise(minimo_macchine = min(numero_macchine),
               massimo_macchine = max(numero_macchine),
-              media_macchine   = mean(numero_macchine),
+              media_macchine = mean(numero_macchine),
               mediana_macchine = median(numero_macchine),
-              totale_macchine  = sum(numero_macchine)) %>%
+              totale_macchine = sum(numero_macchine)) %>%
     #arrange(Casino, desc(bin_giocate)) #non funziona bene come ordinamento
     arrange(Casino, media_macchine) #meglio
   
-  ## ------------------------------------------------------------------------
-  # Vincolo 3
-  ## ------------------------------------------------------------------------
-  f.A3 <- diag(nrow(df))
+  # Vincolo 3 - vincola il numero di slot di ogni categoria tra un min e max calcolato per gruppi di slot che condividono uno stesso range di numero di giocate.
+  # create all combinations of ...
+  f.A3 <- t(predict(dummyVars(~ bin_giocate : factor(Denomination) : MachineType : Casino : Section, data = df), newdata = df))
+  # we must remove empty rows (that is no observation matches the combination, 
+  # think for example about bins belonging to another Casino, they will still be computed but with no matching observation)
+  # exclude all rows that have all zeros (sum is not more than zero)
+  f.A3 <- f.A3[rowSums(f.A3[,])>0, ]
+  # check dimension, it should have a number of rows equal to the number of observation in the dataset 
+  # since we are constraining each Month/Casino/Section/category(tipo) of slots, that is how our dataset is constructed
+  dim(f.A3) #bingo!
+  # Nowm duplicate every row, needed because we need to set a lower and upper bound for the number of slots. 
+  # Retain order --> ob1-low, obs1-up, obs2-low, ...)
   f.A3 <- as.tibble(f.A3) %>% slice(rep(1:n(), each = 2)) %>% as.matrix()
   
   b <- c()
   for (i in 1:nrow(df)) {
-    # get the correct row index to identify the bin reference
+    #get the correct row index to identify the bin reference
     idx <- match(df[i,"bin_giocate"], bin_stats$bin_giocate)
     # create vector of constraint coefficient, lower then upper bounds
-    b <- append(b, bin_stats[idx, "minimo_macchine"])
-    b <- append(b, bin_stats[idx, "massimo_macchine"])
+    b <- c(b, bin_stats[idx, "minimo_macchine"], bin_stats[idx, "massimo_macchine"])
   }
-  
+  #result b vector is list, because bin_stats is a dataframe (tibble to be precise)
   f.b3 <- unlist(b, use.names=FALSE)
+  
   f.dir3 <- rep(c(">=", "<="), dim(df)[1]) # direction of the inequalities
+  # length should be equal to the length of the constraints' coefficient
+  length(f.dir3)
+  
+  sol3 <- solveLP(f.obj, f.b3, f.A3, maximum = TRUE, const.dir = f.dir3) # Va in loop, quello sotto no. 
+  sol3bis <- lp(direction = "max", objective.in = f.obj, const.mat = f.A3, const.dir = f.dir3, const.rhs = f.b3)
+  
+  #sol3$con
+  summary(sol3)
+  sol3bis
   
   #check if A3 is equal to f.A3 -> all(A3 == f.A3) FALSE
   
@@ -186,6 +214,9 @@ sols <- lapply(months, FUN = solver, data = df)
 # give names to the list of solutions
 names(sols) <- months
 
+save(file = "solutions.rdata", solver, bin_stats, df, sols)
+
 sols[["2012-03-01"]]
 # get the optimum found for each month
 sapply(sols, `[[`, "opt")
+
