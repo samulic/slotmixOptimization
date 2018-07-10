@@ -115,37 +115,6 @@ solver <- function(data, month) {
   sol2$con
   
   ## ------------------------------------------------------------------------
-  # Da notare, rispetto alla soluzione precedente, l'ordine in dummyVars differente
-  f.A2 <- t(predict(dummyVars(~ Casino : Section, data = df), newdata = df))
-  # see previous ": factor(Month)". In this case i think that putting Section or Casino first doesn't change the result.
-  
-  # Duplicate every row, needed because for each section/month/casino we need a lower and upper bound. 
-  # Retain order --> ob1-low, obs1-up, obs2-low, ...)
-  f.A2 <- as.tibble(f.A2) %>% slice(rep(1:n(), each = 2)) %>% as.matrix()
-  
-  #I vincoli sono attivati nel seguente modo 
-  # mese1-casino1-sez1-low,
-  # mese1-casino1-sez1-up,
-  # mese1-casino2-sez1;
-  # mese1-casino1-sez2;
-  # mese2;...
-  
-  #nslots contiene il numero di slot per ogni casino e mese, alternato per casino (mese1 casino1, mese1 casino2, mese2 casino1, ...)
-  # combine nslots in two columns, where rows are months and columns are casino (first for Aries)
-  numslots <- matrix(nslots, ncol = 2, byrow = T)
-  f.b2 <- c()
-  # probabilmente si puo' fare senza il ciclo for, ma come??
-  for (i in 1:nrow(numslots)) {
-    f.b2 <- c(f.b2, rep(round(c(numslots[i,1]*.2, numslots[i,1]*.32, numslots[i,2]*0.18, numslots[i,2]*0.35)), 4))
-  }
-  f.dir2 <- rep(c(">=", "<="), length(f.b2)/2) # direction of the inequalities
-  
-  sol2 <- solveLP(f.obj, f.b2, f.A2, maximum = TRUE, const.dir = f.dir2) #solver 
-  sol2bis <- lp(direction = "max", objective.in = f.obj, const.mat = f.A2, const.dir = f.dir2, const.rhs = f.b2)
-  
-  summary(sol2)
-  sol2$con
-  
   #To see solution on the original dataset
   # df[which(sol2$solution != 0),] %>%
   #   arrange(Casino, tipo) %>%
@@ -154,7 +123,9 @@ solver <- function(data, month) {
   # Vincolo 3 - preprocessing
   ## ------------------------------------------------------------------------
   df <- plyr::ddply(df, c("Month", "Casino", "Section"), transform, 
-                    bin_giocate = cut(giocate_totali, breaks = 4, include.lowest = T, dig.lab=10))
+                    bin_giocate = cut(giocate_totali, 
+                                      breaks = quantile(giocate_totali, probs = seq(0, 1, 1/3)), #1/4 per avere i quartili
+                                      include.lowest = T, dig.lab=10))
   head(df)
   
   unique(df$bin_giocate) # 32 -> 1 month * 2 casino * 4 sections * 4 breaks
@@ -162,11 +133,11 @@ solver <- function(data, month) {
   
   bin_stats <- df %>% 
     group_by(bin_giocate, Casino) %>%
-    summarise(minimo_macchine = min(numero_macchine),
+    summarise(minimo_macchine  = min(numero_macchine),
               massimo_macchine = max(numero_macchine),
-              media_macchine = mean(numero_macchine),
+              media_macchine   = mean(numero_macchine),
               mediana_macchine = median(numero_macchine),
-              totale_macchine = sum(numero_macchine)) %>%
+              totale_macchine  = sum(numero_macchine)) %>%
     #arrange(Casino, desc(bin_giocate)) #non funziona bene come ordinamento
     arrange(Casino, media_macchine) #meglio
   
