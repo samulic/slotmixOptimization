@@ -1,0 +1,65 @@
+---
+title: "R Sensitivity Analysis for casino floor optimization"
+output: html_notebook
+---
+
+```{r}
+# load r object with the solutions for each month
+load("solutions.RData")
+```
+
+
+#Sensitivity Analysis
+When solving an LP problem we assume that values of all model coefficients are known with certainty. Such certainty rarely exists. Sensitivity analysis helps answer questions about how sensitive the optimal solution is to changes in various coefficients in a model.  
+We made Sensitivity Analysis only for September: Each consideration, with the right changes, could be extended to the other months.
+
+First of all: Maximum Number of machines in each Casino
+```{r}
+sol <- sols$`2011-09-01`
+shadow_price <- sol$con
+vincolo1 <- shadow_price[1:2,]
+knitr::kable(vincolo1) 
+```
+Observations:  
+- Each constraint is binding: the total number of machines for each Casin? is equal to the previous configuration;  
+- For each extra machines in Aries (first constraint) the values of Obj. Function increases by 11095???. The maximun number of extra machines is 38, so, without considerating the purchase cost and assuming all others coeff. remain constant, the Obj. Function could increase by $$11095??? * 38 = 421610??? $$.  
+- For each extra machines in Libra (Second constraint) the values of Obj. Function increases by 11562???. The maximun number of extra machines is 18 so, without considerating the purchase cost and assuming all others coeff. remain constant, the Obj. Function could increase by $$11562??? * 18 = 208116??? $$.  
+
+Conclusion: If we have to increase the number of machines for only one Casin?, we'll choose Aries
+
+Second one: Number of machines in each section (proportion) 
+We remind that each constraint has lower and upper bound.
+```{r}
+vincolo2 <- shadow_price[3:18,]
+knitr::kable(vincolo2) 
+```
+Let's look the upper bound to know which section have the maximum number of machines.  
+Only constraints n. 14 n. 16 are binding, this means:  
+- In Aries the Section that receives more machines (0.18 of the total) is "Restaurant Plaza" (constraint 7);  
+- In Libra the Section that recerives more machines (0.35 of the total) is "Interior" (constraint 6).  
+
+Let's look the lower bound to know which section have the minimum number of machines.  
+In this case constraints n. 5,7,9 received the minimun number of machines: the number of machines is just sufficient to cover the lower bound, this means:  
+- In Aries one Section, Entrace, receives less machines that the other ones;  
+- In Libra two Sections, Boundary and Entrance, receive less machines that the other ones.  
+
+Also in this case we can see the dual (shadow price) and dual.reg to decide which section could have more machines.
+
+Last one: Number of machines of each category in each section
+We remind that each constraint has lower and upper bound.
+```{r}
+vincolo3 <- shadow_price[19:length(shadow_price[,1]),]
+rownames(vincolo3) <- 1:length(vincolo3[,1])
+knitr::kable(head(vincolo3))
+```
+
+Let's look the upper bound to know which category in each section have the maximum number of machines.
+```{r}
+knitr::kable(vincolo3[vincolo3$actual == vincolo3$bvec & vincolo3$dir == "<=", ])
+```
+Ok queste sono le categorie che in ogni sezione hanno ricevuto il numero massimo di macchine: riesci a farmi una funzioncina che mi riconduca alle macchine del dataframe di partenza? Forse ti conviene usare il dataframe che ho costruito prima "vincolo 3" che contiene solamente le informazioni relative al terzo vincolo (upper e lower bound). Ho riordinato le righe da 1 a 156 con rownames pensando servisse. 
+
+...Second Part...
+```{r}
+knitr::kable(sol$allvar)
+```
