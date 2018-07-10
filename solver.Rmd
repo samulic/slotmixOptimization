@@ -37,7 +37,7 @@ head(df)
 ```
 
 Temporary: use only ...
-```{r echo=TRUE, eval=FALSE}
+```{r}
 df <- filter(df, Month == ymd("2011-09-01")) #!= 
 ```
 
@@ -226,12 +226,9 @@ for (b in unique(df$bin_giocate)) {
 par(mfrow = c(1,1))
 ```
 
-GABRI DOVREI AVER RISOLTO...SEMPLICEMENTE CREANDO LA VARIABILE CON DIAG.  
-Domani fai i dovuti check che io studio web marketing, poi direi che puoi fare il famoso for o quello che vuoi per iterare su tutti i mesi e salvare i risultati.  
-Rimane un unico mistero che non riesco a capire: perch? se lancio "as.tibble(df) %>% slice(rep(1:n(), each = 2)) %>% as.matrix() " il nuovo dataset raddoppiato ? ordinato per casin?? mentre la matrice che raddoppio (f.A3) mantiene lo stesso ordinamento?
 
 Vincolo 3 - vincola il numero di slot di ogni categoria tra un min e max calcolato per gruppi di slot che condividono uno stesso range di numero di giocate.
-```{r}
+```{r eval=FALSE, include=FALSE}
 # create all combinations of ...
 A3 <- t(predict(dummyVars(~ bin_giocate : factor(Denomination) : MachineType : Casino : Section , data = df), newdata = df))
 #see previous ": factor(Month)"
@@ -242,10 +239,10 @@ A3 <- t(predict(dummyVars(~ bin_giocate : factor(Denomination) : MachineType : C
 A3 <- A3[rowSums(A3[,])>0, ]
 # check dimension, it should have a number of rows equal to the number of observation in the dataset 
 # since we are constraining each Month/Casino/Section/category(tipo) of slots, that is how our dataset is constructed
-dim(f.A3) #bingo!
+dim(A3) #bingo!
 # Nowm duplicate every row, needed because we need to set a lower and upper bound for the number of slots. 
 # Retain order --> ob1-low, obs1-up, obs2-low, ...)
-A3 <- as.tibble(A3) %>% slice(rep(1:n(), each = 2)) %>% as.matrix()   
+f.A3 <- as.tibble(A3) %>% slice(rep(1:n(), each = 2)) %>% as.matrix()   
 #l'errore sta nella creazione della matrice A
 
 b <- c()
