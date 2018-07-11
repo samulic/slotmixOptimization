@@ -154,16 +154,7 @@ solver <- function(data, month) {
   
   # Vincolo 3 - vincola il numero di slot di ogni categoria tra un min e max calcolato per gruppi di slot che condividono uno stesso range di numero di giocate.
   # create all combinations of ...
-  f.A3 <- t(predict(dummyVars(~ bin_giocate : factor(Denomination) : MachineType : Casino : Section, data = df), newdata = df))
-  # we must remove empty rows (that is no observation matches the combination, 
-  # think for example about bins belonging to another Casino, they will still be computed but with no matching observation)
-  # exclude all rows that have all zeros (sum is not more than zero)
-  f.A3 <- f.A3[rowSums(f.A3[,])>0, ]
-  # check dimension, it should have a number of rows equal to the number of observation in the dataset 
-  # since we are constraining each Month/Casino/Section/category(tipo) of slots, that is how our dataset is constructed
-  dim(f.A3) #bingo!
-  # Nowm duplicate every row, needed because we need to set a lower and upper bound for the number of slots. 
-  # Retain order --> ob1-low, obs1-up, obs2-low, ...)
+  f.A3 <- diag(nrow(df))
   f.A3 <- as.tibble(f.A3) %>% slice(rep(1:n(), each = 2)) %>% as.matrix()
   
   b <- c()
@@ -171,14 +162,12 @@ solver <- function(data, month) {
     #get the correct row index to identify the bin reference
     idx <- match(df[i,"bin_giocate"], bin_stats$bin_giocate)
     # create vector of constraint coefficient, lower then upper bounds
-    b <- c(b, bin_stats[idx, "minimo_macchine"], bin_stats[idx, "massimo_macchine"])
+    b <- append(b, bin_stats[idx, "minimo_macchine"])
+    b <- append(b, bin_stats[idx, "massimo_macchine"])
   }
-  #result b vector is list, because bin_stats is a dataframe (tibble to be precise)
-  f.b3 <- unlist(b, use.names=FALSE)
   
+  f.b3 <- unlist(b, use.names=FALSE)
   f.dir3 <- rep(c(">=", "<="), dim(df)[1]) # direction of the inequalities
-  # length should be equal to the length of the constraints' coefficient
-  length(f.dir3)
   
   sol3 <- solveLP(f.obj, f.b3, f.A3, maximum = TRUE, const.dir = f.dir3) # Va in loop, quello sotto no. 
   sol3bis <- lp(direction = "max", objective.in = f.obj, const.mat = f.A3, const.dir = f.dir3, const.rhs = f.b3)
@@ -213,6 +202,8 @@ months <- unique(df$Month)
 sols <- lapply(months, FUN = solver, data = df)
 # give names to the list of solutions
 names(sols) <- months
+
+sols$`2011-09-01`$con
 
 save(file = "solutions.rdata", solver, bin_stats, df, sols)
 
