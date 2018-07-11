@@ -1,0 +1,266 @@
+---
+title: "LDE dataset"
+author: "Adreose Eugenio,<br>Caldara Gabriele,<br>Comotto Federico,<br>Scardovelli Massimiliano"
+date: "09 luglio 2018"
+output:
+  html_document:
+    code_download: yes
+    df_print: paged
+    highlight: textmate
+    theme: spacelab
+    toc: yes
+    toc_depth: 5
+---
+
+```{r, include=FALSE}
+library(dplyr)
+library(lubridate)
+library(funModeling)
+library(ggplot2)
+options(scipen = 999)
+```
+
+##Dataset
+
+```{r}
+slot <- readxl::read_excel("Lucky Duck Entertainment revenue 2013.xls", na = c(".", "NA", "NaN"))
+str(slot)
+```
+
+Status Dataframe
+```{r}
+status = df_status(slot, print_results = F)
+sort(unique(slot$Month)) #12 month
+knitr::kable(status)
+```
+
+##Categorization
+Creazione del dataset che verra' utilizzato per i 12 modelli. L'aggregazione avviene per categoria (MachineType+Denomination) per ogni mese in ogni sezione dei 2 Casin?.
+
+
+```{r}
+df <- slot %>%
+  group_by(Month, Casino, Section, MachineType, Denomination) %>%
+  summarise(numero_macchine    = sum(NoMachines),
+            ricavi_totali      = sum(GrossRevenue),
+            ricavo_unitario    = ricavi_totali/numero_macchine,
+            giocate_totali     = sum(Plays),
+            giocate_unitarie   = round(giocate_totali/numero_macchine),
+            ricavo_per_giocata = ricavi_totali/giocate_totali) %>%
+  arrange(Month, Section, MachineType, Denomination) %>%
+  mutate(tipo = paste0(MachineType, "_", Denomination)) 
+head(df)
+```
+
+A seguito del processo di aggregazione, qual e' il numero massimo di categorie per LDE?
+```{r}
+cat("Max number of categories:", nrow(df %>%
+  group_by(tipo) %>%
+  summarise(n = n())))
+```
+
+Quali sono?
+```{r}
+knitr::kable(df %>%
+  group_by(tipo) %>%
+  summarise(n = n()) %>%
+  select(tipo))
+```
+
+Qual e' il numero massimo di categorie in ciascun Casino'?
+```{r}
+Casino = df %>% group_by(tipo, Casino) %>%
+  summarise(n = n()) %>%
+  arrange(Casino)
+cat(c("Max number of categories for Aries:", nrow(Casino %>% filter(Casino == "Aries")),
+      "\nMax number of categories for Libra:", nrow(Casino %>% filter(Casino == "Libra"))))
+```
+
+Quante categorie (in media) ci sono in ciascuna Sezione dei 2 Casin??
+```{r}
+knitr::kable(df %>% group_by(Casino, Section, Month) %>%
+  summarise(n = n()) %>%
+  arrange(Casino, Section) %>%
+  group_by(Casino, Section) %>%
+  summarise(Numero_medio_categorie = mean(n), Varianza_numero_categorie = sqrt(var(n))))
+```
+
+Quante categorie (in media) ci sono in ciascun mese per i 2 Casin??
+```{r}
+knitr::kable(df %>% group_by(Casino, Section, Month) %>%
+  summarise(n = n()) %>%
+  arrange(Casino, Section) %>%
+  group_by(Casino, Month) %>%
+  summarise(Numero_medio_categorie = mean(n), Varianza_numero_categorie = sqrt(var(n))))
+```
+
+##Data Visualization (Exploration)
+Al fine di sottolineare alcuni aspetti denotati in fase di esplorazione verranno creati dei dataset appositi.
+GRAFICO X
+```{r}
+tre <- data %>% select(Section, tipo, ricavo_unitario)
+ggplot(data = tre, aes(x = tipo, y = ricavo_unitario, colour = Section)) +
+  #geom_point(alpha = .6) +
+  geom_jitter(alpha = .8) + 
+  labs(x="Categoria", y="Ricavo unitario", colour = "Sezione", title = "Distribuzione dei ricavi mensili delle slot per categoria e sezione nei due casino", subtitle = "Casino") +
+  theme(axis.text.x = element_text(angle = 40, hjust = .8)) +
+  facet_wrap(~Casino)
+  #theme_light()
+```
+La prima cosa che si puo' notare dal grafico e' una certa uniformita' dei ricavi unitari a parita' di sezione e tipologia di macchina (video, reel, vpoker), fatta eccezione per il casino Aries in cui le macchine reel portano a ricavi piu' variabili, suggerendo che la sezione in cui si trovano non influisce sul profitto per questa tipologia. Ad uno sguardo piu' attento si puo' notare come ci sia una netta distinzione nei ricavi unitari fra i due casino' a parita' di categoria di macchina. Si vede infatti come i ricavi tra stesse sezioni dei due casino' siano invertiti: una macchina video posizionata nella sezione 'entrata' in Aries porta al doppio dei guadagni rispetto alla medesima configurazione in Libra, viceversa per 'boundary' in cui rendono circa la meta' rispetto a Libra. Questo lascia pensare a due situazioni molto eterogenee nei due casino di cui tener conto nella nostra analisi.
+Sia il casino' Aries sia Libra hanno una sezione, rispettivamente il ristorante Plaza e la interna, che porta ricavi molto elevati per le macchine di tipo video.
+
+
+Prima dimensione: il tempo
+```{r}
+ricavi_mese = df %>% 
+  group_by(Month) %>%
+  summarise(ricavo_medio_totale = mean(ricavi_totali),
+            ricavo_medio_unitario = mean(ricavo_unitario),
+            numero_macchine_medie = mean(numero_macchine),
+            varianza_macchine = sqrt(var(numero_macchine)))
+
+ggplot(data=ricavi_mese, aes(x=ricavi_mese$Month, y = ricavi_mese$ricavo_medio_unitario)) +
+  geom_line(alpha=.5, size=1, color="#880011") +
+  ggtitle("Ricavi per Mese di LDE") +
+  labs(x="Mese", y="Ricavo medio unitario") +
+  theme_classic()
+
+ricavi_mese$Month = as.factor(ricavi_mese$Month)
+
+ggplot(data=ricavi_mese, aes(x=ricavi_mese$numero_macchine_medie,
+                             y=ricavi_mese$ricavo_medio_totale,
+                             colour = Month)) +
+  geom_point(alpha=.4, size=4) +
+  ggtitle("Pi? macchine hai pi? guadagni? In linea di massima SI!") +
+  labs(x="Numero medio macchine", y="Ricavi medi totali") + 
+  theme_minimal()
+
+ggplot(data=ricavi_mese, aes(x=ricavi_mese$numero_macchine_medie,
+                             y=ricavi_mese$ricavo_medio_unitario,
+                             colour = Month)) +
+  geom_point(alpha=.4, size=4) +
+  ggtitle("Tante macchine non significa ricavi unitari elevati!") +
+  labs(x="Numero medio macchine", y="Ricavi medi unitari") + 
+  theme_minimal()
+```
+ 
+Seconda dimensione: categorie
+```{r}
+ricavi_categoria = df %>%
+  group_by(Denomination, MachineType) %>%
+  summarise(ricavo_medio_unitario = mean(ricavo_unitario)) %>%
+  mutate(type = paste0(Denomination,sep = "_", MachineType))
+
+ggplot(data=ricavi_categoria, aes(x=ricavi_categoria$type, y = sort(ricavi_categoria$ricavo_medio_unitario))) +
+  geom_bar(stat="identity", fill = "firebrick3" ) +
+  ggtitle("Ricavi per Categoria di LDE") +
+  labs(x="Categoria", y="Ricavo medio unitario") +
+  theme_classic() 
+
+```
+
+Terza dimensione: le sezioni
+```{r}
+ricavi_sezione = df %>% 
+  group_by(Section) %>%
+  summarise(ricavo_medio_unitario = mean(ricavo_unitario))
+
+ggplot(data=ricavi_sezione, aes(x=ricavi_sezione$Section, y = sort(ricavi_sezione$ricavo_medio_unitario))) +
+  geom_bar(stat="identity", fill = "forestgreen", width = 0.4 ) +
+  geom_text(aes(label = round(ricavi_sezione$ricavo_medio_unitario)), nudge_y = 700 ) +
+  ggtitle("Ricavi per Sezione di LDE") +
+  labs(x="Sezione", y="Ricavo medio unitario") +
+  theme_classic() 
+
+```
+
+Quarta dimensione: i Casin?
+```{r}
+ricavi_casino = df %>% 
+  group_by(Casino) %>%
+  summarise(ricavo_medio_unitario = mean(ricavo_unitario))
+
+ggplot(data=ricavi_casino, aes(x=ricavi_casino$Casino, y = ricavi_casino$ricavo_medio_unitario)) +
+  geom_bar(stat="identity", fill = "blue", width = 0.4 ) +
+  geom_text(aes(label = round(ricavi_casino$ricavo_medio_unitario)), nudge_y = 700 ) +
+  ggtitle("Ricavi per Casino di LDE") +
+  labs(x="Casino", y="Ricavo medio unitario") +
+  theme_classic()
+```
+
+Dato che i ricavi unitari cambiano in funzione delle 4 dimensioni analizzate possiamo affermare che ha senso creare un modello per ciascun mese che cerchi di massimizzare i ricavi unitari delle categorie presenti in ciascuna sezione.
+
+##Vincolo numero 3: Motivazione
+
+Iniziamo considerando il Dataset intero
+```{r}
+ggplot(data=df, aes(x=df$giocate_totali, y = df$numero_macchine)) +
+  geom_point(alpha=.5, size=3, color="#880011") +
+  ggtitle("Pi? macchine ci sono pi? si gioca? Si") +
+  labs(x="Giocate Totali", y="Numero di Macchine") +
+  theme_classic()
+
+cat("The Correlation between 'Giocate Totali' and 'Numero Macchine' is:",cor(df$giocate_totali, df$numero_macchine))
+```
+
+Ma ? vero per ogni mese?
+```{r}
+correlazione = list()
+m = sort(unique(ymd(df$Month)))
+for(i in 1:12) {
+  month = df %>% filter(Month == m[i])
+  correlazione[as.character(m[i])] = cor(month$giocate_totali, month$numero_macchine)
+}
+correlazione
+```
+Si!  
+Data l'elevata correlazione tra le due variabili, vogliamo inserire un vincolo che tenga conto di questo aspetto. L'assunto ? che le categorie con maggior numero di macchine siano anche quelle che ottengono pi? giocate in un dato mese, ergo sono quelle "preferite" dalla clientela. Se alcune categorie hanno pi? macchine significa che il manager del Casin? ha constatato che in quel periodo i clienti sono particolarmente interessati a quelle categorie.  
+Tuttavia per settare l'adeguato numero di macchine in funzione delle giocate occorre anche tenere in considerazione la diversa struttura dei due Casin? (Aries e Libra)
+
+Iniziamo considerando il dataset intero
+```{r}
+df$Casino = as.factor(df$Casino)
+
+p = ggplot(df, aes(x=Casino, y=giocate_totali, fill = Casino)) + 
+  geom_boxplot(outlier.shape=8) +
+  labs(y = "Giocate totali") +
+  ggtitle("Distribuzione giocate totali") +
+  #geom_jitter(shape=16, position=position_jitter(0.2)) +
+  theme_dark()
+
+data_summary <- function(x) {
+  "funzione per mettere intervallo di confidenza attorno alla media"
+  m = mean(x)
+  ymin = t.test(x)$conf.int[1]
+  ymax = t.test(x)$conf.int[2]
+  return(c(y=m,ymin=ymin,ymax=ymax))
+}
+
+p + stat_summary(fun.data = data_summary, 
+                 geom="pointrange",
+                 color="red", 
+                 size = 0.7)
+
+t.test(df$giocate_totali ~ df$Casino) #distribuzioni significativamente diverse: non posso usare la congiunta
+```
+In generale ? vero che la distribuzione delle giocate totali cambia a seconda del Casin? di riferimento.
+
+Ma ? vero per ogni mese?
+```{r}
+test = list()
+for(i in 1:12) {
+  month = df %>% filter(Month == m[i])
+  x = t.test(month$giocate_totali ~ month$Casino)
+  test[as.character(m[i])] = x$p.value
+}
+test
+```
+Non sempre!  
+
+Siccome l'obiettivo finale ? quello di determinare il numero di macchine in funzione delle giocate totali dobbiamo:  
+1) discretizzare la variabile giocate totali;  
+2) calcolare alcune misure statistische relative ai gruppi formati in fase di discretizzazione e scegliere la misura per settare la soglia (lower & upper);  
+3) individuare il lower e l'upper bound sulla base dell'indice scelto.  
+
+Per discretizzare la variabile "giocate totali", abbiamo considerato i quartili della distribuzione di frequenza. Fatta questa premessa, sarebbe stato un errore utilizzare la distribuzione di tale variabile cos? com'?: come si evince dall'output precedente, in pi? di un mese, i valori delle giocate totali nei due Casin? sono significativamente diversi. Per non incorrere nell'errore di creare intervalli errati si ? deciso che per ciascun mese la variabile "giocate totali" verr? dicretizzata con intervalli differenti a seconda del Casin? di appartenenza.

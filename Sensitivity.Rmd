@@ -10,49 +10,67 @@ load("solutions.RData")
 
 
 #Sensitivity Analysis
-Nel risolvere un problema di PL si assume che i coefficienti siano conosciuti con certezza, ma nella realtà questa certezza quasi mai esiste. La Sensitivity Analysis è la fase post modellazione che permette di valutare la bontà del modello creato, ovvero quanto la soluzione ottimale è sensibile a variazioni dei coefficienti del modello (vincoli e F.O.).  
-A titolo d'esempio, verrà effettuata la SA solo per la soluzione del mese di settembre: è chiaro che sia possibile replicare il lavoro per i mesi successivi effettuando i dovuti accorgimenti. 
+Nel risolvere un problema di PL si assume che i coefficienti siano conosciuti con certezza, ma nella realt? questa certezza quasi mai esiste. La Sensitivity Analysis ? la fase post modellazione che permette di valutare la bont? del modello creato, ovvero quanto la soluzione ottimale ? sensibile a variazioni dei coefficienti del modello (vincoli e F.O.).  
+A titolo d'esempio, verr? effettuata la SA solo per la soluzione del mese di settembre: ? chiaro che sia possibile replicare il lavoro per i mesi successivi effettuando i dovuti accorgimenti. 
+
+Assegna nome ai vincoli
+```{r}
+vincoli.names <- with(df, paste(Casino,Section,MachineType,Denomination, sep="_"))
+first <- c("Aries", "Libra")
+second <- expand.grid(c('low', 'up'), unique(df$Section), unique(df$Casino))
+concat <- function(x) paste0(x[,2], '_', x[,3], '.', x[,1])
+second <- concat(second)
+third <- expand.grid(c('low','up'), vincoli.names)
+third <- with(third, paste(Var2, Var1, sep = "."))
+```
 
 Vincolo 1 
 ```{r}
 sol <- sols$`2011-09-01`
+rownames(sol$con) <- c(first, second, third)
+
 shadow_price <- sol$con
 vincolo1 <- shadow_price[1:2,]
 knitr::kable(vincolo1) 
 ```
 Osservazioni:   
-- Ciascun vincolo è pienamente soddisfatto, ergo il numero di macchine totali per Aries e Libra resta quello della configurazione iniziale;    
-- Volendo aumentare la disponibilità di macchine per uno dei due Casinò dovremmo guardare il valore dei prezzi ombra (dual) e la regione (dual.reg) dove tali valori sono validi.  
-Si nota che per ogni macchina addizionale allocata ad Aries la Funzione Obiettivo aumenta di euro 11095 (dual) e che l'incremento massimo consentito è di 40 macchine. Per Libra invece ogni macchina addizionale consente alla Funzione Obiettivo di aumentare il suo valore per euro 11562,ma l'incremento massimo consentito è nettamente minore 20 macchine. Potendo scegliere di incrementare la disponibilità di macchine per uno solo dei 2 Casinò, LDE dovrebbe comportarsi in maniera differente a seconda del numero di macchine a disposizione:
-- numero di macchine <= 20, la priorità dovrebbe essere data a Libra in quanto capace di generare l'incremento maggiore;  
-- 20 < numero di macchine <= 40, la priorità dovrebbe essere data ad Aries in quanto capace di generare l'incremento maggiore;  
+- Ciascun vincolo ? pienamente soddisfatto, ergo il numero di macchine totali per Aries e Libra resta quello della configurazione iniziale;    
+- Volendo aumentare la disponibilit? di macchine per uno dei due Casin? dovremmo guardare il valore dei prezzi ombra (dual) e la regione (dual.reg) dove tali valori sono validi.  
+Si nota che per ogni macchina addizionale allocata ad Aries la Funzione Obiettivo aumenta di euro 11095 (dual) e che l'incremento massimo consentito ? di 40 macchine. Per Libra invece ogni macchina addizionale consente alla Funzione Obiettivo di aumentare il suo valore per euro 11562,ma l'incremento massimo consentito ? nettamente minore 20 macchine. Potendo scegliere di incrementare la disponibilit? di macchine per uno solo dei 2 Casin?, LDE dovrebbe comportarsi in maniera differente a seconda del numero di macchine a disposizione:
+- numero di macchine <= 20, la priorit? dovrebbe essere data a Libra in quanto capace di generare l'incremento maggiore;  
+- 20 < numero di macchine <= 40, la priorit? dovrebbe essere data ad Aries in quanto capace di generare l'incremento maggiore;  
 Questione di equazioni: $$11562 * 20 = 11095x$$
 
 
 Vincolo 2
-Si ricorda che ciascun vincolo è stato "sdoppiato" in quanto necessario sia l'upper che il lower bound.
+Si ricorda che ciascun vincolo ? stato "sdoppiato" in quanto necessario sia l'upper che il lower bound.
 ```{r}
 vincolo2 <- shadow_price[3:18,]
 knitr::kable(vincolo2) 
 ```
-Dal vincolo numero 3 al vincolo numero 10 si tratta delle sezioni di Aries, mentre dal vincolo numero 11 al 18 delle sezioni di Libra; l'ordine delle sezioni è il medesimo per i due Casinò: Boundary, Entrance, Interior, Restaurant Plaza.  
+Dal vincolo numero 3 al vincolo numero 10 si tratta delle sezioni di Aries, mentre dal vincolo numero 11 al 18 delle sezioni di Libra; l'ordine delle sezioni ? il medesimo per i due Casin?: Boundary, Entrance, Interior, Restaurant Plaza.  
 Valutando l'upper e il lower bound di ciascun vincolo possiamo capire quali sono state le sezioni che hanno ricevuto il maggior/minor numero di macchine:  
-- Per Aries, la sezione che ha ricevuto il maggior numero di macchine (248) è Restaurant Plaza (upper bound soddisfatto). Mentre le sezioni Entrance ed Interior hanno ricevuto il minor numero di macchine (187): solamente il lower bound viene soddisfatto;
-- Per Libra il discorso è divero: Boundary ed Entrance ricevono il minor numero di macchine possibili (39), mentre a registrare il bottino pieno in termini di macchine è la sezione Interior (82 macchine).  
-Come nel caso precedente è possibile valutare i prezzi ombra e la regione ove questi sono validi per decidere quale sia la sezione da premiare in caso di macchine aggiuntive disponibili nel mese in questione.
+- Per Aries, la sezione che ha ricevuto il maggior numero di macchine (248) ? Restaurant Plaza (upper bound soddisfatto) che era la sezione con il numero minore di slot. Mentre le sezioni Entrance ed Interior hanno ricevuto il minor numero di macchine (187): solamente il lower bound viene soddisfatto (in questo caso erano le sezioni con piu' macchine, rispettivamente 219 e 248);
+- Per Libra il discorso ? diverso: Boundary ed Entrance ricevono il minor numero di macchine possibili (39), mentre a registrare il bottino pieno in termini di macchine ? la sezione Interior (82 macchine), quella con meno slot nei dati (39).  
+Questi risultati sono in linea con quanto ci aspettavamo dal grafico X ("Distribuzione dei ricavi mensili delle slot per categoria e sezione nei due casino") dove si vedeva un profitto maggiore in per alcune combinazioni di tipologia-sezione e casino.
+
+--> quindi ci aspettiamo molte piu' video che reel in Aries. --> possibile vincolo sul tipo (video, reel)..?
+
+Come nel caso precedente ? possibile valutare i prezzi ombra e la regione ove questi sono validi per decidere quale sia la sezione da premiare in caso di macchine aggiuntive disponibili nel mese in questione.
 
 Vincolo numero 3
 ```{r}
-vincolo3 <- shadow_price[19:length(shadow_price[,1]),]
-rownames(vincolo3) <- 1:length(vincolo3[,1])
-knitr::kable(head(vincolo3))
+vincolo3 <- shadow_price[19:dim(shadow_price)[1],]
+slots_sum <- group_by(df, Section, tipo, Casino) %>% summarise(sum = sum(numero_macchine))
+knitr::kable(head(vincolo3, n = 20))
 ```
 
 Queste dovrebbero essere tutte le macchine che hanno soddisfatto l'upper bound, ergo che hanno ricevuto il max di macchine possibili.
 ```{r}
 knitr::kable(vincolo3[vincolo3$actual == vincolo3$bvec & vincolo3$dir == "<=", ])
 ```
-Ok queste sono le categorie che in ogni sezione hanno ricevuto il numero massimo di macchine: riesci a farmi una funzioncina che mi riconduca alle macchine del dataframe di partenza? Forse ti conviene usare il dataframe che ho costruito prima "vincolo 3" che contiene solamente le informazioni relative al terzo vincolo (upper e lower bound). Ho riordinato le righe da 1 a 156 con rownames pensando servisse. 
+
+--> vincolo sulla numerosita' per denomination, limitare slot con solo puntate alte per andare incontro alle tasche di tutti.
 
 Parte 2 -> coefficienti Funzione Obiettivo
 ```{r}
