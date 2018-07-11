@@ -97,6 +97,9 @@ img {
 .tabbed-pane {
   padding-top: 12px;
 }
+.html-widget {
+  margin-bottom: 20px;
+}
 button.code-folding-btn:focus {
   outline: none;
 }
@@ -175,62 +178,70 @@ $(document).ready(function () {
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBsb2FkIHIgb2JqZWN0IHdpdGggdGhlIHNvbHV0aW9ucyBmb3IgZWFjaCBtb250aFxubG9hZChcInNvbHV0aW9ucy5SRGF0YVwiKVxuYGBgIn0= -->
+<pre class="r"><code># load r object with the solutions for each month
+load(&quot;solutions.RData&quot;)</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <div id="sensitivity-analysis" class="section level1">
 <h1>Sensitivity Analysis</h1>
-<p>When solving an LP problem we assume that values of all model coefficients are known with certainty. Such certainty rarely exists. Sensitivity analysis helps answer questions about how sensitive the optimal solution is to changes in various coefficients in a model.<br />
-We made Sensitivity Analysis only for September: Each consideration, with the right changes, could be extended to the other months.</p>
-<p>First of all: Maximum Number of machines in each Casino</p>
+<p>Nel risolvere un problema di PL si assume che i coefficienti siano conosciuti con certezza, ma nella realtà questa certezza quasi mai esiste. La Sensitivity Analysis è la fase post modellazione che permette di valutare la bontà del modello creato, ovvero quanto la soluzione ottimale è sensibile a variazioni dei coefficienti del modello (vincoli e F.O.).<br />
+A titolo d’esempio, verrà effettuata la SA solo per la soluzione del mese di settembre: è chiaro che sia possibile replicare il lavoro per i mesi successivi effettuando i dovuti accorgimenti.</p>
+<p>Vincolo 1</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua25pdHI6OmthYmxlKHZpbmNvbG8xKSBcblxuYGBgIn0= -->
-<pre class="r"><code>knitr::kable(vincolo1) 
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc29sIDwtIHNvbHMkYDIwMTEtMDktMDFgXG5zaGFkb3dfcHJpY2UgPC0gc29sJGNvblxudmluY29sbzEgPC0gc2hhZG93X3ByaWNlWzE6MixdXG5rbml0cjo6a2FibGUodmluY29sbzEpIFxuYGBgIn0= -->
+<pre class="r"><code>sol &lt;- sols$`2011-09-01`
+shadow_price &lt;- sol$con
+vincolo1 &lt;- shadow_price[1:2,]
+knitr::kable(vincolo1) </code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cbnwgYWN0dWFsfGRpciB8IGJ2ZWN8IGZyZWV8ICBkdWFsfCBkdWFsLnJlZ3xcbnwtLS0tLS06fDotLS18LS0tLTp8LS0tLTp8LS0tLS06fC0tLS0tLS0tOnxcbnwgICAgODI2fDw9ICB8ICA4NDl8ICAgMjN8ICAgICAwfCAgICAgICAyM3xcbnwgICAgMjMwfDw9ICB8ICAyMzB8ICAgIDB8IDE1OTE4fCAgICAgICAgM3xcbiJ9 -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cbnwgYWN0dWFsfGRpciB8IGJ2ZWN8IGZyZWV8ICBkdWFsfCBkdWFsLnJlZ3xcbnwtLS0tLS06fDotLS18LS0tLTp8LS0tLTp8LS0tLS06fC0tLS0tLS0tOnxcbnwgICAgODQ5fDw9ICB8ICA4NDl8ICAgIDB8ICA4Nzk3fCAgICAgICA0N3xcbnwgICAgMjMwfDw9ICB8ICAyMzB8ICAgIDB8IDE1OTE4fCAgICAgICAgOHxcbiJ9 -->
 <pre><code>
 
 | actual|dir | bvec| free|  dual| dual.reg|
 |------:|:---|----:|----:|-----:|--------:|
-|    826|&lt;=  |  849|   23|     0|       23|
-|    230|&lt;=  |  230|    0| 15918|        3|</code></pre>
+|    849|&lt;=  |  849|    0|  8797|       47|
+|    230|&lt;=  |  230|    0| 15918|        8|</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Observations:<br />
-- Each constraint is binding: the total number of machines for each Casin? is equal to the previous configuration;<br />
-- For each extra machines in Aries (first constraint) the values of Obj. Function increases by 11095???. The maximun number of extra machines is 38, so, without considerating the purchase cost and assuming all others coeff. remain constant, the Obj. Function could increase by <span class="math display">\[11095??? * 38 = 421610??? \]</span>.<br />
-- For each extra machines in Libra (Second constraint) the values of Obj. Function increases by 11562???. The maximun number of extra machines is 18 so, without considerating the purchase cost and assuming all others coeff. remain constant, the Obj. Function could increase by <span class="math display">\[11562??? * 18 = 208116??? \]</span>.</p>
-<p>Conclusion: If we have to increase the number of machines for only one Casin?, we’ll choose Aries</p>
-<p>Second one: Number of machines in each section (proportion) We remind that each constraint has lower and upper bound.</p>
+<p>Osservazioni:<br />
+- Ciascun vincolo è pienamente soddisfatto, ergo il numero di macchine totali per Aries e Libra resta quello della configurazione iniziale;<br />
+- Volendo aumentare la disponibilità di macchine per uno dei due Casinò dovremmo guardare il valore dei prezzi ombra (dual) e la regione (dual.reg) dove tali valori sono validi.<br />
+Si nota che per ogni macchina addizionale allocata ad Aries la Funzione Obiettivo aumenta di euro 8797 (dual) e che l’incremento massimo consentito è di 47 macchine. Per Libra invece ogni macchina addizionale consente alla Funzione Obiettivo di aumentare il suo valore per euro 15918,ma l’incremento massimo consentito è nettamente minore (7 macchine). Potendo scegliere di incrementare la disponibilità di macchine per uno solo dei 2 Casinò, LDE dovrebbe comportarsi in maniera differente a seconda del numero di macchine a disposizione: - numero di macchine &lt;= 8, la priorità dovrebbe essere data a Libra in quanto capace di generare l’incremento maggiore;<br />
+- 15 &lt;= numero di macchine &lt;= 47, la priorità dovrebbe essere data ad Aries in quanto capace di generare l’incremento maggiore;<br />
+- 8 &lt; numero di macchine &lt; 15, questo intervallo è valido solamente per Aries, tuttavia l’incremento totale generato sarebbe comunque inferiore a quello prodotto da Libra con 8 macchine, quindi si preferisce ancora una volta Libra.<br />
+Questione di equazioni: <span class="math display">\[ 15918 * 8 = 8797x\]</span></p>
+<p>Vincolo 2 Si ricorda che ciascun vincolo è stato “sdoppiato” in quanto necessario sia l’upper che il lower bound.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudmluY29sbzIgPC0gc2hhZG93X3ByaWNlWzM6MTgsXVxua25pdHI6OmthYmxlKHZpbmNvbG8yKSBcbmBgYCJ9 -->
 <pre class="r"><code>vincolo2 &lt;- shadow_price[3:18,]
 knitr::kable(vincolo2) </code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cbnwgICB8IGFjdHVhbHxkaXIgfCBidmVjfCBmcmVlfCAgZHVhbHwgZHVhbC5yZWd8XG58Oi0tfC0tLS0tLTp8Oi0tLXwtLS0tOnwtLS0tOnwtLS0tLTp8LS0tLS0tLS06fFxufDMgIHwgICAgMjcyfD49ICB8ICAxNzB8ICAxMDJ8ICAgICAwfCAgICAgIDEwMnxcbnw0ICB8ICAgIDI3Mnw8PSAgfCAgMjcyfCAgICAwfCAgIDcxNnwgICAgICAgMTB8XG58NSAgfCAgICAgNjV8Pj0gIHwgICA0MXwgICAyNHwgICAgIDB8ICAgICAgIDI0fFxufDYgIHwgICAgIDY1fDw9ICB8ICAgODB8ICAgMTV8ICAgICAwfCAgICAgICAxNXxcbnw3ICB8ICAgIDI3Mnw+PSAgfCAgMTcwfCAgMTAyfCAgICAgMHwgICAgICAxMDJ8XG58OCAgfCAgICAyNzJ8PD0gIHwgIDI3MnwgICAgMHwgIDYwMzN8ICAgICAgIDEzfFxufDkgIHwgICAgIDQxfD49ICB8ICAgNDF8ICAgIDB8ICA3NzY0fCAgICAgICAgM3xcbnwxMCB8ICAgICA0MXw8PSAgfCAgIDgwfCAgIDM5fCAgICAgMHwgICAgICAgMzl8XG58MTEgfCAgICAxNzN8Pj0gIHwgIDE3MHwgICAgM3wgICAgIDB8ICAgICAgICAzfFxufDEyIHwgICAgMTczfDw9ICB8ICAyNzJ8ICAgOTl8ICAgICAwfCAgICAgICA5OXxcbnwxMyB8ICAgICA4MHw+PSAgfCAgIDQxfCAgIDM5fCAgICAgMHwgICAgICAgMzl8XG58MTQgfCAgICAgODB8PD0gIHwgICA4MHwgICAgMHwgMTg5NzR8ICAgICAgICAxfFxufDE1IHwgICAgMjMxfD49ICB8ICAxNzB8ICAgNjF8ICAgICAwfCAgICAgICA2MXxcbnwxNiB8ICAgIDEwOXw8PSAgfCAgMjcyfCAgMTYzfCAgICAgMHwgICAgICAxNjN8XG58MTcgfCAgICAgNDR8Pj0gIHwgICA0MXwgICAgM3wgICAgIDB8ICAgICAgICAzfFxufDE4IHwgICAgIDQ0fDw9ICB8ICAgODB8ICAgMzZ8ICAgICAwfCAgICAgICAzNnxcbiJ9 -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cbnwgICB8IGFjdHVhbHxkaXIgfCBidmVjfCBmcmVlfCAgZHVhbHwgZHVhbC5yZWd8XG58Oi0tfC0tLS0tLTp8Oi0tLXwtLS0tOnwtLS0tOnwtLS0tLTp8LS0tLS0tLS06fFxufDMgIHwgICAgMjM0fD49ICB8ICAxODd8ICAgNDd8ICAgICAwfCAgICAgICA0N3xcbnw0ICB8ICAgIDIzNHw8PSAgfCAgMjQ4fCAgIDE0fCAgICAgMHwgICAgICAgMTR8XG58NSAgfCAgICAxODd8Pj0gIHwgIDE4N3wgICAgMHwgIDM1MjB8ICAgICAgICA2fFxufDYgIHwgICAgMTg3fDw9ICB8ICAyNDh8ICAgNjF8ICAgICAwfCAgICAgICA2MXxcbnw3ICB8ICAgIDE4N3w+PSAgfCAgMTg3fCAgICAwfCAgMTM3OHwgICAgICAgMTJ8XG58OCAgfCAgICAxODd8PD0gIHwgIDI0OHwgICA2MXwgICAgIDB8ICAgICAgIDYxfFxufDkgIHwgICAgMjQxfD49ICB8ICAxODd8ICAgNTR8ICAgICAwfCAgICAgICA1NHxcbnwxMCB8ICAgIDI0MXw8PSAgfCAgMjQ4fCAgICA3fCAgICAgMHwgICAgICAgIDd8XG58MTEgfCAgICAgNjJ8Pj0gIHwgICAzOXwgICAyM3wgICAgIDB8ICAgICAgIDIzfFxufDEyIHwgICAgIDYyfDw9ICB8ICAgODJ8ICAgMjB8ICAgICAwfCAgICAgICAyMHxcbnwxMyB8ICAgICAzOXw+PSAgfCAgIDM5fCAgICAwfCAgNzc2NHwgICAgICAgIDh8XG58MTQgfCAgICAgMzl8PD0gIHwgICA4MnwgICA0M3wgICAgIDB8ICAgICAgIDQzfFxufDE1IHwgICAgIDgyfD49ICB8ICAgMzl8ICAgNDN8ICAgICAwfCAgICAgICA0M3xcbnwxNiB8ICAgICA4Mnw8PSAgfCAgIDgyfCAgICAwfCAyMjU1M3wgICAgICAgMTF8XG58MTcgfCAgICAgNDd8Pj0gIHwgICAzOXwgICAgOHwgICAgIDB8ICAgICAgICA4fFxufDE4IHwgICAgIDQ3fDw9ICB8ICAgODJ8ICAgMzV8ICAgICAwfCAgICAgICAzNXxcbiJ9 -->
 <pre><code>
 
 |   | actual|dir | bvec| free|  dual| dual.reg|
 |:--|------:|:---|----:|----:|-----:|--------:|
-|3  |    272|&gt;=  |  170|  102|     0|      102|
-|4  |    272|&lt;=  |  272|    0|   716|       10|
-|5  |     65|&gt;=  |   41|   24|     0|       24|
-|6  |     65|&lt;=  |   80|   15|     0|       15|
-|7  |    272|&gt;=  |  170|  102|     0|      102|
-|8  |    272|&lt;=  |  272|    0|  6033|       13|
-|9  |     41|&gt;=  |   41|    0|  7764|        3|
-|10 |     41|&lt;=  |   80|   39|     0|       39|
-|11 |    173|&gt;=  |  170|    3|     0|        3|
-|12 |    173|&lt;=  |  272|   99|     0|       99|
-|13 |     80|&gt;=  |   41|   39|     0|       39|
-|14 |     80|&lt;=  |   80|    0| 18974|        1|
-|15 |    231|&gt;=  |  170|   61|     0|       61|
-|16 |    109|&lt;=  |  272|  163|     0|      163|
-|17 |     44|&gt;=  |   41|    3|     0|        3|
-|18 |     44|&lt;=  |   80|   36|     0|       36|</code></pre>
+|3  |    234|&gt;=  |  187|   47|     0|       47|
+|4  |    234|&lt;=  |  248|   14|     0|       14|
+|5  |    187|&gt;=  |  187|    0|  3520|        6|
+|6  |    187|&lt;=  |  248|   61|     0|       61|
+|7  |    187|&gt;=  |  187|    0|  1378|       12|
+|8  |    187|&lt;=  |  248|   61|     0|       61|
+|9  |    241|&gt;=  |  187|   54|     0|       54|
+|10 |    241|&lt;=  |  248|    7|     0|        7|
+|11 |     62|&gt;=  |   39|   23|     0|       23|
+|12 |     62|&lt;=  |   82|   20|     0|       20|
+|13 |     39|&gt;=  |   39|    0|  7764|        8|
+|14 |     39|&lt;=  |   82|   43|     0|       43|
+|15 |     82|&gt;=  |   39|   43|     0|       43|
+|16 |     82|&lt;=  |   82|    0| 22553|       11|
+|17 |     47|&gt;=  |   39|    8|     0|        8|
+|18 |     47|&lt;=  |   82|   35|     0|       35|</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -246,18 +257,18 @@ In this case constraints n. 5,7,9 received the minimun number of machines: the n
 <p>Last one: Number of machines of each category in each section We remind that each constraint has lower and upper bound.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudmluY29sbzMgPC0gc2hhZG93X3ByaWNlWzE5Omxlbmd0aChzaGFkb3dfcHJpY2VbLDFdKSxdXG5yb3duYW1lcyh2aW5jb2xvMykgPC0gMTpsZW5ndGgodmluY29sbzNbLDFdKVxua25pdHI6OmthYmxlKGhlYWQodmluY29sbzMpKVxuYGBgIn0= -->
-<pre class="r"><code>vincolo3 &lt;- shadow_price[19:length(shadow_price[,1]),]
-rownames(vincolo3) &lt;- 1:length(vincolo3[,1])
-knitr::kable(head(vincolo3))</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxudmluY29sbzMgPC0gc2hhZG93X3ByaWNlWzE5Omxlbmd0aChzaGFkb3dfcHJpY2VbLDFdKSxdXG5yb3duYW1lcyh2aW5jb2xvMykgPC0gMTpsZW5ndGgodmluY29sbzNbLDFdKVxua25pdHI6OmthYmxlKGhlYWQodmluY29sbzMpKVxuYGBgXG5gYGAifQ== -->
+<p><code>r</code>r vincolo3 &lt;- shadow_price[19:length(shadow_price[,1]),] rownames(vincolo3) &lt;- 1:length(vincolo3[,1]) knitr::kable(head(vincolo3))</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Let’s look the upper bound to know which category in each section have the maximum number of machines.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua25pdHI6OmthYmxlKHZpbmNvbG8zW3ZpbmNvbG8zJGFjdHVhbCA9PSB2aW5jb2xvMyRidmVjICYgdmluY29sbzMkZGlyID09IFwiPD1cIiwgXSlcbmBgYCJ9 -->
-<pre class="r"><code>knitr::kable(vincolo3[vincolo3$actual == vincolo3$bvec &amp; vincolo3$dir == &quot;&lt;=&quot;, ])</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxua25pdHI6OmthYmxlKHZpbmNvbG8zW3ZpbmNvbG8zJGFjdHVhbCA9PSB2aW5jb2xvMyRidmVjICYgdmluY29sbzMkZGlyID09IFxcPD1cXCwgXSlcbmBgYFxuYGBgIn0= -->
+<p><code>r</code>r knitr::kable(vincolo3[vincolo3<span class="math inline">\(actual == vincolo3\)</span>bvec &amp; vincolo3$dir == &lt;=, ])</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -265,13 +276,14 @@ knitr::kable(head(vincolo3))</code></pre>
 <p>…Second Part…</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua25pdHI6OmthYmxlKHNvbCRhbGx2YXIpXG5gYGAifQ== -->
-<pre class="r"><code>knitr::kable(sol$allvar)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxua25pdHI6OmthYmxlKHNvbCRhbGx2YXIpXG5gYGBcbmBgYCJ9 -->
+<p><code>r</code>r knitr::kable(sol$allvar)</p>
+<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBTZW5zaXRpdml0eSBBbmFseXNpcyBmb3IgY2FzaW5vIGZsb29yIG9wdGltaXphdGlvbiIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKYGBge3J9CiMgbG9hZCByIG9iamVjdCB3aXRoIHRoZSBzb2x1dGlvbnMgZm9yIGVhY2ggbW9udGgKbG9hZCgic29sdXRpb25zLlJEYXRhIikKYGBgCgoKI1NlbnNpdGl2aXR5IEFuYWx5c2lzCldoZW4gc29sdmluZyBhbiBMUCBwcm9ibGVtIHdlIGFzc3VtZSB0aGF0IHZhbHVlcyBvZiBhbGwgbW9kZWwgY29lZmZpY2llbnRzIGFyZSBrbm93biB3aXRoIGNlcnRhaW50eS4gU3VjaCBjZXJ0YWludHkgcmFyZWx5IGV4aXN0cy4gU2Vuc2l0aXZpdHkgYW5hbHlzaXMgaGVscHMgYW5zd2VyIHF1ZXN0aW9ucyBhYm91dCBob3cgc2Vuc2l0aXZlIHRoZSBvcHRpbWFsIHNvbHV0aW9uIGlzIHRvIGNoYW5nZXMgaW4gdmFyaW91cyBjb2VmZmljaWVudHMgaW4gYSBtb2RlbC4gIApXZSBtYWRlIFNlbnNpdGl2aXR5IEFuYWx5c2lzIG9ubHkgZm9yIFNlcHRlbWJlcjogRWFjaCBjb25zaWRlcmF0aW9uLCB3aXRoIHRoZSByaWdodCBjaGFuZ2VzLCBjb3VsZCBiZSBleHRlbmRlZCB0byB0aGUgb3RoZXIgbW9udGhzLgoKRmlyc3Qgb2YgYWxsOiBNYXhpbXVtIE51bWJlciBvZiBtYWNoaW5lcyBpbiBlYWNoIENhc2lubwpgYGB7cn0Kc29sIDwtIHNvbHMkYDIwMTEtMDktMDFgCnNoYWRvd19wcmljZSA8LSBzb2wkY29uCnZpbmNvbG8xIDwtIHNoYWRvd19wcmljZVsxOjIsXQprbml0cjo6a2FibGUodmluY29sbzEpIApgYGAKT2JzZXJ2YXRpb25zOiAgCi0gRWFjaCBjb25zdHJhaW50IGlzIGJpbmRpbmc6IHRoZSB0b3RhbCBudW1iZXIgb2YgbWFjaGluZXMgZm9yIGVhY2ggQ2FzaW4/IGlzIGVxdWFsIHRvIHRoZSBwcmV2aW91cyBjb25maWd1cmF0aW9uOyAgCi0gRm9yIGVhY2ggZXh0cmEgbWFjaGluZXMgaW4gQXJpZXMgKGZpcnN0IGNvbnN0cmFpbnQpIHRoZSB2YWx1ZXMgb2YgT2JqLiBGdW5jdGlvbiBpbmNyZWFzZXMgYnkgMTEwOTU/Pz8uIFRoZSBtYXhpbXVuIG51bWJlciBvZiBleHRyYSBtYWNoaW5lcyBpcyAzOCwgc28sIHdpdGhvdXQgY29uc2lkZXJhdGluZyB0aGUgcHVyY2hhc2UgY29zdCBhbmQgYXNzdW1pbmcgYWxsIG90aGVycyBjb2VmZi4gcmVtYWluIGNvbnN0YW50LCB0aGUgT2JqLiBGdW5jdGlvbiBjb3VsZCBpbmNyZWFzZSBieSAkJDExMDk1Pz8/ICogMzggPSA0MjE2MTA/Pz8gJCQuICAKLSBGb3IgZWFjaCBleHRyYSBtYWNoaW5lcyBpbiBMaWJyYSAoU2Vjb25kIGNvbnN0cmFpbnQpIHRoZSB2YWx1ZXMgb2YgT2JqLiBGdW5jdGlvbiBpbmNyZWFzZXMgYnkgMTE1NjI/Pz8uIFRoZSBtYXhpbXVuIG51bWJlciBvZiBleHRyYSBtYWNoaW5lcyBpcyAxOCBzbywgd2l0aG91dCBjb25zaWRlcmF0aW5nIHRoZSBwdXJjaGFzZSBjb3N0IGFuZCBhc3N1bWluZyBhbGwgb3RoZXJzIGNvZWZmLiByZW1haW4gY29uc3RhbnQsIHRoZSBPYmouIEZ1bmN0aW9uIGNvdWxkIGluY3JlYXNlIGJ5ICQkMTE1NjI/Pz8gKiAxOCA9IDIwODExNj8/PyAkJC4gIAoKQ29uY2x1c2lvbjogSWYgd2UgaGF2ZSB0byBpbmNyZWFzZSB0aGUgbnVtYmVyIG9mIG1hY2hpbmVzIGZvciBvbmx5IG9uZSBDYXNpbj8sIHdlJ2xsIGNob29zZSBBcmllcwoKU2Vjb25kIG9uZTogTnVtYmVyIG9mIG1hY2hpbmVzIGluIGVhY2ggc2VjdGlvbiAocHJvcG9ydGlvbikgCldlIHJlbWluZCB0aGF0IGVhY2ggY29uc3RyYWludCBoYXMgbG93ZXIgYW5kIHVwcGVyIGJvdW5kLgpgYGB7cn0KdmluY29sbzIgPC0gc2hhZG93X3ByaWNlWzM6MTgsXQprbml0cjo6a2FibGUodmluY29sbzIpIApgYGAKTGV0J3MgbG9vayB0aGUgdXBwZXIgYm91bmQgdG8ga25vdyB3aGljaCBzZWN0aW9uIGhhdmUgdGhlIG1heGltdW0gbnVtYmVyIG9mIG1hY2hpbmVzLiAgCk9ubHkgY29uc3RyYWludHMgbi4gMTQgbi4gMTYgYXJlIGJpbmRpbmcsIHRoaXMgbWVhbnM6ICAKLSBJbiBBcmllcyB0aGUgU2VjdGlvbiB0aGF0IHJlY2VpdmVzIG1vcmUgbWFjaGluZXMgKDAuMTggb2YgdGhlIHRvdGFsKSBpcyAiUmVzdGF1cmFudCBQbGF6YSIgKGNvbnN0cmFpbnQgNyk7ICAKLSBJbiBMaWJyYSB0aGUgU2VjdGlvbiB0aGF0IHJlY2VyaXZlcyBtb3JlIG1hY2hpbmVzICgwLjM1IG9mIHRoZSB0b3RhbCkgaXMgIkludGVyaW9yIiAoY29uc3RyYWludCA2KS4gIAoKTGV0J3MgbG9vayB0aGUgbG93ZXIgYm91bmQgdG8ga25vdyB3aGljaCBzZWN0aW9uIGhhdmUgdGhlIG1pbmltdW0gbnVtYmVyIG9mIG1hY2hpbmVzLiAgCkluIHRoaXMgY2FzZSBjb25zdHJhaW50cyBuLiA1LDcsOSByZWNlaXZlZCB0aGUgbWluaW11biBudW1iZXIgb2YgbWFjaGluZXM6IHRoZSBudW1iZXIgb2YgbWFjaGluZXMgaXMganVzdCBzdWZmaWNpZW50IHRvIGNvdmVyIHRoZSBsb3dlciBib3VuZCwgdGhpcyBtZWFuczogIAotIEluIEFyaWVzIG9uZSBTZWN0aW9uLCBFbnRyYWNlLCByZWNlaXZlcyBsZXNzIG1hY2hpbmVzIHRoYXQgdGhlIG90aGVyIG9uZXM7ICAKLSBJbiBMaWJyYSB0d28gU2VjdGlvbnMsIEJvdW5kYXJ5IGFuZCBFbnRyYW5jZSwgcmVjZWl2ZSBsZXNzIG1hY2hpbmVzIHRoYXQgdGhlIG90aGVyIG9uZXMuICAKCkFsc28gaW4gdGhpcyBjYXNlIHdlIGNhbiBzZWUgdGhlIGR1YWwgKHNoYWRvdyBwcmljZSkgYW5kIGR1YWwucmVnIHRvIGRlY2lkZSB3aGljaCBzZWN0aW9uIGNvdWxkIGhhdmUgbW9yZSBtYWNoaW5lcy4KCkxhc3Qgb25lOiBOdW1iZXIgb2YgbWFjaGluZXMgb2YgZWFjaCBjYXRlZ29yeSBpbiBlYWNoIHNlY3Rpb24KV2UgcmVtaW5kIHRoYXQgZWFjaCBjb25zdHJhaW50IGhhcyBsb3dlciBhbmQgdXBwZXIgYm91bmQuCmBgYHtyfQp2aW5jb2xvMyA8LSBzaGFkb3dfcHJpY2VbMTk6bGVuZ3RoKHNoYWRvd19wcmljZVssMV0pLF0Kcm93bmFtZXModmluY29sbzMpIDwtIDE6bGVuZ3RoKHZpbmNvbG8zWywxXSkKa25pdHI6OmthYmxlKGhlYWQodmluY29sbzMpKQpgYGAKCkxldCdzIGxvb2sgdGhlIHVwcGVyIGJvdW5kIHRvIGtub3cgd2hpY2ggY2F0ZWdvcnkgaW4gZWFjaCBzZWN0aW9uIGhhdmUgdGhlIG1heGltdW0gbnVtYmVyIG9mIG1hY2hpbmVzLgpgYGB7cn0Ka25pdHI6OmthYmxlKHZpbmNvbG8zW3ZpbmNvbG8zJGFjdHVhbCA9PSB2aW5jb2xvMyRidmVjICYgdmluY29sbzMkZGlyID09ICI8PSIsIF0pCmBgYApPayBxdWVzdGUgc29ubyBsZSBjYXRlZ29yaWUgY2hlIGluIG9nbmkgc2V6aW9uZSBoYW5ubyByaWNldnV0byBpbCBudW1lcm8gbWFzc2ltbyBkaSBtYWNjaGluZTogcmllc2NpIGEgZmFybWkgdW5hIGZ1bnppb25jaW5hIGNoZSBtaSByaWNvbmR1Y2EgYWxsZSBtYWNjaGluZSBkZWwgZGF0YWZyYW1lIGRpIHBhcnRlbnphPyBGb3JzZSB0aSBjb252aWVuZSB1c2FyZSBpbCBkYXRhZnJhbWUgY2hlIGhvIGNvc3RydWl0byBwcmltYSAidmluY29sbyAzIiBjaGUgY29udGllbmUgc29sYW1lbnRlIGxlIGluZm9ybWF6aW9uaSByZWxhdGl2ZSBhbCB0ZXJ6byB2aW5jb2xvICh1cHBlciBlIGxvd2VyIGJvdW5kKS4gSG8gcmlvcmRpbmF0byBsZSByaWdoZSBkYSAxIGEgMTU2IGNvbiByb3duYW1lcyBwZW5zYW5kbyBzZXJ2aXNzZS4gCgouLi5TZWNvbmQgUGFydC4uLgpgYGB7cn0Ka25pdHI6OmthYmxlKHNvbCRhbGx2YXIpCmBgYAo=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgU2Vuc2l0aXZpdHkgQW5hbHlzaXMgZm9yIGNhc2lubyBmbG9vciBvcHRpbWl6YXRpb24iDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpgYGB7cn0NCiMgbG9hZCByIG9iamVjdCB3aXRoIHRoZSBzb2x1dGlvbnMgZm9yIGVhY2ggbW9udGgNCmxvYWQoInNvbHV0aW9ucy5SRGF0YSIpDQpgYGANCg0KDQojU2Vuc2l0aXZpdHkgQW5hbHlzaXMNCk5lbCByaXNvbHZlcmUgdW4gcHJvYmxlbWEgZGkgUEwgc2kgYXNzdW1lIGNoZSBpIGNvZWZmaWNpZW50aSBzaWFubyBjb25vc2NpdXRpIGNvbiBjZXJ0ZXp6YSwgbWEgbmVsbGEgcmVhbHTgIHF1ZXN0YSBjZXJ0ZXp6YSBxdWFzaSBtYWkgZXNpc3RlLiBMYSBTZW5zaXRpdml0eSBBbmFseXNpcyDoIGxhIGZhc2UgcG9zdCBtb2RlbGxhemlvbmUgY2hlIHBlcm1ldHRlIGRpIHZhbHV0YXJlIGxhIGJvbnTgIGRlbCBtb2RlbGxvIGNyZWF0bywgb3Z2ZXJvIHF1YW50byBsYSBzb2x1emlvbmUgb3R0aW1hbGUg6CBzZW5zaWJpbGUgYSB2YXJpYXppb25pIGRlaSBjb2VmZmljaWVudGkgZGVsIG1vZGVsbG8gKHZpbmNvbGkgZSBGLk8uKS4gIA0KQSB0aXRvbG8gZCdlc2VtcGlvLCB2ZXJy4CBlZmZldHR1YXRhIGxhIFNBIHNvbG8gcGVyIGxhIHNvbHV6aW9uZSBkZWwgbWVzZSBkaSBzZXR0ZW1icmU6IOggY2hpYXJvIGNoZSBzaWEgcG9zc2liaWxlIHJlcGxpY2FyZSBpbCBsYXZvcm8gcGVyIGkgbWVzaSBzdWNjZXNzaXZpIGVmZmV0dHVhbmRvIGkgZG92dXRpIGFjY29yZ2ltZW50aS4gDQoNClZpbmNvbG8gMSANCmBgYHtyfQ0Kc29sIDwtIHNvbHMkYDIwMTEtMDktMDFgDQpzaGFkb3dfcHJpY2UgPC0gc29sJGNvbg0KdmluY29sbzEgPC0gc2hhZG93X3ByaWNlWzE6MixdDQprbml0cjo6a2FibGUodmluY29sbzEpIA0KYGBgDQpPc3NlcnZhemlvbmk6ICAgDQotIENpYXNjdW4gdmluY29sbyDoIHBpZW5hbWVudGUgc29kZGlzZmF0dG8sIGVyZ28gaWwgbnVtZXJvIGRpIG1hY2NoaW5lIHRvdGFsaSBwZXIgQXJpZXMgZSBMaWJyYSByZXN0YSBxdWVsbG8gZGVsbGEgY29uZmlndXJhemlvbmUgaW5pemlhbGU7ICAgIA0KLSBWb2xlbmRvIGF1bWVudGFyZSBsYSBkaXNwb25pYmlsaXTgIGRpIG1hY2NoaW5lIHBlciB1bm8gZGVpIGR1ZSBDYXNpbvIgZG92cmVtbW8gZ3VhcmRhcmUgaWwgdmFsb3JlIGRlaSBwcmV6emkgb21icmEgKGR1YWwpIGUgbGEgcmVnaW9uZSAoZHVhbC5yZWcpIGRvdmUgdGFsaSB2YWxvcmkgc29ubyB2YWxpZGkuICANClNpIG5vdGEgY2hlIHBlciBvZ25pIG1hY2NoaW5hIGFkZGl6aW9uYWxlIGFsbG9jYXRhIGFkIEFyaWVzIGxhIEZ1bnppb25lIE9iaWV0dGl2byBhdW1lbnRhIGRpIGV1cm8gODc5NyAoZHVhbCkgZSBjaGUgbCdpbmNyZW1lbnRvIG1hc3NpbW8gY29uc2VudGl0byDoIGRpIDQ3IG1hY2NoaW5lLiBQZXIgTGlicmEgaW52ZWNlIG9nbmkgbWFjY2hpbmEgYWRkaXppb25hbGUgY29uc2VudGUgYWxsYSBGdW56aW9uZSBPYmlldHRpdm8gZGkgYXVtZW50YXJlIGlsIHN1byB2YWxvcmUgcGVyIGV1cm8gMTU5MTgsbWEgbCdpbmNyZW1lbnRvIG1hc3NpbW8gY29uc2VudGl0byDoIG5ldHRhbWVudGUgbWlub3JlICg3IG1hY2NoaW5lKS4gUG90ZW5kbyBzY2VnbGllcmUgZGkgaW5jcmVtZW50YXJlIGxhIGRpc3BvbmliaWxpdOAgZGkgbWFjY2hpbmUgcGVyIHVubyBzb2xvIGRlaSAyIENhc2lu8iwgTERFIGRvdnJlYmJlIGNvbXBvcnRhcnNpIGluIG1hbmllcmEgZGlmZmVyZW50ZSBhIHNlY29uZGEgZGVsIG51bWVybyBkaSBtYWNjaGluZSBhIGRpc3Bvc2l6aW9uZToNCi0gbnVtZXJvIGRpIG1hY2NoaW5lIDw9IDgsIGxhIHByaW9yaXTgIGRvdnJlYmJlIGVzc2VyZSBkYXRhIGEgTGlicmEgaW4gcXVhbnRvIGNhcGFjZSBkaSBnZW5lcmFyZSBsJ2luY3JlbWVudG8gbWFnZ2lvcmU7ICANCi0gMTUgPD0gbnVtZXJvIGRpIG1hY2NoaW5lIDw9IDQ3LCBsYSBwcmlvcml04CBkb3ZyZWJiZSBlc3NlcmUgZGF0YSBhZCBBcmllcyBpbiBxdWFudG8gY2FwYWNlIGRpIGdlbmVyYXJlIGwnaW5jcmVtZW50byBtYWdnaW9yZTsgIA0KLSA4IDwgbnVtZXJvIGRpIG1hY2NoaW5lIDwgMTUsIHF1ZXN0byBpbnRlcnZhbGxvIOggdmFsaWRvIHNvbGFtZW50ZSBwZXIgQXJpZXMsIHR1dHRhdmlhIGwnaW5jcmVtZW50byB0b3RhbGUgZ2VuZXJhdG8gc2FyZWJiZSBjb211bnF1ZSBpbmZlcmlvcmUgYSBxdWVsbG8gcHJvZG90dG8gZGEgTGlicmEgY29uIDggbWFjY2hpbmUsIHF1aW5kaSBzaSBwcmVmZXJpc2NlIGFuY29yYSB1bmEgdm9sdGEgTGlicmEuICANClF1ZXN0aW9uZSBkaSBlcXVhemlvbmk6ICQkIDE1OTE4ICogOCA9IDg3OTd4JCQNCg0KDQpWaW5jb2xvIDINClNpIHJpY29yZGEgY2hlIGNpYXNjdW4gdmluY29sbyDoIHN0YXRvICJzZG9wcGlhdG8iIGluIHF1YW50byBuZWNlc3NhcmlvIHNpYSBsJ3VwcGVyIGNoZSBpbCBsb3dlciBib3VuZC4NCmBgYHtyfQ0KdmluY29sbzIgPC0gc2hhZG93X3ByaWNlWzM6MTgsXQ0Ka25pdHI6OmthYmxlKHZpbmNvbG8yKSANCmBgYA0KDQoNCkxldCdzIGxvb2sgdGhlIHVwcGVyIGJvdW5kIHRvIGtub3cgd2hpY2ggc2VjdGlvbiBoYXZlIHRoZSBtYXhpbXVtIG51bWJlciBvZiBtYWNoaW5lcy4gIA0KT25seSBjb25zdHJhaW50cyBuLiAxNCBuLiAxNiBhcmUgYmluZGluZywgdGhpcyBtZWFuczogIA0KLSBJbiBBcmllcyB0aGUgU2VjdGlvbiB0aGF0IHJlY2VpdmVzIG1vcmUgbWFjaGluZXMgKDAuMTggb2YgdGhlIHRvdGFsKSBpcyAiUmVzdGF1cmFudCBQbGF6YSIgKGNvbnN0cmFpbnQgNyk7ICANCi0gSW4gTGlicmEgdGhlIFNlY3Rpb24gdGhhdCByZWNlcml2ZXMgbW9yZSBtYWNoaW5lcyAoMC4zNSBvZiB0aGUgdG90YWwpIGlzICJJbnRlcmlvciIgKGNvbnN0cmFpbnQgNikuICANCg0KTGV0J3MgbG9vayB0aGUgbG93ZXIgYm91bmQgdG8ga25vdyB3aGljaCBzZWN0aW9uIGhhdmUgdGhlIG1pbmltdW0gbnVtYmVyIG9mIG1hY2hpbmVzLiAgDQpJbiB0aGlzIGNhc2UgY29uc3RyYWludHMgbi4gNSw3LDkgcmVjZWl2ZWQgdGhlIG1pbmltdW4gbnVtYmVyIG9mIG1hY2hpbmVzOiB0aGUgbnVtYmVyIG9mIG1hY2hpbmVzIGlzIGp1c3Qgc3VmZmljaWVudCB0byBjb3ZlciB0aGUgbG93ZXIgYm91bmQsIHRoaXMgbWVhbnM6ICANCi0gSW4gQXJpZXMgb25lIFNlY3Rpb24sIEVudHJhY2UsIHJlY2VpdmVzIGxlc3MgbWFjaGluZXMgdGhhdCB0aGUgb3RoZXIgb25lczsgIA0KLSBJbiBMaWJyYSB0d28gU2VjdGlvbnMsIEJvdW5kYXJ5IGFuZCBFbnRyYW5jZSwgcmVjZWl2ZSBsZXNzIG1hY2hpbmVzIHRoYXQgdGhlIG90aGVyIG9uZXMuICANCg0KQWxzbyBpbiB0aGlzIGNhc2Ugd2UgY2FuIHNlZSB0aGUgZHVhbCAoc2hhZG93IHByaWNlKSBhbmQgZHVhbC5yZWcgdG8gZGVjaWRlIHdoaWNoIHNlY3Rpb24gY291bGQgaGF2ZSBtb3JlIG1hY2hpbmVzLg0KDQpMYXN0IG9uZTogTnVtYmVyIG9mIG1hY2hpbmVzIG9mIGVhY2ggY2F0ZWdvcnkgaW4gZWFjaCBzZWN0aW9uDQpXZSByZW1pbmQgdGhhdCBlYWNoIGNvbnN0cmFpbnQgaGFzIGxvd2VyIGFuZCB1cHBlciBib3VuZC4NCmBgYHtyfQ0KdmluY29sbzMgPC0gc2hhZG93X3ByaWNlWzE5Omxlbmd0aChzaGFkb3dfcHJpY2VbLDFdKSxdDQpyb3duYW1lcyh2aW5jb2xvMykgPC0gMTpsZW5ndGgodmluY29sbzNbLDFdKQ0Ka25pdHI6OmthYmxlKGhlYWQodmluY29sbzMpKQ0KYGBgDQoNCkxldCdzIGxvb2sgdGhlIHVwcGVyIGJvdW5kIHRvIGtub3cgd2hpY2ggY2F0ZWdvcnkgaW4gZWFjaCBzZWN0aW9uIGhhdmUgdGhlIG1heGltdW0gbnVtYmVyIG9mIG1hY2hpbmVzLg0KYGBge3J9DQprbml0cjo6a2FibGUodmluY29sbzNbdmluY29sbzMkYWN0dWFsID09IHZpbmNvbG8zJGJ2ZWMgJiB2aW5jb2xvMyRkaXIgPT0gIjw9IiwgXSkNCmBgYA0KT2sgcXVlc3RlIHNvbm8gbGUgY2F0ZWdvcmllIGNoZSBpbiBvZ25pIHNlemlvbmUgaGFubm8gcmljZXZ1dG8gaWwgbnVtZXJvIG1hc3NpbW8gZGkgbWFjY2hpbmU6IHJpZXNjaSBhIGZhcm1pIHVuYSBmdW56aW9uY2luYSBjaGUgbWkgcmljb25kdWNhIGFsbGUgbWFjY2hpbmUgZGVsIGRhdGFmcmFtZSBkaSBwYXJ0ZW56YT8gRm9yc2UgdGkgY29udmllbmUgdXNhcmUgaWwgZGF0YWZyYW1lIGNoZSBobyBjb3N0cnVpdG8gcHJpbWEgInZpbmNvbG8gMyIgY2hlIGNvbnRpZW5lIHNvbGFtZW50ZSBsZSBpbmZvcm1hemlvbmkgcmVsYXRpdmUgYWwgdGVyem8gdmluY29sbyAodXBwZXIgZSBsb3dlciBib3VuZCkuIEhvIHJpb3JkaW5hdG8gbGUgcmlnaGUgZGEgMSBhIDE1NiBjb24gcm93bmFtZXMgcGVuc2FuZG8gc2Vydmlzc2UuIA0KDQouLi5TZWNvbmQgUGFydC4uLg0KYGBge3J9DQprbml0cjo6a2FibGUoc29sJGFsbHZhcikNCmBgYA0K</div>
 
 
 

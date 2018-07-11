@@ -10,29 +10,34 @@ load("solutions.RData")
 
 
 #Sensitivity Analysis
-When solving an LP problem we assume that values of all model coefficients are known with certainty. Such certainty rarely exists. Sensitivity analysis helps answer questions about how sensitive the optimal solution is to changes in various coefficients in a model.  
-We made Sensitivity Analysis only for September: Each consideration, with the right changes, could be extended to the other months.
+Nel risolvere un problema di PL si assume che i coefficienti siano conosciuti con certezza, ma nella realtà questa certezza quasi mai esiste. La Sensitivity Analysis è la fase post modellazione che permette di valutare la bontà del modello creato, ovvero quanto la soluzione ottimale è sensibile a variazioni dei coefficienti del modello (vincoli e F.O.).  
+A titolo d'esempio, verrà effettuata la SA solo per la soluzione del mese di settembre: è chiaro che sia possibile replicare il lavoro per i mesi successivi effettuando i dovuti accorgimenti. 
 
-First of all: Maximum Number of machines in each Casino
+Vincolo 1 
 ```{r}
 sol <- sols$`2011-09-01`
 shadow_price <- sol$con
 vincolo1 <- shadow_price[1:2,]
 knitr::kable(vincolo1) 
 ```
-Observations:  
-- Each constraint is binding: the total number of machines for each Casin? is equal to the previous configuration;  
-- For each extra machines in Aries (first constraint) the values of Obj. Function increases by 11095???. The maximun number of extra machines is 38, so, without considerating the purchase cost and assuming all others coeff. remain constant, the Obj. Function could increase by $$11095??? * 38 = 421610??? $$.  
-- For each extra machines in Libra (Second constraint) the values of Obj. Function increases by 11562???. The maximun number of extra machines is 18 so, without considerating the purchase cost and assuming all others coeff. remain constant, the Obj. Function could increase by $$11562??? * 18 = 208116??? $$.  
+Osservazioni:   
+- Ciascun vincolo è pienamente soddisfatto, ergo il numero di macchine totali per Aries e Libra resta quello della configurazione iniziale;    
+- Volendo aumentare la disponibilità di macchine per uno dei due Casinò dovremmo guardare il valore dei prezzi ombra (dual) e la regione (dual.reg) dove tali valori sono validi.  
+Si nota che per ogni macchina addizionale allocata ad Aries la Funzione Obiettivo aumenta di euro 8797 (dual) e che l'incremento massimo consentito è di 47 macchine. Per Libra invece ogni macchina addizionale consente alla Funzione Obiettivo di aumentare il suo valore per euro 15918,ma l'incremento massimo consentito è nettamente minore (7 macchine). Potendo scegliere di incrementare la disponibilità di macchine per uno solo dei 2 Casinò, LDE dovrebbe comportarsi in maniera differente a seconda del numero di macchine a disposizione:
+- numero di macchine <= 8, la priorità dovrebbe essere data a Libra in quanto capace di generare l'incremento maggiore;  
+- 15 <= numero di macchine <= 47, la priorità dovrebbe essere data ad Aries in quanto capace di generare l'incremento maggiore;  
+- 8 < numero di macchine < 15, questo intervallo è valido solamente per Aries, tuttavia l'incremento totale generato sarebbe comunque inferiore a quello prodotto da Libra con 8 macchine, quindi si preferisce ancora una volta Libra.  
+Questione di equazioni: $$ 15918 * 8 = 8797x$$
 
-Conclusion: If we have to increase the number of machines for only one Casin?, we'll choose Aries
 
-Second one: Number of machines in each section (proportion) 
-We remind that each constraint has lower and upper bound.
+Vincolo 2
+Si ricorda che ciascun vincolo è stato "sdoppiato" in quanto necessario sia l'upper che il lower bound.
 ```{r}
 vincolo2 <- shadow_price[3:18,]
 knitr::kable(vincolo2) 
 ```
+
+
 Let's look the upper bound to know which section have the maximum number of machines.  
 Only constraints n. 14 n. 16 are binding, this means:  
 - In Aries the Section that receives more machines (0.18 of the total) is "Restaurant Plaza" (constraint 7);  
