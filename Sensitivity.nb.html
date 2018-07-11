@@ -197,23 +197,22 @@ shadow_price &lt;- sol$con
 vincolo1 &lt;- shadow_price[1:2,]
 knitr::kable(vincolo1) </code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cbnwgYWN0dWFsfGRpciB8IGJ2ZWN8IGZyZWV8ICBkdWFsfCBkdWFsLnJlZ3xcbnwtLS0tLS06fDotLS18LS0tLTp8LS0tLTp8LS0tLS06fC0tLS0tLS0tOnxcbnwgICAgODQ5fDw9ICB8ICA4NDl8ICAgIDB8ICA4Nzk3fCAgICAgICA0N3xcbnwgICAgMjMwfDw9ICB8ICAyMzB8ICAgIDB8IDE1OTE4fCAgICAgICAgOHxcbiJ9 -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cbnwgYWN0dWFsfGRpciB8IGJ2ZWN8IGZyZWV8ICBkdWFsfCBkdWFsLnJlZ3xcbnwtLS0tLS06fDotLS18LS0tLTp8LS0tLTp8LS0tLS06fC0tLS0tLS0tOnxcbnwgICAgODQ5fDw9ICB8ICA4NDl8ICAgIDB8IDExMDk1fCAgICAgICA0MHxcbnwgICAgMjMwfDw9ICB8ICAyMzB8ICAgIDB8IDExNTYyfCAgICAgICAyMHxcbiJ9 -->
 <pre><code>
 
 | actual|dir | bvec| free|  dual| dual.reg|
 |------:|:---|----:|----:|-----:|--------:|
-|    849|&lt;=  |  849|    0|  8797|       47|
-|    230|&lt;=  |  230|    0| 15918|        8|</code></pre>
+|    849|&lt;=  |  849|    0| 11095|       40|
+|    230|&lt;=  |  230|    0| 11562|       20|</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Osservazioni:<br />
 - Ciascun vincolo è pienamente soddisfatto, ergo il numero di macchine totali per Aries e Libra resta quello della configurazione iniziale;<br />
 - Volendo aumentare la disponibilità di macchine per uno dei due Casinò dovremmo guardare il valore dei prezzi ombra (dual) e la regione (dual.reg) dove tali valori sono validi.<br />
-Si nota che per ogni macchina addizionale allocata ad Aries la Funzione Obiettivo aumenta di euro 8797 (dual) e che l’incremento massimo consentito è di 47 macchine. Per Libra invece ogni macchina addizionale consente alla Funzione Obiettivo di aumentare il suo valore per euro 15918,ma l’incremento massimo consentito è nettamente minore (7 macchine). Potendo scegliere di incrementare la disponibilità di macchine per uno solo dei 2 Casinò, LDE dovrebbe comportarsi in maniera differente a seconda del numero di macchine a disposizione: - numero di macchine &lt;= 8, la priorità dovrebbe essere data a Libra in quanto capace di generare l’incremento maggiore;<br />
-- 15 &lt;= numero di macchine &lt;= 47, la priorità dovrebbe essere data ad Aries in quanto capace di generare l’incremento maggiore;<br />
-- 8 &lt; numero di macchine &lt; 15, questo intervallo è valido solamente per Aries, tuttavia l’incremento totale generato sarebbe comunque inferiore a quello prodotto da Libra con 8 macchine, quindi si preferisce ancora una volta Libra.<br />
-Questione di equazioni: <span class="math display">\[ 15918 * 8 = 8797x\]</span></p>
+Si nota che per ogni macchina addizionale allocata ad Aries la Funzione Obiettivo aumenta di euro 11095 (dual) e che l’incremento massimo consentito è di 40 macchine. Per Libra invece ogni macchina addizionale consente alla Funzione Obiettivo di aumentare il suo valore per euro 11562,ma l’incremento massimo consentito è nettamente minore 20 macchine. Potendo scegliere di incrementare la disponibilità di macchine per uno solo dei 2 Casinò, LDE dovrebbe comportarsi in maniera differente a seconda del numero di macchine a disposizione: - numero di macchine &lt;= 20, la priorità dovrebbe essere data a Libra in quanto capace di generare l’incremento maggiore;<br />
+- 20 &lt; numero di macchine &lt;= 40, la priorità dovrebbe essere data ad Aries in quanto capace di generare l’incremento maggiore;<br />
+Questione di equazioni: <span class="math display">\[11562 * 20 = 11095x\]</span></p>
 <p>Vincolo 2 Si ricorda che ciascun vincolo è stato “sdoppiato” in quanto necessario sia l’upper che il lower bound.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
@@ -221,59 +220,103 @@ Questione di equazioni: <span class="math display">\[ 15918 * 8 = 8797x\]</span>
 <pre class="r"><code>vincolo2 &lt;- shadow_price[3:18,]
 knitr::kable(vincolo2) </code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5cbnwgICB8IGFjdHVhbHxkaXIgfCBidmVjfCBmcmVlfCAgZHVhbHwgZHVhbC5yZWd8XG58Oi0tfC0tLS0tLTp8Oi0tLXwtLS0tOnwtLS0tOnwtLS0tLTp8LS0tLS0tLS06fFxufDMgIHwgICAgMjM0fD49ICB8ICAxODd8ICAgNDd8ICAgICAwfCAgICAgICA0N3xcbnw0ICB8ICAgIDIzNHw8PSAgfCAgMjQ4fCAgIDE0fCAgICAgMHwgICAgICAgMTR8XG58NSAgfCAgICAxODd8Pj0gIHwgIDE4N3wgICAgMHwgIDM1MjB8ICAgICAgICA2fFxufDYgIHwgICAgMTg3fDw9ICB8ICAyNDh8ICAgNjF8ICAgICAwfCAgICAgICA2MXxcbnw3ICB8ICAgIDE4N3w+PSAgfCAgMTg3fCAgICAwfCAgMTM3OHwgICAgICAgMTJ8XG58OCAgfCAgICAxODd8PD0gIHwgIDI0OHwgICA2MXwgICAgIDB8ICAgICAgIDYxfFxufDkgIHwgICAgMjQxfD49ICB8ICAxODd8ICAgNTR8ICAgICAwfCAgICAgICA1NHxcbnwxMCB8ICAgIDI0MXw8PSAgfCAgMjQ4fCAgICA3fCAgICAgMHwgICAgICAgIDd8XG58MTEgfCAgICAgNjJ8Pj0gIHwgICAzOXwgICAyM3wgICAgIDB8ICAgICAgIDIzfFxufDEyIHwgICAgIDYyfDw9ICB8ICAgODJ8ICAgMjB8ICAgICAwfCAgICAgICAyMHxcbnwxMyB8ICAgICAzOXw+PSAgfCAgIDM5fCAgICAwfCAgNzc2NHwgICAgICAgIDh8XG58MTQgfCAgICAgMzl8PD0gIHwgICA4MnwgICA0M3wgICAgIDB8ICAgICAgIDQzfFxufDE1IHwgICAgIDgyfD49ICB8ICAgMzl8ICAgNDN8ICAgICAwfCAgICAgICA0M3xcbnwxNiB8ICAgICA4Mnw8PSAgfCAgIDgyfCAgICAwfCAyMjU1M3wgICAgICAgMTF8XG58MTcgfCAgICAgNDd8Pj0gIHwgICAzOXwgICAgOHwgICAgIDB8ICAgICAgICA4fFxufDE4IHwgICAgIDQ3fDw9ICB8ICAgODJ8ICAgMzV8ICAgICAwfCAgICAgICAzNXxcbiJ9 -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cbnwgICB8IGFjdHVhbHxkaXIgfCBidmVjfCBmcmVlfCBkdWFsfCBkdWFsLnJlZ3xcbnw6LS18LS0tLS0tOnw6LS0tfC0tLS06fC0tLS06fC0tLS06fC0tLS0tLS0tOnxcbnwzICB8ICAgIDIyN3w+PSAgfCAgMTg3fCAgIDQwfCAgICAwfCAgICAgICA0MHxcbnw0ICB8ICAgIDIyN3w8PSAgfCAgMjQ4fCAgIDIxfCAgICAwfCAgICAgICAyMXxcbnw1ICB8ICAgIDE4N3w+PSAgfCAgMTg3fCAgICAwfCA0OTU5fCAgICAgICAzOXxcbnw2ICB8ICAgIDE4N3w8PSAgfCAgMjQ4fCAgIDYxfCAgICAwfCAgICAgICA2MXxcbnw3ICB8ICAgIDE4N3w+PSAgfCAgMTg3fCAgICAwfCAgIDk3fCAgICAgICAxOXxcbnw4ICB8ICAgIDE4N3w8PSAgfCAgMjQ4fCAgIDYxfCAgICAwfCAgICAgICA2MXxcbnw5ICB8ICAgIDI0OHw+PSAgfCAgMTg3fCAgIDYxfCAgICAwfCAgICAgICA2MXxcbnwxMCB8ICAgIDI0OHw8PSAgfCAgMjQ4fCAgICAwfCA5NDQ3fCAgICAgICAyMXxcbnwxMSB8ICAgICAzOXw+PSAgfCAgIDM5fCAgICAwfCA0NjA3fCAgICAgICAyMHxcbnwxMiB8ICAgICAzOXw8PSAgfCAgIDgyfCAgIDQzfCAgICAwfCAgICAgICA0M3xcbnwxMyB8ICAgICAzOXw+PSAgfCAgIDM5fCAgICAwfCA1NzE2fCAgICAgICAgM3xcbnwxNCB8ICAgICAzOXw8PSAgfCAgIDgyfCAgIDQzfCAgICAwfCAgICAgICA0M3xcbnwxNSB8ICAgICA4Mnw+PSAgfCAgIDM5fCAgIDQzfCAgICAwfCAgICAgICA0M3xcbnwxNiB8ICAgICA4Mnw8PSAgfCAgIDgyfCAgICAwfCA5MjIwfCAgICAgICAxMHxcbnwxNyB8ICAgICA3MHw+PSAgfCAgIDM5fCAgIDMxfCAgICAwfCAgICAgICAzMXxcbnwxOCB8ICAgICA3MHw8PSAgfCAgIDgyfCAgIDEyfCAgICAwfCAgICAgICAxMnxcbiJ9 -->
 <pre><code>
 
-|   | actual|dir | bvec| free|  dual| dual.reg|
-|:--|------:|:---|----:|----:|-----:|--------:|
-|3  |    234|&gt;=  |  187|   47|     0|       47|
-|4  |    234|&lt;=  |  248|   14|     0|       14|
-|5  |    187|&gt;=  |  187|    0|  3520|        6|
-|6  |    187|&lt;=  |  248|   61|     0|       61|
-|7  |    187|&gt;=  |  187|    0|  1378|       12|
-|8  |    187|&lt;=  |  248|   61|     0|       61|
-|9  |    241|&gt;=  |  187|   54|     0|       54|
-|10 |    241|&lt;=  |  248|    7|     0|        7|
-|11 |     62|&gt;=  |   39|   23|     0|       23|
-|12 |     62|&lt;=  |   82|   20|     0|       20|
-|13 |     39|&gt;=  |   39|    0|  7764|        8|
-|14 |     39|&lt;=  |   82|   43|     0|       43|
-|15 |     82|&gt;=  |   39|   43|     0|       43|
-|16 |     82|&lt;=  |   82|    0| 22553|       11|
-|17 |     47|&gt;=  |   39|    8|     0|        8|
-|18 |     47|&lt;=  |   82|   35|     0|       35|</code></pre>
+|   | actual|dir | bvec| free| dual| dual.reg|
+|:--|------:|:---|----:|----:|----:|--------:|
+|3  |    227|&gt;=  |  187|   40|    0|       40|
+|4  |    227|&lt;=  |  248|   21|    0|       21|
+|5  |    187|&gt;=  |  187|    0| 4959|       39|
+|6  |    187|&lt;=  |  248|   61|    0|       61|
+|7  |    187|&gt;=  |  187|    0|   97|       19|
+|8  |    187|&lt;=  |  248|   61|    0|       61|
+|9  |    248|&gt;=  |  187|   61|    0|       61|
+|10 |    248|&lt;=  |  248|    0| 9447|       21|
+|11 |     39|&gt;=  |   39|    0| 4607|       20|
+|12 |     39|&lt;=  |   82|   43|    0|       43|
+|13 |     39|&gt;=  |   39|    0| 5716|        3|
+|14 |     39|&lt;=  |   82|   43|    0|       43|
+|15 |     82|&gt;=  |   39|   43|    0|       43|
+|16 |     82|&lt;=  |   82|    0| 9220|       10|
+|17 |     70|&gt;=  |   39|   31|    0|       31|
+|18 |     70|&lt;=  |   82|   12|    0|       12|</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Let’s look the upper bound to know which section have the maximum number of machines.<br />
-Only constraints n. 14 n. 16 are binding, this means:<br />
-- In Aries the Section that receives more machines (0.18 of the total) is “Restaurant Plaza” (constraint 7);<br />
-- In Libra the Section that recerives more machines (0.35 of the total) is “Interior” (constraint 6).</p>
-<p>Let’s look the lower bound to know which section have the minimum number of machines.<br />
-In this case constraints n. 5,7,9 received the minimun number of machines: the number of machines is just sufficient to cover the lower bound, this means:<br />
-- In Aries one Section, Entrace, receives less machines that the other ones;<br />
-- In Libra two Sections, Boundary and Entrance, receive less machines that the other ones.</p>
-<p>Also in this case we can see the dual (shadow price) and dual.reg to decide which section could have more machines.</p>
-<p>Last one: Number of machines of each category in each section We remind that each constraint has lower and upper bound.</p>
+<p>Dal vincolo numero 3 al vincolo numero 10 si tratta delle sezioni di Aries, mentre dal vincolo numero 11 al 18 delle sezioni di Libra; l’ordine delle sezioni è il medesimo per i due Casinò: Boundary, Entrance, Interior, Restaurant Plaza.<br />
+Valutando l’upper e il lower bound di ciascun vincolo possiamo capire quali sono state le sezioni che hanno ricevuto il maggior/minor numero di macchine:<br />
+- Per Aries, la sezione che ha ricevuto il maggior numero di macchine (248) è Restaurant Plaza (upper bound soddisfatto). Mentre le sezioni Entrance ed Interior hanno ricevuto il minor numero di macchine (187): solamente il lower bound viene soddisfatto; - Per Libra il discorso è divero: Boundary ed Entrance ricevono il minor numero di macchine possibili (39), mentre a registrare il bottino pieno in termini di macchine è la sezione Interior (82 macchine).<br />
+Come nel caso precedente è possibile valutare i prezzi ombra e la regione ove questi sono validi per decidere quale sia la sezione da premiare in caso di macchine aggiuntive disponibili nel mese in questione.</p>
+<p>Vincolo numero 3</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxudmluY29sbzMgPC0gc2hhZG93X3ByaWNlWzE5Omxlbmd0aChzaGFkb3dfcHJpY2VbLDFdKSxdXG5yb3duYW1lcyh2aW5jb2xvMykgPC0gMTpsZW5ndGgodmluY29sbzNbLDFdKVxua25pdHI6OmthYmxlKGhlYWQodmluY29sbzMpKVxuYGBgXG5gYGAifQ== -->
-<p><code>r</code>r vincolo3 &lt;- shadow_price[19:length(shadow_price[,1]),] rownames(vincolo3) &lt;- 1:length(vincolo3[,1]) knitr::kable(head(vincolo3))</p>
-<pre><code></code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudmluY29sbzMgPC0gc2hhZG93X3ByaWNlWzE5Omxlbmd0aChzaGFkb3dfcHJpY2VbLDFdKSxdXG5yb3duYW1lcyh2aW5jb2xvMykgPC0gMTpsZW5ndGgodmluY29sbzNbLDFdKVxua25pdHI6OmthYmxlKGhlYWQodmluY29sbzMpKVxuYGBgIn0= -->
+<pre class="r"><code>vincolo3 &lt;- shadow_price[19:length(shadow_price[,1]),]
+rownames(vincolo3) &lt;- 1:length(vincolo3[,1])
+knitr::kable(head(vincolo3))</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cbnwgYWN0dWFsfGRpciB8IGJ2ZWN8IGZyZWV8IGR1YWx8IGR1YWwucmVnfFxufC0tLS0tLTp8Oi0tLXwtLS0tOnwtLS0tOnwtLS0tOnwtLS0tLS0tLTp8XG58ICAgICA1NXw+PSAgfCAgIDExfCAgIDQ0fCAgICAwfCAgICAgICA0NHxcbnwgICAgIDU1fDw9ICB8ICAxMDF8ICAgNDZ8ICAgIDB8ICAgICAgIDQ2fFxufCAgICAgIDV8Pj0gIHwgICAgNXwgICAgMHwgMjQ1MXwgICAgICAgMjF8XG58ICAgICAgNXw8PSAgfCAgIDI2fCAgIDIxfCAgICAwfCAgICAgICAyMXxcbnwgICAgICAzfD49ICB8ICAgIDF8ICAgIDJ8ICAgIDB8ICAgICAgICAyfFxufCAgICAgIDN8PD0gIHwgICAgM3wgICAgMHwgMzIxMXwgICAgICAgIDJ8XG4ifQ== -->
+<pre><code>
+
+| actual|dir | bvec| free| dual| dual.reg|
+|------:|:---|----:|----:|----:|--------:|
+|     55|&gt;=  |   11|   44|    0|       44|
+|     55|&lt;=  |  101|   46|    0|       46|
+|      5|&gt;=  |    5|    0| 2451|       21|
+|      5|&lt;=  |   26|   21|    0|       21|
+|      3|&gt;=  |    1|    2|    0|        2|
+|      3|&lt;=  |    3|    0| 3211|        2|</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Let’s look the upper bound to know which category in each section have the maximum number of machines.</p>
+<p>Queste dovrebbero essere tutte le macchine che hanno soddisfatto l’upper bound, ergo che hanno ricevuto il max di macchine possibili.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxua25pdHI6OmthYmxlKHZpbmNvbG8zW3ZpbmNvbG8zJGFjdHVhbCA9PSB2aW5jb2xvMyRidmVjICYgdmluY29sbzMkZGlyID09IFxcPD1cXCwgXSlcbmBgYFxuYGBgIn0= -->
-<p><code>r</code>r knitr::kable(vincolo3[vincolo3<span class="math inline">\(actual == vincolo3\)</span>bvec &amp; vincolo3$dir == &lt;=, ])</p>
-<pre><code></code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua25pdHI6OmthYmxlKHZpbmNvbG8zW3ZpbmNvbG8zJGFjdHVhbCA9PSB2aW5jb2xvMyRidmVjICYgdmluY29sbzMkZGlyID09IFwiPD1cIiwgXSlcbmBgYCJ9 -->
+<pre class="r"><code>knitr::kable(vincolo3[vincolo3$actual == vincolo3$bvec &amp; vincolo3$dir == &quot;&lt;=&quot;, ])</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5cbnwgICAgfCBhY3R1YWx8ZGlyIHwgYnZlY3wgZnJlZXwgIGR1YWx8IGR1YWwucmVnfFxufDotLS18LS0tLS0tOnw6LS0tfC0tLS06fC0tLS06fC0tLS0tOnwtLS0tLS0tLTp8XG58NiAgIHwgICAgICAzfDw9ICB8ICAgIDN8ICAgIDB8ICAzMjExfCAgICAgICAgMnxcbnw4ICAgfCAgICAgMjJ8PD0gIHwgICAyMnwgICAgMHwgMjY4MzZ8ICAgICAgIDIwfFxufDEwICB8ICAgIDEwMXw8PSAgfCAgMTAxfCAgICAwfCAgOTE5OXwgICAgICAgNDZ8XG58MTIgIHwgICAgICAzfDw9ICB8ICAgIDN8ICAgIDB8IDExODE5fCAgICAgICAgMnxcbnwxNCAgfCAgICAgIDV8PD0gIHwgICAgNXwgICAgMHwgMjQ5MDd8ICAgICAgICA0fFxufDE4ICB8ICAgICAgOXw8PSAgfCAgICA5fCAgICAwfCAgNjY2NXwgICAgICAgIDd8XG58NDIgIHwgICAgICA5fDw9ICB8ICAgIDl8ICAgIDB8ICAyMzA4fCAgICAgICAgM3xcbnw0NCAgfCAgICAgMjZ8PD0gIHwgICAyNnwgICAgMHwgIDM2NTl8ICAgICAgIDIxfFxufDQ4ICB8ICAgICAgOXw8PSAgfCAgICA5fCAgICAwfCAgMTM4MXwgICAgICAgIDh8XG58NTAgIHwgICAgICA1fDw9ICB8ICAgIDV8ICAgIDB8ICAxMTI5fCAgICAgICAgM3xcbnw1MiAgfCAgICAgMjJ8PD0gIHwgICAyMnwgICAgMHwgIDg3MjR8ICAgICAgIDIwfFxufDU0ICB8ICAgICAyNnw8PSAgfCAgIDI2fCAgICAwfCAgIDkyM3wgICAgICAgMjF8XG58NTYgIHwgICAgICA5fDw9ICB8ICAgIDl8ICAgIDB8ICAgNTE5fCAgICAgICAgM3xcbnw2OCAgfCAgICAgMjJ8PD0gIHwgICAyMnwgICAgMHwgIDE3NjZ8ICAgICAgIDIwfFxufDc2ICB8ICAgICAgM3w8PSAgfCAgICAzfCAgICAwfCAgIDI2M3wgICAgICAgIDJ8XG58NzggIHwgICAgICA5fDw9ICB8ICAgIDl8ICAgIDB8ICAxODgzfCAgICAgICAgOHxcbnw4NCAgfCAgICAgIDl8PD0gIHwgICAgOXwgICAgMHwgIDYwOTd8ICAgICAgICA4fFxufDEwMCB8ICAgICAzNHw8PSAgfCAgIDM0fCAgICAwfCAgMTIyM3wgICAgICAgMzB8XG58MTAyIHwgICAgIDI2fDw9ICB8ICAgMjZ8ICAgIDB8ICAgNjIxfCAgICAgICAxOXxcbnwxMDggfCAgICAgIDN8PD0gIHwgICAgM3wgICAgMHwgMTc2ODl8ICAgICAgICAyfFxufDExMCB8ICAgICAgM3w8PSAgfCAgICAzfCAgICAwfCAxNDExMHwgICAgICAgIDJ8XG58MTEyIHwgICAgMTAxfDw9ICB8ICAxMDF8ICAgIDB8ICAgOTE5fCAgICAgICAxOXxcbnwxMTQgfCAgICAgMzR8PD0gIHwgICAzNHwgICAgMHwgICAgIDB8ICAgICAgIE5BfFxufDExNiB8ICAgICAyMnw8PSAgfCAgIDIyfCAgICAwfCAgNzU1MXwgICAgICAgMTl8XG58MTM2IHwgICAgMTAxfDw9ICB8ICAxMDF8ICAgIDB8ICAzMDIxfCAgICAgICA0MXxcbnwxNDAgfCAgICAgMjZ8PD0gIHwgICAyNnwgICAgMHwgIDEzNjh8ICAgICAgIDIxfFxufDE0MiB8ICAgICAgNXw8PSAgfCAgICA1fCAgICAwfCAgMTM5MXwgICAgICAgIDR8XG58MTQ0IHwgICAgIDI2fDw9ICB8ICAgMjZ8ICAgIDB8IDEwMzk0fCAgICAgICAyMXxcbnwxNDYgfCAgICAgIDl8PD0gIHwgICAgOXwgICAgMHwgIDgwNjV8ICAgICAgICA4fFxufDE0OCB8ICAgICAgOXw8PSAgfCAgICA5fCAgICAwfCAgNjg4NHwgICAgICAgIDh8XG58MTU2IHwgICAgIDM0fDw9ICB8ICAgMzR8ICAgIDB8ICA0MzU2fCAgICAgICAxMHxcbiJ9 -->
+<pre><code>
+
+|    | actual|dir | bvec| free|  dual| dual.reg|
+|:---|------:|:---|----:|----:|-----:|--------:|
+|6   |      3|&lt;=  |    3|    0|  3211|        2|
+|8   |     22|&lt;=  |   22|    0| 26836|       20|
+|10  |    101|&lt;=  |  101|    0|  9199|       46|
+|12  |      3|&lt;=  |    3|    0| 11819|        2|
+|14  |      5|&lt;=  |    5|    0| 24907|        4|
+|18  |      9|&lt;=  |    9|    0|  6665|        7|
+|42  |      9|&lt;=  |    9|    0|  2308|        3|
+|44  |     26|&lt;=  |   26|    0|  3659|       21|
+|48  |      9|&lt;=  |    9|    0|  1381|        8|
+|50  |      5|&lt;=  |    5|    0|  1129|        3|
+|52  |     22|&lt;=  |   22|    0|  8724|       20|
+|54  |     26|&lt;=  |   26|    0|   923|       21|
+|56  |      9|&lt;=  |    9|    0|   519|        3|
+|68  |     22|&lt;=  |   22|    0|  1766|       20|
+|76  |      3|&lt;=  |    3|    0|   263|        2|
+|78  |      9|&lt;=  |    9|    0|  1883|        8|
+|84  |      9|&lt;=  |    9|    0|  6097|        8|
+|100 |     34|&lt;=  |   34|    0|  1223|       30|
+|102 |     26|&lt;=  |   26|    0|   621|       19|
+|108 |      3|&lt;=  |    3|    0| 17689|        2|
+|110 |      3|&lt;=  |    3|    0| 14110|        2|
+|112 |    101|&lt;=  |  101|    0|   919|       19|
+|114 |     34|&lt;=  |   34|    0|     0|       NA|
+|116 |     22|&lt;=  |   22|    0|  7551|       19|
+|136 |    101|&lt;=  |  101|    0|  3021|       41|
+|140 |     26|&lt;=  |   26|    0|  1368|       21|
+|142 |      5|&lt;=  |    5|    0|  1391|        4|
+|144 |     26|&lt;=  |   26|    0| 10394|       21|
+|146 |      9|&lt;=  |    9|    0|  8065|        8|
+|148 |      9|&lt;=  |    9|    0|  6884|        8|
+|156 |     34|&lt;=  |   34|    0|  4356|       10|</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Ok queste sono le categorie che in ogni sezione hanno ricevuto il numero massimo di macchine: riesci a farmi una funzioncina che mi riconduca alle macchine del dataframe di partenza? Forse ti conviene usare il dataframe che ho costruito prima “vincolo 3” che contiene solamente le informazioni relative al terzo vincolo (upper e lower bound). Ho riordinato le righe da 1 a 156 con rownames pensando servisse.</p>
-<p>…Second Part…</p>
+<p>Parte 2 -&gt; coefficienti Funzione Obiettivo</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxua25pdHI6OmthYmxlKHNvbCRhbGx2YXIpXG5gYGBcbmBgYCJ9 -->
@@ -283,7 +326,7 @@ In this case constraints n. 5,7,9 received the minimun number of machines: the n
 <!-- rnb-chunk-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgU2Vuc2l0aXZpdHkgQW5hbHlzaXMgZm9yIGNhc2lubyBmbG9vciBvcHRpbWl6YXRpb24iDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpgYGB7cn0NCiMgbG9hZCByIG9iamVjdCB3aXRoIHRoZSBzb2x1dGlvbnMgZm9yIGVhY2ggbW9udGgNCmxvYWQoInNvbHV0aW9ucy5SRGF0YSIpDQpgYGANCg0KDQojU2Vuc2l0aXZpdHkgQW5hbHlzaXMNCk5lbCByaXNvbHZlcmUgdW4gcHJvYmxlbWEgZGkgUEwgc2kgYXNzdW1lIGNoZSBpIGNvZWZmaWNpZW50aSBzaWFubyBjb25vc2NpdXRpIGNvbiBjZXJ0ZXp6YSwgbWEgbmVsbGEgcmVhbHTgIHF1ZXN0YSBjZXJ0ZXp6YSBxdWFzaSBtYWkgZXNpc3RlLiBMYSBTZW5zaXRpdml0eSBBbmFseXNpcyDoIGxhIGZhc2UgcG9zdCBtb2RlbGxhemlvbmUgY2hlIHBlcm1ldHRlIGRpIHZhbHV0YXJlIGxhIGJvbnTgIGRlbCBtb2RlbGxvIGNyZWF0bywgb3Z2ZXJvIHF1YW50byBsYSBzb2x1emlvbmUgb3R0aW1hbGUg6CBzZW5zaWJpbGUgYSB2YXJpYXppb25pIGRlaSBjb2VmZmljaWVudGkgZGVsIG1vZGVsbG8gKHZpbmNvbGkgZSBGLk8uKS4gIA0KQSB0aXRvbG8gZCdlc2VtcGlvLCB2ZXJy4CBlZmZldHR1YXRhIGxhIFNBIHNvbG8gcGVyIGxhIHNvbHV6aW9uZSBkZWwgbWVzZSBkaSBzZXR0ZW1icmU6IOggY2hpYXJvIGNoZSBzaWEgcG9zc2liaWxlIHJlcGxpY2FyZSBpbCBsYXZvcm8gcGVyIGkgbWVzaSBzdWNjZXNzaXZpIGVmZmV0dHVhbmRvIGkgZG92dXRpIGFjY29yZ2ltZW50aS4gDQoNClZpbmNvbG8gMSANCmBgYHtyfQ0Kc29sIDwtIHNvbHMkYDIwMTEtMDktMDFgDQpzaGFkb3dfcHJpY2UgPC0gc29sJGNvbg0KdmluY29sbzEgPC0gc2hhZG93X3ByaWNlWzE6MixdDQprbml0cjo6a2FibGUodmluY29sbzEpIA0KYGBgDQpPc3NlcnZhemlvbmk6ICAgDQotIENpYXNjdW4gdmluY29sbyDoIHBpZW5hbWVudGUgc29kZGlzZmF0dG8sIGVyZ28gaWwgbnVtZXJvIGRpIG1hY2NoaW5lIHRvdGFsaSBwZXIgQXJpZXMgZSBMaWJyYSByZXN0YSBxdWVsbG8gZGVsbGEgY29uZmlndXJhemlvbmUgaW5pemlhbGU7ICAgIA0KLSBWb2xlbmRvIGF1bWVudGFyZSBsYSBkaXNwb25pYmlsaXTgIGRpIG1hY2NoaW5lIHBlciB1bm8gZGVpIGR1ZSBDYXNpbvIgZG92cmVtbW8gZ3VhcmRhcmUgaWwgdmFsb3JlIGRlaSBwcmV6emkgb21icmEgKGR1YWwpIGUgbGEgcmVnaW9uZSAoZHVhbC5yZWcpIGRvdmUgdGFsaSB2YWxvcmkgc29ubyB2YWxpZGkuICANClNpIG5vdGEgY2hlIHBlciBvZ25pIG1hY2NoaW5hIGFkZGl6aW9uYWxlIGFsbG9jYXRhIGFkIEFyaWVzIGxhIEZ1bnppb25lIE9iaWV0dGl2byBhdW1lbnRhIGRpIGV1cm8gODc5NyAoZHVhbCkgZSBjaGUgbCdpbmNyZW1lbnRvIG1hc3NpbW8gY29uc2VudGl0byDoIGRpIDQ3IG1hY2NoaW5lLiBQZXIgTGlicmEgaW52ZWNlIG9nbmkgbWFjY2hpbmEgYWRkaXppb25hbGUgY29uc2VudGUgYWxsYSBGdW56aW9uZSBPYmlldHRpdm8gZGkgYXVtZW50YXJlIGlsIHN1byB2YWxvcmUgcGVyIGV1cm8gMTU5MTgsbWEgbCdpbmNyZW1lbnRvIG1hc3NpbW8gY29uc2VudGl0byDoIG5ldHRhbWVudGUgbWlub3JlICg3IG1hY2NoaW5lKS4gUG90ZW5kbyBzY2VnbGllcmUgZGkgaW5jcmVtZW50YXJlIGxhIGRpc3BvbmliaWxpdOAgZGkgbWFjY2hpbmUgcGVyIHVubyBzb2xvIGRlaSAyIENhc2lu8iwgTERFIGRvdnJlYmJlIGNvbXBvcnRhcnNpIGluIG1hbmllcmEgZGlmZmVyZW50ZSBhIHNlY29uZGEgZGVsIG51bWVybyBkaSBtYWNjaGluZSBhIGRpc3Bvc2l6aW9uZToNCi0gbnVtZXJvIGRpIG1hY2NoaW5lIDw9IDgsIGxhIHByaW9yaXTgIGRvdnJlYmJlIGVzc2VyZSBkYXRhIGEgTGlicmEgaW4gcXVhbnRvIGNhcGFjZSBkaSBnZW5lcmFyZSBsJ2luY3JlbWVudG8gbWFnZ2lvcmU7ICANCi0gMTUgPD0gbnVtZXJvIGRpIG1hY2NoaW5lIDw9IDQ3LCBsYSBwcmlvcml04CBkb3ZyZWJiZSBlc3NlcmUgZGF0YSBhZCBBcmllcyBpbiBxdWFudG8gY2FwYWNlIGRpIGdlbmVyYXJlIGwnaW5jcmVtZW50byBtYWdnaW9yZTsgIA0KLSA4IDwgbnVtZXJvIGRpIG1hY2NoaW5lIDwgMTUsIHF1ZXN0byBpbnRlcnZhbGxvIOggdmFsaWRvIHNvbGFtZW50ZSBwZXIgQXJpZXMsIHR1dHRhdmlhIGwnaW5jcmVtZW50byB0b3RhbGUgZ2VuZXJhdG8gc2FyZWJiZSBjb211bnF1ZSBpbmZlcmlvcmUgYSBxdWVsbG8gcHJvZG90dG8gZGEgTGlicmEgY29uIDggbWFjY2hpbmUsIHF1aW5kaSBzaSBwcmVmZXJpc2NlIGFuY29yYSB1bmEgdm9sdGEgTGlicmEuICANClF1ZXN0aW9uZSBkaSBlcXVhemlvbmk6ICQkIDE1OTE4ICogOCA9IDg3OTd4JCQNCg0KDQpWaW5jb2xvIDINClNpIHJpY29yZGEgY2hlIGNpYXNjdW4gdmluY29sbyDoIHN0YXRvICJzZG9wcGlhdG8iIGluIHF1YW50byBuZWNlc3NhcmlvIHNpYSBsJ3VwcGVyIGNoZSBpbCBsb3dlciBib3VuZC4NCmBgYHtyfQ0KdmluY29sbzIgPC0gc2hhZG93X3ByaWNlWzM6MTgsXQ0Ka25pdHI6OmthYmxlKHZpbmNvbG8yKSANCmBgYA0KDQoNCkxldCdzIGxvb2sgdGhlIHVwcGVyIGJvdW5kIHRvIGtub3cgd2hpY2ggc2VjdGlvbiBoYXZlIHRoZSBtYXhpbXVtIG51bWJlciBvZiBtYWNoaW5lcy4gIA0KT25seSBjb25zdHJhaW50cyBuLiAxNCBuLiAxNiBhcmUgYmluZGluZywgdGhpcyBtZWFuczogIA0KLSBJbiBBcmllcyB0aGUgU2VjdGlvbiB0aGF0IHJlY2VpdmVzIG1vcmUgbWFjaGluZXMgKDAuMTggb2YgdGhlIHRvdGFsKSBpcyAiUmVzdGF1cmFudCBQbGF6YSIgKGNvbnN0cmFpbnQgNyk7ICANCi0gSW4gTGlicmEgdGhlIFNlY3Rpb24gdGhhdCByZWNlcml2ZXMgbW9yZSBtYWNoaW5lcyAoMC4zNSBvZiB0aGUgdG90YWwpIGlzICJJbnRlcmlvciIgKGNvbnN0cmFpbnQgNikuICANCg0KTGV0J3MgbG9vayB0aGUgbG93ZXIgYm91bmQgdG8ga25vdyB3aGljaCBzZWN0aW9uIGhhdmUgdGhlIG1pbmltdW0gbnVtYmVyIG9mIG1hY2hpbmVzLiAgDQpJbiB0aGlzIGNhc2UgY29uc3RyYWludHMgbi4gNSw3LDkgcmVjZWl2ZWQgdGhlIG1pbmltdW4gbnVtYmVyIG9mIG1hY2hpbmVzOiB0aGUgbnVtYmVyIG9mIG1hY2hpbmVzIGlzIGp1c3Qgc3VmZmljaWVudCB0byBjb3ZlciB0aGUgbG93ZXIgYm91bmQsIHRoaXMgbWVhbnM6ICANCi0gSW4gQXJpZXMgb25lIFNlY3Rpb24sIEVudHJhY2UsIHJlY2VpdmVzIGxlc3MgbWFjaGluZXMgdGhhdCB0aGUgb3RoZXIgb25lczsgIA0KLSBJbiBMaWJyYSB0d28gU2VjdGlvbnMsIEJvdW5kYXJ5IGFuZCBFbnRyYW5jZSwgcmVjZWl2ZSBsZXNzIG1hY2hpbmVzIHRoYXQgdGhlIG90aGVyIG9uZXMuICANCg0KQWxzbyBpbiB0aGlzIGNhc2Ugd2UgY2FuIHNlZSB0aGUgZHVhbCAoc2hhZG93IHByaWNlKSBhbmQgZHVhbC5yZWcgdG8gZGVjaWRlIHdoaWNoIHNlY3Rpb24gY291bGQgaGF2ZSBtb3JlIG1hY2hpbmVzLg0KDQpMYXN0IG9uZTogTnVtYmVyIG9mIG1hY2hpbmVzIG9mIGVhY2ggY2F0ZWdvcnkgaW4gZWFjaCBzZWN0aW9uDQpXZSByZW1pbmQgdGhhdCBlYWNoIGNvbnN0cmFpbnQgaGFzIGxvd2VyIGFuZCB1cHBlciBib3VuZC4NCmBgYHtyfQ0KdmluY29sbzMgPC0gc2hhZG93X3ByaWNlWzE5Omxlbmd0aChzaGFkb3dfcHJpY2VbLDFdKSxdDQpyb3duYW1lcyh2aW5jb2xvMykgPC0gMTpsZW5ndGgodmluY29sbzNbLDFdKQ0Ka25pdHI6OmthYmxlKGhlYWQodmluY29sbzMpKQ0KYGBgDQoNCkxldCdzIGxvb2sgdGhlIHVwcGVyIGJvdW5kIHRvIGtub3cgd2hpY2ggY2F0ZWdvcnkgaW4gZWFjaCBzZWN0aW9uIGhhdmUgdGhlIG1heGltdW0gbnVtYmVyIG9mIG1hY2hpbmVzLg0KYGBge3J9DQprbml0cjo6a2FibGUodmluY29sbzNbdmluY29sbzMkYWN0dWFsID09IHZpbmNvbG8zJGJ2ZWMgJiB2aW5jb2xvMyRkaXIgPT0gIjw9IiwgXSkNCmBgYA0KT2sgcXVlc3RlIHNvbm8gbGUgY2F0ZWdvcmllIGNoZSBpbiBvZ25pIHNlemlvbmUgaGFubm8gcmljZXZ1dG8gaWwgbnVtZXJvIG1hc3NpbW8gZGkgbWFjY2hpbmU6IHJpZXNjaSBhIGZhcm1pIHVuYSBmdW56aW9uY2luYSBjaGUgbWkgcmljb25kdWNhIGFsbGUgbWFjY2hpbmUgZGVsIGRhdGFmcmFtZSBkaSBwYXJ0ZW56YT8gRm9yc2UgdGkgY29udmllbmUgdXNhcmUgaWwgZGF0YWZyYW1lIGNoZSBobyBjb3N0cnVpdG8gcHJpbWEgInZpbmNvbG8gMyIgY2hlIGNvbnRpZW5lIHNvbGFtZW50ZSBsZSBpbmZvcm1hemlvbmkgcmVsYXRpdmUgYWwgdGVyem8gdmluY29sbyAodXBwZXIgZSBsb3dlciBib3VuZCkuIEhvIHJpb3JkaW5hdG8gbGUgcmlnaGUgZGEgMSBhIDE1NiBjb24gcm93bmFtZXMgcGVuc2FuZG8gc2Vydmlzc2UuIA0KDQouLi5TZWNvbmQgUGFydC4uLg0KYGBge3J9DQprbml0cjo6a2FibGUoc29sJGFsbHZhcikNCmBgYA0K</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgU2Vuc2l0aXZpdHkgQW5hbHlzaXMgZm9yIGNhc2lubyBmbG9vciBvcHRpbWl6YXRpb24iDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpgYGB7cn0NCiMgbG9hZCByIG9iamVjdCB3aXRoIHRoZSBzb2x1dGlvbnMgZm9yIGVhY2ggbW9udGgNCmxvYWQoInNvbHV0aW9ucy5SRGF0YSIpDQpgYGANCg0KDQojU2Vuc2l0aXZpdHkgQW5hbHlzaXMNCk5lbCByaXNvbHZlcmUgdW4gcHJvYmxlbWEgZGkgUEwgc2kgYXNzdW1lIGNoZSBpIGNvZWZmaWNpZW50aSBzaWFubyBjb25vc2NpdXRpIGNvbiBjZXJ0ZXp6YSwgbWEgbmVsbGEgcmVhbHTgIHF1ZXN0YSBjZXJ0ZXp6YSBxdWFzaSBtYWkgZXNpc3RlLiBMYSBTZW5zaXRpdml0eSBBbmFseXNpcyDoIGxhIGZhc2UgcG9zdCBtb2RlbGxhemlvbmUgY2hlIHBlcm1ldHRlIGRpIHZhbHV0YXJlIGxhIGJvbnTgIGRlbCBtb2RlbGxvIGNyZWF0bywgb3Z2ZXJvIHF1YW50byBsYSBzb2x1emlvbmUgb3R0aW1hbGUg6CBzZW5zaWJpbGUgYSB2YXJpYXppb25pIGRlaSBjb2VmZmljaWVudGkgZGVsIG1vZGVsbG8gKHZpbmNvbGkgZSBGLk8uKS4gIA0KQSB0aXRvbG8gZCdlc2VtcGlvLCB2ZXJy4CBlZmZldHR1YXRhIGxhIFNBIHNvbG8gcGVyIGxhIHNvbHV6aW9uZSBkZWwgbWVzZSBkaSBzZXR0ZW1icmU6IOggY2hpYXJvIGNoZSBzaWEgcG9zc2liaWxlIHJlcGxpY2FyZSBpbCBsYXZvcm8gcGVyIGkgbWVzaSBzdWNjZXNzaXZpIGVmZmV0dHVhbmRvIGkgZG92dXRpIGFjY29yZ2ltZW50aS4gDQoNClZpbmNvbG8gMSANCmBgYHtyfQ0Kc29sIDwtIHNvbHMkYDIwMTEtMDktMDFgDQpzaGFkb3dfcHJpY2UgPC0gc29sJGNvbg0KdmluY29sbzEgPC0gc2hhZG93X3ByaWNlWzE6MixdDQprbml0cjo6a2FibGUodmluY29sbzEpIA0KYGBgDQpPc3NlcnZhemlvbmk6ICAgDQotIENpYXNjdW4gdmluY29sbyDoIHBpZW5hbWVudGUgc29kZGlzZmF0dG8sIGVyZ28gaWwgbnVtZXJvIGRpIG1hY2NoaW5lIHRvdGFsaSBwZXIgQXJpZXMgZSBMaWJyYSByZXN0YSBxdWVsbG8gZGVsbGEgY29uZmlndXJhemlvbmUgaW5pemlhbGU7ICAgIA0KLSBWb2xlbmRvIGF1bWVudGFyZSBsYSBkaXNwb25pYmlsaXTgIGRpIG1hY2NoaW5lIHBlciB1bm8gZGVpIGR1ZSBDYXNpbvIgZG92cmVtbW8gZ3VhcmRhcmUgaWwgdmFsb3JlIGRlaSBwcmV6emkgb21icmEgKGR1YWwpIGUgbGEgcmVnaW9uZSAoZHVhbC5yZWcpIGRvdmUgdGFsaSB2YWxvcmkgc29ubyB2YWxpZGkuICANClNpIG5vdGEgY2hlIHBlciBvZ25pIG1hY2NoaW5hIGFkZGl6aW9uYWxlIGFsbG9jYXRhIGFkIEFyaWVzIGxhIEZ1bnppb25lIE9iaWV0dGl2byBhdW1lbnRhIGRpIGV1cm8gMTEwOTUgKGR1YWwpIGUgY2hlIGwnaW5jcmVtZW50byBtYXNzaW1vIGNvbnNlbnRpdG8g6CBkaSA0MCBtYWNjaGluZS4gUGVyIExpYnJhIGludmVjZSBvZ25pIG1hY2NoaW5hIGFkZGl6aW9uYWxlIGNvbnNlbnRlIGFsbGEgRnVuemlvbmUgT2JpZXR0aXZvIGRpIGF1bWVudGFyZSBpbCBzdW8gdmFsb3JlIHBlciBldXJvIDExNTYyLG1hIGwnaW5jcmVtZW50byBtYXNzaW1vIGNvbnNlbnRpdG8g6CBuZXR0YW1lbnRlIG1pbm9yZSAyMCBtYWNjaGluZS4gUG90ZW5kbyBzY2VnbGllcmUgZGkgaW5jcmVtZW50YXJlIGxhIGRpc3BvbmliaWxpdOAgZGkgbWFjY2hpbmUgcGVyIHVubyBzb2xvIGRlaSAyIENhc2lu8iwgTERFIGRvdnJlYmJlIGNvbXBvcnRhcnNpIGluIG1hbmllcmEgZGlmZmVyZW50ZSBhIHNlY29uZGEgZGVsIG51bWVybyBkaSBtYWNjaGluZSBhIGRpc3Bvc2l6aW9uZToNCi0gbnVtZXJvIGRpIG1hY2NoaW5lIDw9IDIwLCBsYSBwcmlvcml04CBkb3ZyZWJiZSBlc3NlcmUgZGF0YSBhIExpYnJhIGluIHF1YW50byBjYXBhY2UgZGkgZ2VuZXJhcmUgbCdpbmNyZW1lbnRvIG1hZ2dpb3JlOyAgDQotIDIwIDwgbnVtZXJvIGRpIG1hY2NoaW5lIDw9IDQwLCBsYSBwcmlvcml04CBkb3ZyZWJiZSBlc3NlcmUgZGF0YSBhZCBBcmllcyBpbiBxdWFudG8gY2FwYWNlIGRpIGdlbmVyYXJlIGwnaW5jcmVtZW50byBtYWdnaW9yZTsgIA0KUXVlc3Rpb25lIGRpIGVxdWF6aW9uaTogJCQxMTU2MiAqIDIwID0gMTEwOTV4JCQNCg0KDQpWaW5jb2xvIDINClNpIHJpY29yZGEgY2hlIGNpYXNjdW4gdmluY29sbyDoIHN0YXRvICJzZG9wcGlhdG8iIGluIHF1YW50byBuZWNlc3NhcmlvIHNpYSBsJ3VwcGVyIGNoZSBpbCBsb3dlciBib3VuZC4NCmBgYHtyfQ0KdmluY29sbzIgPC0gc2hhZG93X3ByaWNlWzM6MTgsXQ0Ka25pdHI6OmthYmxlKHZpbmNvbG8yKSANCmBgYA0KRGFsIHZpbmNvbG8gbnVtZXJvIDMgYWwgdmluY29sbyBudW1lcm8gMTAgc2kgdHJhdHRhIGRlbGxlIHNlemlvbmkgZGkgQXJpZXMsIG1lbnRyZSBkYWwgdmluY29sbyBudW1lcm8gMTEgYWwgMTggZGVsbGUgc2V6aW9uaSBkaSBMaWJyYTsgbCdvcmRpbmUgZGVsbGUgc2V6aW9uaSDoIGlsIG1lZGVzaW1vIHBlciBpIGR1ZSBDYXNpbvI6IEJvdW5kYXJ5LCBFbnRyYW5jZSwgSW50ZXJpb3IsIFJlc3RhdXJhbnQgUGxhemEuICANClZhbHV0YW5kbyBsJ3VwcGVyIGUgaWwgbG93ZXIgYm91bmQgZGkgY2lhc2N1biB2aW5jb2xvIHBvc3NpYW1vIGNhcGlyZSBxdWFsaSBzb25vIHN0YXRlIGxlIHNlemlvbmkgY2hlIGhhbm5vIHJpY2V2dXRvIGlsIG1hZ2dpb3IvbWlub3IgbnVtZXJvIGRpIG1hY2NoaW5lOiAgDQotIFBlciBBcmllcywgbGEgc2V6aW9uZSBjaGUgaGEgcmljZXZ1dG8gaWwgbWFnZ2lvciBudW1lcm8gZGkgbWFjY2hpbmUgKDI0OCkg6CBSZXN0YXVyYW50IFBsYXphICh1cHBlciBib3VuZCBzb2RkaXNmYXR0bykuIE1lbnRyZSBsZSBzZXppb25pIEVudHJhbmNlIGVkIEludGVyaW9yIGhhbm5vIHJpY2V2dXRvIGlsIG1pbm9yIG51bWVybyBkaSBtYWNjaGluZSAoMTg3KTogc29sYW1lbnRlIGlsIGxvd2VyIGJvdW5kIHZpZW5lIHNvZGRpc2ZhdHRvOw0KLSBQZXIgTGlicmEgaWwgZGlzY29yc28g6CBkaXZlcm86IEJvdW5kYXJ5IGVkIEVudHJhbmNlIHJpY2V2b25vIGlsIG1pbm9yIG51bWVybyBkaSBtYWNjaGluZSBwb3NzaWJpbGkgKDM5KSwgbWVudHJlIGEgcmVnaXN0cmFyZSBpbCBib3R0aW5vIHBpZW5vIGluIHRlcm1pbmkgZGkgbWFjY2hpbmUg6CBsYSBzZXppb25lIEludGVyaW9yICg4MiBtYWNjaGluZSkuICANCkNvbWUgbmVsIGNhc28gcHJlY2VkZW50ZSDoIHBvc3NpYmlsZSB2YWx1dGFyZSBpIHByZXp6aSBvbWJyYSBlIGxhIHJlZ2lvbmUgb3ZlIHF1ZXN0aSBzb25vIHZhbGlkaSBwZXIgZGVjaWRlcmUgcXVhbGUgc2lhIGxhIHNlemlvbmUgZGEgcHJlbWlhcmUgaW4gY2FzbyBkaSBtYWNjaGluZSBhZ2dpdW50aXZlIGRpc3BvbmliaWxpIG5lbCBtZXNlIGluIHF1ZXN0aW9uZS4NCg0KVmluY29sbyBudW1lcm8gMw0KYGBge3J9DQp2aW5jb2xvMyA8LSBzaGFkb3dfcHJpY2VbMTk6bGVuZ3RoKHNoYWRvd19wcmljZVssMV0pLF0NCnJvd25hbWVzKHZpbmNvbG8zKSA8LSAxOmxlbmd0aCh2aW5jb2xvM1ssMV0pDQprbml0cjo6a2FibGUoaGVhZCh2aW5jb2xvMykpDQpgYGANCg0KUXVlc3RlIGRvdnJlYmJlcm8gZXNzZXJlIHR1dHRlIGxlIG1hY2NoaW5lIGNoZSBoYW5ubyBzb2RkaXNmYXR0byBsJ3VwcGVyIGJvdW5kLCBlcmdvIGNoZSBoYW5ubyByaWNldnV0byBpbCBtYXggZGkgbWFjY2hpbmUgcG9zc2liaWxpLg0KYGBge3J9DQprbml0cjo6a2FibGUodmluY29sbzNbdmluY29sbzMkYWN0dWFsID09IHZpbmNvbG8zJGJ2ZWMgJiB2aW5jb2xvMyRkaXIgPT0gIjw9IiwgXSkNCmBgYA0KT2sgcXVlc3RlIHNvbm8gbGUgY2F0ZWdvcmllIGNoZSBpbiBvZ25pIHNlemlvbmUgaGFubm8gcmljZXZ1dG8gaWwgbnVtZXJvIG1hc3NpbW8gZGkgbWFjY2hpbmU6IHJpZXNjaSBhIGZhcm1pIHVuYSBmdW56aW9uY2luYSBjaGUgbWkgcmljb25kdWNhIGFsbGUgbWFjY2hpbmUgZGVsIGRhdGFmcmFtZSBkaSBwYXJ0ZW56YT8gRm9yc2UgdGkgY29udmllbmUgdXNhcmUgaWwgZGF0YWZyYW1lIGNoZSBobyBjb3N0cnVpdG8gcHJpbWEgInZpbmNvbG8gMyIgY2hlIGNvbnRpZW5lIHNvbGFtZW50ZSBsZSBpbmZvcm1hemlvbmkgcmVsYXRpdmUgYWwgdGVyem8gdmluY29sbyAodXBwZXIgZSBsb3dlciBib3VuZCkuIEhvIHJpb3JkaW5hdG8gbGUgcmlnaGUgZGEgMSBhIDE1NiBjb24gcm93bmFtZXMgcGVuc2FuZG8gc2Vydmlzc2UuIA0KDQpQYXJ0ZSAyIC0+IGNvZWZmaWNpZW50aSBGdW56aW9uZSBPYmlldHRpdm8NCmBgYHtyfQ0Ka25pdHI6OmthYmxlKHNvbCRhbGx2YXIpDQpgYGANCg==</div>
 
 
 

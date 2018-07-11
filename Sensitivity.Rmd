@@ -23,11 +23,10 @@ knitr::kable(vincolo1)
 Osservazioni:   
 - Ciascun vincolo è pienamente soddisfatto, ergo il numero di macchine totali per Aries e Libra resta quello della configurazione iniziale;    
 - Volendo aumentare la disponibilità di macchine per uno dei due Casinò dovremmo guardare il valore dei prezzi ombra (dual) e la regione (dual.reg) dove tali valori sono validi.  
-Si nota che per ogni macchina addizionale allocata ad Aries la Funzione Obiettivo aumenta di euro 8797 (dual) e che l'incremento massimo consentito è di 47 macchine. Per Libra invece ogni macchina addizionale consente alla Funzione Obiettivo di aumentare il suo valore per euro 15918,ma l'incremento massimo consentito è nettamente minore (7 macchine). Potendo scegliere di incrementare la disponibilità di macchine per uno solo dei 2 Casinò, LDE dovrebbe comportarsi in maniera differente a seconda del numero di macchine a disposizione:
-- numero di macchine <= 8, la priorità dovrebbe essere data a Libra in quanto capace di generare l'incremento maggiore;  
-- 15 <= numero di macchine <= 47, la priorità dovrebbe essere data ad Aries in quanto capace di generare l'incremento maggiore;  
-- 8 < numero di macchine < 15, questo intervallo è valido solamente per Aries, tuttavia l'incremento totale generato sarebbe comunque inferiore a quello prodotto da Libra con 8 macchine, quindi si preferisce ancora una volta Libra.  
-Questione di equazioni: $$ 15918 * 8 = 8797x$$
+Si nota che per ogni macchina addizionale allocata ad Aries la Funzione Obiettivo aumenta di euro 11095 (dual) e che l'incremento massimo consentito è di 40 macchine. Per Libra invece ogni macchina addizionale consente alla Funzione Obiettivo di aumentare il suo valore per euro 11562,ma l'incremento massimo consentito è nettamente minore 20 macchine. Potendo scegliere di incrementare la disponibilità di macchine per uno solo dei 2 Casinò, LDE dovrebbe comportarsi in maniera differente a seconda del numero di macchine a disposizione:
+- numero di macchine <= 20, la priorità dovrebbe essere data a Libra in quanto capace di generare l'incremento maggiore;  
+- 20 < numero di macchine <= 40, la priorità dovrebbe essere data ad Aries in quanto capace di generare l'incremento maggiore;  
+Questione di equazioni: $$11562 * 20 = 11095x$$
 
 
 Vincolo 2
@@ -36,35 +35,26 @@ Si ricorda che ciascun vincolo è stato "sdoppiato" in quanto necessario sia l'up
 vincolo2 <- shadow_price[3:18,]
 knitr::kable(vincolo2) 
 ```
+Dal vincolo numero 3 al vincolo numero 10 si tratta delle sezioni di Aries, mentre dal vincolo numero 11 al 18 delle sezioni di Libra; l'ordine delle sezioni è il medesimo per i due Casinò: Boundary, Entrance, Interior, Restaurant Plaza.  
+Valutando l'upper e il lower bound di ciascun vincolo possiamo capire quali sono state le sezioni che hanno ricevuto il maggior/minor numero di macchine:  
+- Per Aries, la sezione che ha ricevuto il maggior numero di macchine (248) è Restaurant Plaza (upper bound soddisfatto). Mentre le sezioni Entrance ed Interior hanno ricevuto il minor numero di macchine (187): solamente il lower bound viene soddisfatto;
+- Per Libra il discorso è divero: Boundary ed Entrance ricevono il minor numero di macchine possibili (39), mentre a registrare il bottino pieno in termini di macchine è la sezione Interior (82 macchine).  
+Come nel caso precedente è possibile valutare i prezzi ombra e la regione ove questi sono validi per decidere quale sia la sezione da premiare in caso di macchine aggiuntive disponibili nel mese in questione.
 
-
-Let's look the upper bound to know which section have the maximum number of machines.  
-Only constraints n. 14 n. 16 are binding, this means:  
-- In Aries the Section that receives more machines (0.18 of the total) is "Restaurant Plaza" (constraint 7);  
-- In Libra the Section that recerives more machines (0.35 of the total) is "Interior" (constraint 6).  
-
-Let's look the lower bound to know which section have the minimum number of machines.  
-In this case constraints n. 5,7,9 received the minimun number of machines: the number of machines is just sufficient to cover the lower bound, this means:  
-- In Aries one Section, Entrace, receives less machines that the other ones;  
-- In Libra two Sections, Boundary and Entrance, receive less machines that the other ones.  
-
-Also in this case we can see the dual (shadow price) and dual.reg to decide which section could have more machines.
-
-Last one: Number of machines of each category in each section
-We remind that each constraint has lower and upper bound.
+Vincolo numero 3
 ```{r}
 vincolo3 <- shadow_price[19:length(shadow_price[,1]),]
 rownames(vincolo3) <- 1:length(vincolo3[,1])
 knitr::kable(head(vincolo3))
 ```
 
-Let's look the upper bound to know which category in each section have the maximum number of machines.
+Queste dovrebbero essere tutte le macchine che hanno soddisfatto l'upper bound, ergo che hanno ricevuto il max di macchine possibili.
 ```{r}
 knitr::kable(vincolo3[vincolo3$actual == vincolo3$bvec & vincolo3$dir == "<=", ])
 ```
 Ok queste sono le categorie che in ogni sezione hanno ricevuto il numero massimo di macchine: riesci a farmi una funzioncina che mi riconduca alle macchine del dataframe di partenza? Forse ti conviene usare il dataframe che ho costruito prima "vincolo 3" che contiene solamente le informazioni relative al terzo vincolo (upper e lower bound). Ho riordinato le righe da 1 a 156 con rownames pensando servisse. 
 
-...Second Part...
+Parte 2 -> coefficienti Funzione Obiettivo
 ```{r}
 knitr::kable(sol$allvar)
 ```
