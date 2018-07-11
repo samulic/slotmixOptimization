@@ -13,7 +13,7 @@ library(lubridate)
 library(caret)
 library(linprog)
 options(scipen = 999)
-slot <- readxl::read_excel("data/Lucky Duck Entertainment revenue 2013.xls", na = c(".", "NA", "NaN"))
+slot <- readxl::read_excel("Lucky Duck Entertainment revenue 2013.xls", na = c(".", "NA", "NaN"))
 str(slot)
 ```
 
@@ -145,45 +145,6 @@ summary(sol2)
 sol2$con
 ```
 
-#Soluzione Gabri
-Proporzione minima e massima per la serie storica intera diventano le soglie per tutti i mesi (cioe' fisse). 
-```{r}
-# Da notare, rispetto alla soluzione precedente, l'ordine in dummyVars differente
-f.A2 <- t(predict(dummyVars(~ Casino : Section, data = df), newdata = df))
-# see previous ": factor(Month)". In this case i think that putting Section or Casino first doesn't change the result.
-
-# Duplicate every row, needed because for each section/month/casino we need a lower and upper bound. 
-# Retain order --> ob1-low, obs1-up, obs2-low, ...)
-f.A2 <- as.tibble(f.A2) %>% slice(rep(1:n(), each = 2)) %>% as.matrix()
-
-#I vincoli sono attivati nel seguente modo 
-# mese1-casino1-sez1-low,
-# mese1-casino1-sez1-up,
-# mese1-casino2-sez1;
-# mese1-casino1-sez2;
-# mese2;...
-
-#nslots contiene il numero di slot per ogni casino e mese, alternato per casino (mese1 casino1, mese1 casino2, mese2 casino1, ...)
-# combine nslots in two columns, where rows are months and columns are casino (first for Aries)
-numslots <- matrix(nslots, ncol = 2, byrow = T)
-f.b2 <- c()
-# probabilmente si puo' fare senza il ciclo for, ma come??
-for (i in 1:nrow(numslots)) {
-  f.b2 <- c(f.b2, rep(round(c(numslots[i,1]*.2, numslots[i,1]*.32, numslots[i,2]*0.18, numslots[i,2]*0.35)), 4))
-}
-f.dir2 <- rep(c(">=", "<="), length(f.b2)/2) # direction of the inequalities
-
-sol2 <- solveLP(f.obj, f.b2, f.A2, maximum = TRUE, const.dir = f.dir2) #solver 
-sol2bis <- lp(direction = "max", objective.in = f.obj, const.mat = f.A2, const.dir = f.dir2, const.rhs = f.b2)
-
-summary(sol2)
-sol2$con
-
-#To see solution on the original dataset
-# df[which(sol2$solution != 0),] %>%
-#   arrange(Casino, tipo) %>%
-#   View()
-```
 
 Vincolo 3 - Preprocessing
 ```{r}
