@@ -13,8 +13,16 @@ load("solutions.RData")
 Nel risolvere un problema di PL si assume che i coefficienti siano conosciuti con certezza, ma nella realt? questa certezza quasi mai esiste. La Sensitivity Analysis ? la fase post modellazione che permette di valutare la bont? del modello creato, ovvero quanto la soluzione ottimale ? sensibile a variazioni dei coefficienti del modello (vincoli e F.O.).  
 A titolo d'esempio, verr? effettuata la SA solo per la soluzione del mese di settembre: ? chiaro che sia possibile replicare il lavoro per i mesi successivi effettuando i dovuti accorgimenti. 
 
+```{r, include=FALSE}
+library(lubridate)
+library(dplyr)
+library(ggplot2)
+```
+
+
 Assegna nome ai vincoli
 ```{r}
+df <- df %>% filter(Month == ymd("2011-09-01"))
 vincoli.names <- with(df, paste(Casino,Section,MachineType,Denomination, sep="_"))
 first <- c("Aries", "Libra")
 second <- expand.grid(c('low', 'up'), unique(df$Section), unique(df$Casino))
@@ -34,45 +42,72 @@ vincolo1 <- shadow_price[1:2,]
 knitr::kable(vincolo1) 
 ```
 Osservazioni:   
-- Ciascun vincolo ? pienamente soddisfatto, ergo il numero di macchine totali per Aries e Libra resta quello della configurazione iniziale;    
-- Volendo aumentare la disponibilit? di macchine per uno dei due Casin? dovremmo guardare il valore dei prezzi ombra (dual) e la regione (dual.reg) dove tali valori sono validi.  
-Si nota che per ogni macchina addizionale allocata ad Aries la Funzione Obiettivo aumenta di euro 11095 (dual) e che l'incremento massimo consentito ? di 40 macchine. Per Libra invece ogni macchina addizionale consente alla Funzione Obiettivo di aumentare il suo valore per euro 11562,ma l'incremento massimo consentito ? nettamente minore 20 macchine. Potendo scegliere di incrementare la disponibilit? di macchine per uno solo dei 2 Casin?, LDE dovrebbe comportarsi in maniera differente a seconda del numero di macchine a disposizione:
-- numero di macchine <= 20, la priorit? dovrebbe essere data a Libra in quanto capace di generare l'incremento maggiore;  
-- 20 < numero di macchine <= 40, la priorit? dovrebbe essere data ad Aries in quanto capace di generare l'incremento maggiore;  
+- Ciascun vincolo è pienamente soddisfatto, ergo il numero di macchine totali per Aries e Libra resta quello della configurazione iniziale;    
+- Volendo aumentare la disponibilità di macchine per uno dei due Casinò dovremmo guardare il valore dei prezzi ombra (dual) e la regione (dual.reg) dove tali valori sono validi.  
+Si nota che per ogni macchina addizionale allocata ad Aries la Funzione Obiettivo aumenta di euro 11095 (dual) e che l'incremento massimo consentito è di 40 macchine. Per Libra invece ogni macchina addizionale consente alla Funzione Obiettivo di aumentare il suo valore per euro 11562, ma l'incremento massimo consentito è esattamente la metà, 20 macchine. Potendo scegliere di incrementare la disponibilità di macchine per uno solo dei 2 Casinò, LDE potrebbe perseguire 2 strategie differenti:
+- numero di macchine <= 20, la priorità dovrebbe essere data a Libra in quanto capace di generare l'incremento maggiore;  
+- 20 < numero di macchine <= 40, la priorità dovrebbe essere data ad Aries in quanto capace di generare l'incremento maggiore;  
 Questione di equazioni: $$11562 * 20 = 11095x$$
 
 
 Vincolo 2
-Si ricorda che ciascun vincolo ? stato "sdoppiato" in quanto necessario sia l'upper che il lower bound.
+Si ricorda che ciascun vincolo è stato "sdoppiato" poichè necessario sia l'upper che il lower bound del vincolo stesso.
 ```{r}
 vincolo2 <- shadow_price[3:18,]
 knitr::kable(vincolo2) 
 ```
-Dal vincolo numero 3 al vincolo numero 10 si tratta delle sezioni di Aries, mentre dal vincolo numero 11 al 18 delle sezioni di Libra; l'ordine delle sezioni ? il medesimo per i due Casin?: Boundary, Entrance, Interior, Restaurant Plaza.  
-Valutando l'upper e il lower bound di ciascun vincolo possiamo capire quali sono state le sezioni che hanno ricevuto il maggior/minor numero di macchine:  
-- Per Aries, la sezione che ha ricevuto il maggior numero di macchine (248) ? Restaurant Plaza (upper bound soddisfatto) che era la sezione con il numero minore di slot. Mentre le sezioni Entrance ed Interior hanno ricevuto il minor numero di macchine (187): solamente il lower bound viene soddisfatto (in questo caso erano le sezioni con piu' macchine, rispettivamente 219 e 248);
-- Per Libra il discorso ? diverso: Boundary ed Entrance ricevono il minor numero di macchine possibili (39), mentre a registrare il bottino pieno in termini di macchine ? la sezione Interior (82 macchine), quella con meno slot nei dati (39).  
-Questi risultati sono in linea con quanto ci aspettavamo dal grafico X ("Distribuzione dei ricavi mensili delle slot per categoria e sezione nei due casino") dove si vedeva un profitto maggiore in per alcune combinazioni di tipologia-sezione e casino.
+Dal vincolo numero 3 al vincolo numero 10 si tratta delle sezioni di Aries, mentre dal vincolo numero 11 al 18 delle sezioni di Libra; l'ordine delle sezioni è il medesimo per i due Casinò: Boundary, Entrance, Interior, Restaurant Plaza.  
+Valutando l'upper e il lower bound di ciascun vincolo possiamo capire quali sezioni hanno ricevuto il maggior/minor numero di macchine:  
+- In "Aries", la sezione "Restaurant Plaza" è quella che riceve più macchine in assoluto (upper bound soddisfatto): abbiamo un cambio strutturale rispetto alla configurazione precedente dove "Restaurant Plaza" era la sezione con il minor numero di slot. Le sezioni Entrance ed Interior hanno ricevuto il minor numero di macchine (187): solamente il lower bound viene soddisfatto (in questo caso erano le sezioni con piu' macchine, rispettivamente 219 e 248);
+- In "Libra"" il discorso è diverso: Boundary ed Entrance ricevono il minor numero di macchine possibili (39), mentre a registrare il bottino pieno in termini di slot è la sezione Interior (82 macchine), anche in questo caso sottolineamo il cambio strutturale: Interior nella precedente disposizione aveva solo 39.  
+Sorpesa?!  
+Questi risultati sono in linea con quanto ci aspettavamo dal grafico X ("Distribuzione dei ricavi mensili delle slot per categoria e sezione nei due casino") dove si vedeva un profitto maggiore per alcune combinazioni di tipologia-sezione e casino.
 
---> quindi ci aspettiamo molte piu' video che reel in Aries. --> possibile vincolo sul tipo (video, reel)..?
-
-Come nel caso precedente ? possibile valutare i prezzi ombra e la regione ove questi sono validi per decidere quale sia la sezione da premiare in caso di macchine aggiuntive disponibili nel mese in questione.
+--> quindi ci aspettiamo molte piu' video che reel in Aries. --> possibile vincolo sul tipo (video, reel), chiediamo al Manager?!  
+Concludiamo il discorso dicendo che, come nel caso precedente, è possibile valurare valore e regione di validità dei prezzi ombra per individuare possibili variazioni nel numero di slot per sezione.
 
 Vincolo numero 3
+Si ricorda che ciascun vincolo è stato "sdoppiato" poichè necessario sia l'upper che il lower bound del vincolo stesso.  
 ```{r}
 vincolo3 <- shadow_price[19:dim(shadow_price)[1],]
+vincolo3$rownames <- row.names(vincolo3)
+vincolo3 <- vincolo3[c(7,1:6)]
+vincolo3 <- vincolo3 %>% arrange(rownames, dual)
 slots_sum <- group_by(df, Section, tipo, Casino) %>% summarise(sum = sum(numero_macchine))
 knitr::kable(head(vincolo3, n = 20))
 ```
 
-Queste dovrebbero essere tutte le macchine che hanno soddisfatto l'upper bound, ergo che hanno ricevuto il max di macchine possibili.
+Data l'elevato numero di vincoli e quindi la complessità generata in fase di valutazione ci limiteremo a valutare quali categorie hanno ricevuto il numero di slot massimo.
 ```{r}
 knitr::kable(vincolo3[vincolo3$actual == vincolo3$bvec & vincolo3$dir == "<=", ])
 ```
+Come si può facilemente notare le categorie più nobili, in termini di numero di slot ricevute, sono quelle che nel grafico X (file Exploration) si distinguevano per una propensione elevata al ricavo unitario: reel and video per entrmabi i Casinò; Sono proprio queste due categorie a prevalere nella precedente tabella segno che le stesse portano a ricavi maggiori. 
 
---> vincolo sulla numerosita' per denomination, limitare slot con solo puntate alte per andare incontro alle tasche di tutti.
-
-Parte 2 -> coefficienti Funzione Obiettivo
+Quale categoria preferire?...e in quale sezione di quale Casino?
 ```{r}
-knitr::kable(sol$allvar)
+vincolo3 <- vincolo3 %>% mutate(incremento = dual * dual.reg)
+vincolo3 <- vincolo3 %>% arrange(desc(incremento))
+knitr::kable(vincolo3[vincolo3$actual == vincolo3$bvec & vincolo3$dir == "<=", ])
 ```
+Si potrebbe consigliare al manager di LDE di aumentare di 20 macchine la categoria reel_0.05, nella sezione boundary di Aries, poichè quest'ultima permette di incrementare il valore della F.O. di euro 536720. Chiaramente questa considerazione andrebbe ricalibrata qualora le nuove macchine disponibili per LDE fossero di numerosità inferiore a 20: come per il primo vincolo si dovrebbero calcolare tutte le combinazioni possibili al fine di delineare una guida per il gestionale di LDE.
+
+Concludiamo questa parte di valutazione post ottimo valutando quali siano le possibili variazioni per i coefficienti della F.O.. Sottilineamo che questa parte può considersi centrale in quanto i ricavi unitari ottenuti a seguito della categorizzazione sono corretti, ma presentano sicuramente un certo grado di incertezza. Valutare quale sia la variazione consentita a tali valori permette di dare maggiore enfasi sull'ottimo trovato: anche a seguito di variazioni dei coefficienti della F.O. il risultato non cambierebbe. 
+
+Calcoliamo per ogni valore dell F.O. quale sia il suo incremento/decremento massimo
+```{r}
+coef_FO <- sol$allvar[1:78,] #exclude slack variable
+coef_FO$variabili <- vincoli.names
+coef_FO <- coef_FO %>% 
+  select(variabili, min.c, cvec, max.c) %>% 
+  arrange(variabili) %>%
+  mutate(incremento_max = max.c - cvec, decremento_max = cvec - min.c)
+```
+
+Distribuzione dell'incremento e del decremento
+```{r}
+cat("distribuzione incremento massimo\n")
+summary(coef_FO$incremento_max)
+cat("distribuzione decremento massimo\n")
+summary(coef_FO$decremento_max)
+```
+Si nota che la distribuzione di tali valori è molto distribuita quindi anche variazioni considerevoli di un valore dei coefficienti della F.O., non cambierebbe la soluzione ottima trovata.
