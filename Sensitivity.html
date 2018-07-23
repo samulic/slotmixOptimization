@@ -355,16 +355,15 @@ knitr::kable(vincolo2) </code></pre>
 </tr>
 </tbody>
 </table>
-<p>Dal vincolo numero 3 al vincolo numero 10 si tratta delle sezioni di Aries, mentre dal vincolo numero 11 al 18 delle sezioni di Libra; l’ordine delle sezioni è il medesimo per i due Casinò: Boundary, Entrance, Interior, Restaurant Plaza.<br />
-Valutando l’upper e il lower bound di ciascun vincolo possiamo capire quali sezioni hanno ricevuto il maggior/minor numero di macchine:<br />
+<p>Valutando l’upper e il lower bound di ciascun vincolo possiamo capire quali sezioni hanno ricevuto il maggior/minor numero di macchine:<br />
 - In “Aries”, la sezione “Restaurant Plaza” è quella che riceve più macchine in assoluto (upper bound soddisfatto): abbiamo un cambio strutturale rispetto alla configurazione precedente dove “Restaurant Plaza” era la sezione con il minor numero di slot. Le sezioni Entrance ed Interior hanno ricevuto il minor numero di macchine (187): solamente il lower bound viene soddisfatto (in questo caso erano le sezioni con piu’ macchine, rispettivamente 219 e 248);<br />
 - In “Libra”&quot; il discorso è diverso: Boundary ed Entrance ricevono il minor numero di macchine possibili (39), mentre a registrare il bottino pieno in termini di slot è la sezione Interior (82 macchine), anche in questo caso sottolineamo il cambio strutturale: Interior nella precedente disposizione aveva solo 39.<br />
 Sorpesa?!<br />
 Questi risultati sono in linea con quanto ci aspettavamo dal grafico X (“Distribuzione dei ricavi mensili delle slot per categoria e sezione nei due casino”) dove si vedeva un profitto maggiore per alcune combinazioni di tipologia-sezione e casino.<br />
-Concludiamo il discorso dicendo che, come nel caso precedente, è possibile valurare valore e regione di validità dei prezzi ombra per individuare possibili variazioni nel numero di slot per sezione.</p>
+Concludiamo il discorso dicendo che, come nel caso precedente, è possibile valutare valore e regione di validità dei prezzi ombra per individuare possibili variazioni nel numero di slot per sezione.</p>
 </div>
-<div id="vincolo-numero-3" class="section level3">
-<h3>Vincolo numero 3</h3>
+<div id="vincolo-3" class="section level3">
+<h3>Vincolo 3</h3>
 <p>Si ricorda che ciascun vincolo è stato “sdoppiato” poichè necessario sia l’upper che il lower bound del vincolo stesso.</p>
 <pre class="r"><code>vincolo3 &lt;- shadow_price[19:dim(shadow_price)[1],]
 vincolo3$rownames &lt;- row.names(vincolo3)
@@ -895,7 +894,7 @@ knitr::kable(head(vincolo3, n = 20))</code></pre>
 </tr>
 </tbody>
 </table>
-<p>Come si può facilemente notare le categorie più nobili, in termini di numero di slot ricevute, sono quelle che nel grafico X (file Exploration) si distinguevano per una propensione elevata al ricavo unitario: reel and video per entrmabi i Casinò; Sono proprio queste due categorie a prevalere nella precedente tabella segno che le stesse portano a ricavi maggiori.</p>
+<p>Come si può facilemente notare le categorie più nobili, in termini di numero di slot ricevute, sono quelle che nel grafico X (file Exploration) si distinguevano per una propensione elevata al ricavo unitario: reel and video per entrambi i Casinò. Sono proprio queste due categorie a prevalere nella precedente tabella segno che le stesse portano a ricavi maggiori.</p>
 <p>Quale categoria preferire?…e in quale sezione di quale Casino?</p>
 <pre class="r"><code>vincolo3 &lt;- vincolo3 %&gt;% mutate(incremento = dual * dual.reg)
 vincolo3 &lt;- vincolo3 %&gt;% arrange(desc(incremento))
@@ -1281,7 +1280,7 @@ coef_FO &lt;- coef_FO %&gt;%
 <pre class="r"><code>summary(coef_FO$decremento_max)</code></pre>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##      24    2792     Inf     Inf     Inf     Inf</code></pre>
-<p>Si nota che la distribuzione di tali valori è molto distribuita quindi anche variazioni considerevoli di un valore dei coefficienti della F.O., non cambierebbe la soluzione ottima trovata.</p>
+<p>Si nota una certa “dispersione” delle 2 distribuzioni: variazioni considerevoli di un valore dei coefficienti della F.O. non cambierebbero la soluzione ottima trovata.</p>
 </div>
 </div>
 
